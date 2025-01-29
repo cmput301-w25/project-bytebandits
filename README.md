@@ -5,6 +5,7 @@
 | Name        | CCID   | GitHub Username |
 | ----------- | ------ | --------------- |
 | Rasheed Othman | rothman | @rothman5     |
+| Zaid Al-Qadiri | zalqadir | zaidalqadiri     |
 | [Full Name] | [CCID] | [@username]     |
 | [Full Name] | [CCID] | [@username]     |
 | [Full Name] | [CCID] | [@username]     |
