@@ -4,7 +4,7 @@
 
 | Name        | CCID   | GitHub Username |
 | ----------- | ------ | --------------- |
-| [Full Name] | [CCID] | [@username]     |
+| Rasheed Othman | rothman | @rothman5     |
 | [Full Name] | [CCID] | [@username]     |
 | [Full Name] | [CCID] | [@username]     |
 | [Full Name] | [CCID] | [@username]     |
