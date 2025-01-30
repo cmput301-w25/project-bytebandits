@@ -3,14 +3,13 @@
 ## Team Members
 
 | Name            | CCID     | GitHub Username |
-|-----------------|----------|-----------------|
+| --------------- | -------- | --------------- |
 | Rasheed Othman  | rothman  | @rothman5       |
 | Zaid Al-Qadiri  | zalqadir | @zaidalqadiri   |
 | Hanss Rivera    | hanssrap | @Vicescq        |
-| Tony Yang       | tmyang   | @tony_m_yang    |
+| Tony Yang       | tmyang   | @tony-m-yang    |
 | Soham Limbachia | limbachi | @SohamLimbachia |
-| [Full Name]     | [CCID]   | [@username]     |
-| [Full Name]     | [CCID]   | [@username]     |
+| Michael Tran    | mtran7   | @michaeltran14  |
 
 ## Project Description
 
