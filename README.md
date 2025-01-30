@@ -2,15 +2,15 @@
 
 ## Team Members
 
-| Name        | CCID   | GitHub Username |
-| ----------- | ------ | --------------- |
-| Rasheed Othman | rothman | @rothman5     |
-| Zaid Al-Qadiri | zalqadir | @zaidalqadiri     |
-| Hanss Rivera | hanssrap | @Vicescq     |
-| Tony Yang |  tmyang | @tony_m_yang    |
-| [Full Name] | [CCID] | [@username]     |
-| [Full Name] | [CCID] | [@username]     |
-| [Full Name] | [CCID] | [@username]     |
+| Name            | CCID     | GitHub Username |
+|-----------------|----------|-----------------|
+| Rasheed Othman  | rothman  | @rothman5       |
+| Zaid Al-Qadiri  | zalqadir | @zaidalqadiri   |
+| Hanss Rivera    | hanssrap | @Vicescq        |
+| Tony Yang       | tmyang   | @tony_m_yang    |
+| Soham Limbachia | limbachi | @SohamLimbachia |
+| [Full Name]     | [CCID]   | [@username]     |
+| [Full Name]     | [CCID]   | [@username]     |
 
 ## Project Description
 
