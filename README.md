@@ -7,7 +7,7 @@
 | Rasheed Othman | rothman | @rothman5     |
 | Zaid Al-Qadiri | zalqadir | @zaidalqadiri     |
 | Hanss Rivera | hanssrap | @Vicescq     |
-| [Full Name] | [CCID] | [@username]     |
+| Tony Yang |  tmyang | @tony_m_yang    |
 | [Full Name] | [CCID] | [@username]     |
 | [Full Name] | [CCID] | [@username]     |
 | [Full Name] | [CCID] | [@username]     |
