@@ -7,7 +7,7 @@
 | Rasheed Othman  | rothman  | @rothman5       |
 | Zaid Al-Qadiri  | zalqadir | @zaidalqadiri   |
 | Hanss Rivera    | hanssrap | @Vicescq        |
-| Tony Yang       | tmyang   | @tony_m_yang    |
+| Tony Yang       | tmyang   | @tony-m-yang    |
 | Soham Limbachia | limbachi | @SohamLimbachia |
 | Michael Tran    | mtran7   | @michaeltran14  |
 
