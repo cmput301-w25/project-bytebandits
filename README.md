@@ -13,7 +13,7 @@
 
 ## Project Description
 
-[Brief description of the project in your own words]
+[Brief description of the prSoject in your own words]
 
 ## Key Features
 
