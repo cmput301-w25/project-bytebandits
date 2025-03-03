@@ -29,10 +29,10 @@ public class SignupFragment extends Fragment {
     TextInputEditText pswrdText;
     TextInputEditText pswrdConText;
 
-
     @Nullable
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
+            @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.signup, container, false);
         signup = view.findViewById(R.id.registerBtn);
         accountExists = view.findViewById(R.id.accountExists);
@@ -56,36 +56,39 @@ public class SignupFragment extends Fragment {
     }
 
     /**
-     * Authenticates user input, displays an error if something is wrong, or switches to login fragment if everything is correct
+     * Authenticates user input, displays an error if something is wrong, or
+     * switches to login fragment if everything is correct
      */
-    private void authenticate(){
+    private void authenticate() {
 
-        if (!(isEmptyText(userText) || isEmptyText(emailText) || isEmptyText(emailText) || isEmptyText(pswrdConText))){
+        if (!(isEmptyText(userText) || isEmptyText(emailText) || isEmptyText(emailText) || isEmptyText(pswrdConText))) {
 
             // call db class
             // make query -> does provided email exist? does username exist?
             // return true if both does not exist
 
-            boolean querySuccess = true; // placeholder and for testing, set to false if you want to see error text, true for login switch
+            boolean querySuccess = true; // placeholder and for testing, set to false if you want to see error text,
+                                         // true for login switch
             boolean usernameReqsValid = !userText.getText().toString().contains("@");
             boolean pswrdMatch = pswrdText.getText().toString().equals(pswrdConText.getText().toString());
 
-            if (querySuccess && pswrdMatch && usernameReqsValid){
+            if (querySuccess && pswrdMatch && usernameReqsValid) {
                 ((StartupActivity) requireActivity()).loginFragment();
             }
 
-            else if (!usernameReqsValid){
+            else if (!usernameReqsValid) {
                 AlertDialog dialog = createDialog("Username cannot have '@' within it");
                 dialog.show();
             }
 
-            else{
-                AlertDialog dialog = createDialog("Invalid information! Or the provided username or email already has an account attached to it");
+            else {
+                AlertDialog dialog = createDialog(
+                        "Invalid information! Or the provided username or email already has an account attached to it");
                 dialog.show();
             }
         }
 
-        else{
+        else {
             AlertDialog dialog = createDialog("No null/empty strings allowed!");
             dialog.show();
         }
@@ -94,19 +97,21 @@ public class SignupFragment extends Fragment {
 
     /**
      * Helper function to check if text is not null nor empty
+     * 
      * @param text
      * @return true if it is null/empty, false if not
      */
-    private boolean isEmptyText(TextInputEditText text){
+    private boolean isEmptyText(TextInputEditText text) {
         return TextUtils.isEmpty(text.getText());
     }
 
     /**
      * Error text dialog logic
+     * 
      * @param msg
      * @return the dialog
      */
-    AlertDialog createDialog(String msg){
+    AlertDialog createDialog(String msg) {
         AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
         builder.setMessage(msg);
         builder.setPositiveButton("Close", new DialogInterface.OnClickListener() {

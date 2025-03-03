@@ -32,7 +32,8 @@ public class LoginFragment extends Fragment {
 
     @Nullable
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
+            @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.login, container, false);
         login = view.findViewById(R.id.loginBtn);
         userEmailText = view.findViewById(R.id.UserEmailInputText);
@@ -59,31 +60,35 @@ public class LoginFragment extends Fragment {
     /**
      * Checks to see if provided information is valid
      */
-    private void authenticate(){
-        if (!(isEmptyText(userEmailText) || isEmptyText(passwordText))){
+    private void authenticate() {
+        if (!(isEmptyText(userEmailText) || isEmptyText(passwordText))) {
 
-            // determine if text input is email or username by checking to see if it has an '@'
+            // determine if text input is email or username by checking to see if it has an
+            // '@'
             // call db class
-            // make query -> does provided email OR username exist? -> if so, does password input match in db?
+            // make query -> does provided email OR username exist? -> if so, does password
+            // input match in db?
             // return true if all passes otherwise false
 
-            boolean querySuccess = true; // placeholder and for testing, set to false if you want to see error text, true for main activity switch
+            boolean querySuccess = true; // placeholder and for testing, set to false if you want to see error text,
+                                         // true for main activity switch
 
-            if (querySuccess){
-                SharedPreferences sharedPref = requireActivity().getSharedPreferences("UserPrefs", Context.MODE_PRIVATE);
+            if (querySuccess) {
+                SharedPreferences sharedPref = requireActivity().getSharedPreferences("UserPrefs",
+                        Context.MODE_PRIVATE);
                 SharedPreferences.Editor editor = sharedPref.edit();
                 editor.putBoolean("LoggedIn", true);
                 editor.commit();
                 ((StartupActivity) requireActivity()).mainActivitySwitch();
             }
 
-            else{
+            else {
                 AlertDialog dialog = createDialog("Invalid information!");
                 dialog.show();
             }
         }
 
-        else{
+        else {
             AlertDialog dialog = createDialog("No null/empty strings allowed!");
             dialog.show();
         }
@@ -91,19 +96,21 @@ public class LoginFragment extends Fragment {
 
     /**
      * Helper function to check if text is not null nor empty
+     * 
      * @param text
      * @return true if it is null/empty, false if not
      */
-    private boolean isEmptyText(TextInputEditText text){
+    private boolean isEmptyText(TextInputEditText text) {
         return TextUtils.isEmpty(text.getText());
     }
 
     /**
      * Error text dialog logic
+     * 
      * @param msg
      * @return the dialog
      */
-    AlertDialog createDialog(String msg){
+    AlertDialog createDialog(String msg) {
         AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
         builder.setMessage(msg);
         builder.setPositiveButton("Close", new DialogInterface.OnClickListener() {
