@@ -1,21 +1,17 @@
 package com.github.bytebandits.bithub;
 
 import android.content.Context;
-import android.graphics.Movie;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
-import android.widget.Switch;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 
 public class MoodPostArrayAdapter extends ArrayAdapter<MoodPost> {
     public MoodPostArrayAdapter(Context context, ArrayList<MoodPost> moodPosts) {
@@ -43,15 +39,10 @@ public class MoodPostArrayAdapter extends ArrayAdapter<MoodPost> {
         TextView timeView = view.findViewById(R.id.textTime);
         TextView emotionView = view.findViewById(R.id.textEmotion);
 
-        // Set up a formatter to get the date and time of our mood post to the wanted format
-        Date date = moodPost.getPostedDateTime();
-        SimpleDateFormat dateFormatter = new SimpleDateFormat("MMM. dd, yyyy");
-        SimpleDateFormat timeFormatter = new SimpleDateFormat("h:mma");
-
         // Set the text views of the view based on the movie object
         nameView.setText(moodPost.getUsername());
-        dateView.setText(dateFormatter.format(date));
-        timeView.setText(timeFormatter.format(date));
+        dateView.setText(moodPost.getFormattedPostedDate());
+        timeView.setText(moodPost.getFormattedPostedTime());
         emotionView.setText(moodPost.getEmotion().getState());
         logoView.setImageResource(moodPost.getEmotion().getLogoID());
 

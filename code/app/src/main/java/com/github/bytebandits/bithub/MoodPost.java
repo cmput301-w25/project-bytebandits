@@ -3,6 +3,7 @@ package com.github.bytebandits.bithub;
 import android.location.Location;
 import android.util.Base64;
 
+import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.UUID;
@@ -12,7 +13,7 @@ import java.util.UUID;
  * @author Tony Yang
  */
 
-public class MoodPost {
+public class MoodPost implements Serializable {
     private UUID postID;
     private Emotion emotion;
     // private Profile profile; // Profile class not implemented yet
@@ -94,12 +95,12 @@ public class MoodPost {
     }
 
     /**
-     * Returns the mood post's emotion's name as a string for database storage
+     * Returns the mood post's emotion's name as a string for database storage and display
      * @return
-     *      Returns a String object representing the mood post's emotion's name (ex. "SADNESS")
+     *      Returns a String object representing the mood post's emotion's name (ex. "Sadness")
      */
     public String getEmotionString() {
-        return getEmotion().name();
+        return getEmotion().getState();
     }
 
     //REMOVE LATER, temp getters and setters for username
@@ -138,7 +139,26 @@ public class MoodPost {
         // Format the string before returning
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
         return formatter.format(getPostedDateTime());
+    }
 
+    /**
+     * Returns the mood post's date in a formatted string
+     * @return
+     *      Returns a formatted String object representing the mood post's date posted
+     */
+    public String getFormattedPostedDate() {
+        SimpleDateFormat dateFormatter = new SimpleDateFormat("MMM. dd, yyyy");
+        return dateFormatter.format(getPostedDateTime());
+    }
+
+    /**
+     * Returns the mood post's time in a formatted string
+     * @return
+     *      Returns a formatted String object representing the mood post's time posted
+     */
+    public String getFormattedPostedTime() {
+        SimpleDateFormat timeFormatter = new SimpleDateFormat("h:mma");
+        return timeFormatter.format(getPostedDateTime());
     }
 
     /**
@@ -161,7 +181,7 @@ public class MoodPost {
     }
 
     /**
-     * Returns the mood post's attached location as a string for database storage
+     * Returns the mood post's attached location as a string for database storage and display
      * @return
      *      Returns a String object representing the mood post's attached location.
      *      Returns null when the mood post has no attached location.
@@ -191,7 +211,7 @@ public class MoodPost {
     }
 
     /**
-     * Returns the mood post's social situation's name as a string for database storage
+     * Returns the mood post's social situation's name as a string for database storage and display
      * @return
      *      Returns a String object representing the mood post's social situation's name (ex. "ALONE")
      *      Returns null when the mood post has no attached social situation.
