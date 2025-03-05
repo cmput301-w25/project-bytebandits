@@ -3,10 +3,10 @@ package com.github.bytebandits.bithub;
 import java.util.UUID;
 
 public class User {
-    UUID uuid;
-    String name;
-    String password;
-    String email = "";
+    private UUID uuid;
+    private String name;
+    private String password;
+    private String email = "";
 
     public User(String name, String password, String email) {
         this.name = name;
