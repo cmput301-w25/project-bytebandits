@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -34,11 +35,22 @@ public class HomepageFragment extends Fragment {
 
         //Test Data
         dataList.add(new MoodPost(Emotion.HAPPINESS, "Tony Yang",
-                null, SocialSituation.ALONE, "I'm alone", null));
+                null, SocialSituation.ALONE, "I'm happy", null));
         dataList.add(new MoodPost(Emotion.ANGER, "Tony Yang",
-                null, SocialSituation.GROUP, "In a group", null));
+                null, SocialSituation.GROUP, "I'm angry", null));
         dataList.add(new MoodPost(Emotion.DISGUST, "Tony Yang",
                 null, SocialSituation.PARTNER, null, null));
+
+        // on item click on list, select the item clicked then set edit and delete button as visible
+        moodPostList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view,
+                                    int position, long id) {
+                DetailedMoodPostFragment detailedMoodPostFragment =
+                        DetailedMoodPostFragment.newInstance(dataList.get(position));
+                detailedMoodPostFragment.show(getActivity().getSupportFragmentManager(), "Detailed Mood Post View");
+            }
+        });
 
         return view;
     }
