@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center_horizontal">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:layout_width="380dp"
+        android:layout_height="133dp"
+        android:background="@drawable/mood_post_background"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <ImageView
+            android:id="@+id/moodIcon"
+            android:layout_width="90dp"
+            android:layout_height="90dp"
+            android:layout_marginTop="21dp"
+            android:layout_marginEnd="21dp"
+            android:scaleType="centerCrop"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/textDate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="21dp"
+            android:layout_marginTop="21dp"
+            android:alpha="0.25"
+            android:fontFamily="@font/dm_sans_extralight"
+            android:letterSpacing="0.25"
+            android:text="Jan. 11, 2025"
+            android:textColor="@color/white"
+            android:textSize="12sp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/textTime"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="21dp"
+            android:layout_marginEnd="21dp"
+            android:alpha="0.25"
+            android:fontFamily="@font/dm_sans_extralight"
+            android:letterSpacing="0.25"
+            android:text="10:59AM"
+            android:textColor="@color/white"
+            android:textSize="12sp"
+            app:layout_constraintEnd_toStartOf="@+id/moodIcon"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/textEmotion"
+            android:layout_width="wrap_content"
+            android:layout_height="51dp"
+            android:layout_marginStart="21dp"
+            android:layout_marginBottom="22dp"
+            android:fontFamily="@font/stix_two_text_bold"
+            android:text="Emotion"
+            android:textColor="@color/Accent1"
+            android:textSize="40sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <TextView
+            android:id="@+id/textUserName"
+            android:layout_width="wrap_content"
+            android:layout_height="20dp"
+            android:layout_marginStart="21dp"
+            android:layout_marginBottom="63dp"
+            android:fontFamily="@font/stix_two_text_bold"
+            android:text="John Doe"
+            android:textColor="@color/Accent2"
+            android:textSize="16sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <TextView
+            android:id="@+id/textIsFeeling"
+            android:layout_width="wrap_content"
+            android:layout_height="20dp"
+            android:layout_marginBottom="63dp"
+            android:fontFamily="@font/stix_two_text_regular"
+            android:text=" is feeling..."
+            android:textColor="@color/Accent1"
+            android:textSize="16sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/textUserName" />
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</LinearLayout>
