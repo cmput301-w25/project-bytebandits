@@ -13,6 +13,15 @@ import androidx.fragment.app.FragmentTransaction;
 
 import com.github.bytebandits.bithub.databinding.ActivityMainBinding;
 
+/**
+ * MainActivity serves as the primary hub of the Bithub application after user authentication.
+ * It is responsible for:
+ * - Displaying and managing the main features of the app through different fragments
+ *   (Home, Explore, Create, Notifications, Profile) using a BottomNavigationView.
+ * - Initializing the UI with View Binding for improved performance and cleaner code.
+ * - Handling fragment transactions to switch between different sections of the app.
+ */
+
 public class MainActivity extends AppCompatActivity {
     SessionManager sessionManager;
 
