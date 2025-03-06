@@ -1,26 +1,49 @@
 package com.github.bytebandits.bithub;
 
-import android.graphics.Movie;
 import android.location.Location;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.ListView;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
+
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.ArrayList;
 
-public class HomepageFragment extends Fragment {
+public class HomepageFragment extends Fragment implements
+        PostMoodFragment.AddMoodPostDialogListener{
     private ArrayList<MoodPost> dataList;
     private ListView moodPostList;
     private MoodPostArrayAdapter moodPostAdapter;
+
+    // GET RID OF LATER ONCE DATABASE IS IMPLEMENTED
+    private FloatingActionButton tempButton;
+    @Override
+    public void addMoodPost(MoodPost moodPost) {
+        if (!(moodPost == null)) {
+            moodPostAdapter.add(moodPost);
+            moodPostAdapter.notifyDataSetChanged();
+        }
+        FrameLayout layout = getView().findViewById(R.id.child_fragment_container);
+        layout.setVisibility(View.GONE);
+    }
+    private void launchPostMoodFragment() {
+        FrameLayout layout = getView().findViewById(R.id.child_fragment_container);
+        layout.setVisibility(View.VISIBLE);
+        PostMoodFragment postMoodFragment = new PostMoodFragment();
+        FragmentTransaction transaction = getChildFragmentManager().beginTransaction();
+        transaction.replace(R.id.child_fragment_container, postMoodFragment); // Use the parent fragment's container
+        transaction.addToBackStack(null); // Optional: Add to back stack
+        transaction.commit();
+    }
 
     @Nullable
     @Override
@@ -51,6 +74,15 @@ public class HomepageFragment extends Fragment {
                 detailedMoodPostFragment.show(getActivity().getSupportFragmentManager(), "Detailed Mood Post View");
             }
         });
+
+        // DELETE LATER ONCE NAV BAR IS IMPLEMENTED
+        // Method to launch the child fragment
+        tempButton = view.findViewById(R.id.tempButton);
+        tempButton.setOnClickListener(v -> {
+            // Go to post mood fragment
+            launchPostMoodFragment();
+        });
+
 
         return view;
     }

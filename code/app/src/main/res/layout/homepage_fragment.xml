@@ -4,12 +4,27 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <!--Delete once nav bar is implemented-->
+    <FrameLayout
+        android:id="@+id/child_fragment_container"
+        android:visibility="gone"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
+
+    <!--Change back to layout_height back to match_parent once nav bar is implemented-->
     <ListView
         android:id="@+id/homepageMoodPostList"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="500dp"
         android:divider="@android:color/transparent"
-        android:dividerHeight="12dp">
-    </ListView>
+        android:dividerHeight="12dp"></ListView>
+
+    <!--Delete once nav bar is implemented-->
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/tempButton"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:contentDescription="Post a mood"
+        android:src="@android:drawable/ic_input_add"></com.google.android.material.floatingactionbutton.FloatingActionButton>
 
 </LinearLayout>
