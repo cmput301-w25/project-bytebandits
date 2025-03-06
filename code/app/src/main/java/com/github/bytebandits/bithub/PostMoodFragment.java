@@ -48,7 +48,8 @@ public class PostMoodFragment extends Fragment {
 
     @Nullable
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater,
+                             @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.post_mood_fragment, container, false);
         // Initialize views
         Spinner editEmotion = view.findViewById(R.id.postMoodEmotion);
@@ -87,7 +88,8 @@ public class PostMoodFragment extends Fragment {
         // Handle user selected input for spinners
         editEmotion.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
-            public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
+            public void onItemSelected(AdapterView<?> parentView, View selectedItemView,
+                                       int position, long id) {
                 selectedEmotion = (Emotion) parentView.getItemAtPosition(position);
             }
             @Override
@@ -98,7 +100,8 @@ public class PostMoodFragment extends Fragment {
         });
         editSocialSituation.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
-            public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
+            public void onItemSelected(AdapterView<?> parentView, View selectedItemView,
+                                       int position, long id) {
                 // if prefer not to say is selected, set social situation to null
                 if (position == 0) { selectedSocialSituation = null; }
                 // else set it regularly
@@ -113,16 +116,22 @@ public class PostMoodFragment extends Fragment {
 
         confirmButton.setOnClickListener(v -> {
             // Get inputs
-            // TODO Data verification : max 20 char or 3 words
             if (editDescription.getText().toString().isEmpty()) { selectedDescription = null; }
             else { selectedDescription = editDescription.getText().toString(); }
 
-            // Send mood post back to homepage fragment
-            listener.addMoodPost(new MoodPost(selectedEmotion, "Tony Yang",
-                    null, selectedSocialSituation, selectedDescription, null));
+            // Check for valid description input (max 20 char. or 3 words), if valid, add mood post
+            if (selectedDescription != null &&
+                    ((moreThanThreeWords(selectedDescription)) || selectedDescription.length() > 20)) {
+                editDescription.setError("Description can be max 20 characters or 3 words");
+            }
+            else {
+                // Send mood post back to homepage fragment
+                listener.addMoodPost(new MoodPost(selectedEmotion, "Tony Yang",
+                        null, selectedSocialSituation, selectedDescription, null));
 
-            // Go back to homepage fragment
-            getParentFragmentManager().popBackStack();
+                // Go back to homepage fragment
+                getParentFragmentManager().popBackStack();
+            }
         });
 
         cancelButton.setOnClickListener(v -> {
@@ -132,5 +141,13 @@ public class PostMoodFragment extends Fragment {
         });
 
         return view;
+    }
+
+    // Helper function that checks if a string has a max of three words
+    // Used for checking for valid description input
+    private boolean moreThanThreeWords(String string) {
+        if (string == null) { return false; }
+        String[] words = string.split("\\s+"); // Groups all whitespace together and splits by the whitespace
+        return (words.length > 3);
     }
 }
