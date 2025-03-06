@@ -1,5 +1,6 @@
 package com.github.bytebandits.bithub;
 
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.activity.EdgeToEdge;
@@ -31,7 +32,18 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
-        setContentView(R.layout.activity_main);
+
+        // Check if user is logged in
+        if (Database.loggedInUser() != null) {
+            // There is some user logged in
+
+            setContentView(R.layout.activity_main);
+        } else {
+            // If no user is logged in, go to the start activity
+            Intent intent = new Intent(this, StartupActivity.class);
+            startActivity(intent);
+            finish();  // Prevents the user from going back to this activity by pressing the back button
+        }
 
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
