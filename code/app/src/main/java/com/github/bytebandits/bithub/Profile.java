@@ -7,22 +7,20 @@ import java.util.HashMap;
 import java.util.UUID;
 
 public class Profile {
-    private User user;
-    private HashMap<UUID, MoodPost> posts;
-    private ArrayList<Object> inbox;
-    private ProfileManager pManager;
+    private String userID;
+    private Boolean locationServices;
     private Bitmap image = null;
 
-    public Profile(User user) {
-        this.user = user;
-    }
-    public Profile(User user, Bitmap image) {
-        this.user = user;
-        this.image = image;
+    public String getUserID() {
+        return userID;
     }
 
-    public User getUser() {
-        return user;
+    public void enableLocationServices() {
+        this.locationServices = true;
+    }
+
+    public void disableLocationServices() {
+        this.locationServices = false;
     }
 
     public Bitmap getImage() {
@@ -31,18 +29,5 @@ public class Profile {
 
     public void setImage(Bitmap image) {
         this.image = image;
-    }
-
-    public ProfileManager getPManager() {
-        return pManager;
-    }
-    public void editPost(UUID postID, HashMap<String, Object> options) {
-
-    }
-    public void addPost(MoodPost post) {
-
-    }
-    public void deletePost(UUID postID) {
-
     }
 }
