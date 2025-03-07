@@ -1,5 +1,6 @@
 package com.github.bytebandits.bithub;
 
+import android.graphics.Bitmap;
 import android.location.Location;
 import android.util.Base64;
 
@@ -25,16 +26,15 @@ public class MoodPost implements Serializable {
     private Location location;
     private SocialSituation situation;
     private String desc;
-    private byte[] image;
+    private Bitmap image;
 
     /**
      * Constructor to make a mood post
      * @param emotion
      *      Emotion object representing the emotion of the mood post.
      *      Cannot be null.
-     * @param location
-     *      Location object representing the location of the mood post.
-     *      When null is passed, it means that no location is attached to the mood post.
+     * @param showLocation
+     *      boolean representing whether or not we should attach our current location to the post
      * @param situation
      *      SocialSituation object representing the social situation of the mood post.
      *      When null is passed, it means that no social situation is attached to the mood post.
@@ -43,16 +43,16 @@ public class MoodPost implements Serializable {
      *      Can be a max of 20 characters or 3 words.
      *      When null is passed, it means that no description is attached to the mood post.
      * @param image
-     *      A byte array representing the image attached to the mood post
+     *      A bitmap representing the image attached to the mood post
      *      When null is passed, it means that no image is attached to the mood post.
      */
-    public MoodPost(Emotion emotion, String username, Location location, SocialSituation situation,
-                    String desc, byte[] image) {
+    public MoodPost(Emotion emotion, String username, boolean showLocation, SocialSituation situation,
+                    String desc, Bitmap image) {
         this.postID = UUID.randomUUID();
         this.emotion = emotion;
         this.username = username;
         this.dateTime = new Date();
-        this.location = location;
+        this.location = null; // change later to save location based on showLocation
         this.situation = situation;
         this.desc = desc;
         this.image = image;
@@ -173,11 +173,11 @@ public class MoodPost implements Serializable {
 
     /**
      * Sets the mood post's attached location
-     * @param location
-     *      Location object representing the mood post's attached location.
+     * @param showLocation
+     *       boolean representing whether or not we should attach our current location to the post
      */
-    public void setLocation(Location location) {
-        this.location = location;
+    public void setLocation(boolean showLocation) {
+        this.location = null;  // change later to save location based on showLocation
     }
 
     /**
@@ -245,19 +245,19 @@ public class MoodPost implements Serializable {
      * Returns the mood post's attached image
      *
      * @return
-     *      Returns a byte array representing the image attached to the mood post
+     *      Returns a bitmap representing the image attached to the mood post
      *      Returns null when the mood post has no attached image.
      */
-    public byte[] getMoodImage() {
+    public Bitmap getImage() {
         return image;
     }
 
     /**
      * Sets the mood post's attached image
      * @param image
-     *      byte array representing the image attached to the mood post
+     *      bitmap representing the image attached to the mood post
      */
-    public void setMoodImage(byte[] image) {
+    public void setMoodImage(Bitmap image) {
         this.image = image;
     }
 
@@ -268,9 +268,9 @@ public class MoodPost implements Serializable {
      *      Returns a Base64 String representing the image
      *      Returns null when the mood post has no attached image.
      */
-    public String getMoodImageString() {
+    public String getImageString() {
         // Check if there is an attached image
-        if (getMoodImage() == null) { return null; }
-        return Base64.encodeToString(getMoodImage(), Base64.DEFAULT);
+        if (getImage() == null) { return null; }
+        return null; // TODO
     }
 }
