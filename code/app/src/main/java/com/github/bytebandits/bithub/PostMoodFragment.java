@@ -127,7 +127,7 @@ public class PostMoodFragment extends Fragment {
             else {
                 // Send mood post back to homepage fragment
                 listener.addMoodPost(new MoodPost(selectedEmotion, "Tony Yang",
-                        null, selectedSocialSituation, selectedDescription, null));
+                        false, selectedSocialSituation, selectedDescription, null));
 
                 // Go back to homepage fragment
                 getParentFragmentManager().popBackStack();

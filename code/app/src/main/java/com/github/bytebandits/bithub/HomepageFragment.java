@@ -58,11 +58,11 @@ public class HomepageFragment extends Fragment implements
 
         //Test Data
         dataList.add(new MoodPost(Emotion.HAPPINESS, "Tony Yang",
-                null, SocialSituation.ALONE, "I'm happy", null));
+                false, SocialSituation.ALONE, "I'm happy", null));
         dataList.add(new MoodPost(Emotion.ANGER, "Tony Yang",
-                null, SocialSituation.GROUP, "I'm angry", null));
+                false, SocialSituation.GROUP, "I'm angry", null));
         dataList.add(new MoodPost(Emotion.DISGUST, "Tony Yang",
-                null, SocialSituation.PARTNER, null, null));
+                false, SocialSituation.PARTNER, null, null));
 
         // on item click on list, select the item clicked then set edit and delete button as visible
         moodPostList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
