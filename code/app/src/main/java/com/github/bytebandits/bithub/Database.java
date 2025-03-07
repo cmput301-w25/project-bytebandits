@@ -29,7 +29,7 @@ public final class Database {
     public static HashMap<String, Object> getUser(String userId) {
         usersCollectionRef.document(userId).get().addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
-                DocumentSnapshot doc = task.getResult();
+//                HashMap<String, Object> user = task.getResult().toObject();
             }
         });
 
@@ -54,7 +54,7 @@ public final class Database {
     }
 
     // Fetch posts by a specific user UUID
-    public static void getPosts(@NotNull String userId) {
+    public static ArrayList<MoodPost> getPosts(@NotNull String userId) {
         ArrayList<MoodPost> posts = new ArrayList<>();
         postsCollectionRef.document(userId).collection("posts").get().addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
@@ -103,7 +103,7 @@ public final class Database {
         DocumentReference postDocRef = postsCollectionRef.document(postId);
 
         // mock getting user id from session manager
-        // String userId = SessionManager.getCurrentProfile().getUserId();
+        // String userId = MainActivity.SessionManager.getCurrentProfile().getUserId();
         String userId = "mock";
 
         DocumentReference userDocRef = usersCollectionRef.document(userId);
@@ -112,6 +112,7 @@ public final class Database {
         Database.sendPostNotifications(userDocRef, postDocRef);
     }
 
+    @SuppressWarnings("unchecked")
     private static void sendPostNotifications(DocumentReference userDocRef, DocumentReference postDocRef){
         DocumentSnapshot userDocSnapshot = userDocRef.get().getResult();
         if (userDocSnapshot.exists()) {

@@ -33,17 +33,17 @@ public class SessionManager {
         editor.commit();
     }
 
-    public boolean isLoggedIn(){
+    public boolean isLoggedIn() {
         return prefs.getBoolean(IS_LOGIN, false);
     }
 
     public void checkLogin() {
-        if (!this.isLoggedIn()){
+        if (!this.isLoggedIn()) {
             // Redirect to the start up activity
-//             Intent i = new Intent(context, StartupActivity.class);
-//             i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            Intent i = new Intent(context, StartupActivity.class);
+            i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 
-//            context.startActivity(i);
+            context.startActivity(i);
         }
     }
 
@@ -66,10 +66,10 @@ public class SessionManager {
         editor.clear();
         editor.commit();
 
-//        Intent i = new Intent(context, StartupActivity.class);
-//        i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-//        i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        Intent i = new Intent(context, StartupActivity.class);
+        i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 
-//        context.startActivity(i);
+        context.startActivity(i);
     }
 }
