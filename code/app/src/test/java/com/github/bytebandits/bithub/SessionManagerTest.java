@@ -173,4 +173,5 @@ public class SessionManagerTest {
         assertNull(sharedPreferences.getString("password", null));
         assertNull(sharedPreferences.getString("profile", null));
     }
+
 }
