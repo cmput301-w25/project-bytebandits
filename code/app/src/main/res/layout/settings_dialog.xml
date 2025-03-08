@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/background"
+    android:gravity="center_horizontal"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/settings_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="57dp"
+        android:text="Settings"
+        android:textColor="@color/gold"
+        android:textSize="34sp" />
+
+    <EditText
+        android:id="@+id/name_edit_text"
+        android:layout_width="293dp"
+        android:layout_height="wrap_content"
+        android:layout_margin="20dp"
+        android:ems="10"
+        android:inputType="text"
+        android:text="Name"
+        android:textColor="@color/gold" />
+
+    <EditText
+        android:id="@+id/email_edit_text"
+        android:layout_width="298dp"
+        android:layout_height="wrap_content"
+        android:layout_margin="20dp"
+        android:ems="10"
+        android:hint="johndoe@email.com"
+        android:inputType="textEmailAddress"
+        android:textColor="@color/gold" />
+
+    <EditText
+        android:id="@+id/password_edit_text"
+        android:layout_width="294dp"
+        android:layout_height="wrap_content"
+        android:layout_margin="20dp"
+        android:ems="10"
+        android:hint="*******"
+        android:inputType="textPassword"
+        android:textColor="@color/gold" />
+
+    <CheckBox
+        android:id="@+id/location_checkbox"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="30dp"
+        android:text="Enable Location Services"
+        android:textColor="@color/gold" />
+
+    <Button
+        android:id="@+id/logout_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="48dp"
+        android:backgroundTint="#D01212"
+        android:text="Logout"
+        android:textSize="20sp" />
+
+</LinearLayout>

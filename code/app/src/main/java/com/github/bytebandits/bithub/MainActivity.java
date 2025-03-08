@@ -26,6 +26,7 @@ import com.github.bytebandits.bithub.databinding.ActivityMainBinding;
 public class MainActivity extends AppCompatActivity {
     SessionManager sessionManager;
 
+//    public static Profile globalProfile;
     private ActivityMainBinding binding;
 
     @Override
@@ -33,17 +34,19 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
 
-        // Check if user is logged in
-        if (Database.loggedInUser() != null) {
-            // There is some user logged in
-
-            setContentView(R.layout.activity_main);
-        } else {
-            // If no user is logged in, go to the start activity
-            Intent intent = new Intent(this, StartupActivity.class);
-            startActivity(intent);
-            finish();  // Prevents the user from going back to this activity by pressing the back button
-        }
+//        Profile loggedInProfile = Database.loggedInUser();
+//
+//        // Check if user is logged in
+//        if (loggedInProfile != null) {
+//            // There is some user logged in
+//            globalProfile = loggedInProfile;
+//            setContentView(R.layout.activity_main);
+//        } else {
+//            // If no user is logged in, go to the start activity
+//            Intent intent = new Intent(this, StartupActivity.class);
+//            startActivity(intent);
+//            finish();  // Prevents the user from going back to this activity by pressing the back button
+//        }
 
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
@@ -80,5 +83,14 @@ public class MainActivity extends AppCompatActivity {
         fragmentTransaction.replace(R.id.frameLayout, fragment);
         fragmentTransaction.commit();
     }
+    // Access the global profile anywhere in the app
+//    public static Profile getGlobalProfile() {
+//        return globalProfile;
+//    }
+//
+//    // Clear the global profile
+//    public static void clearGlobalProfile() {
+//        globalProfile = null;
+//    }
 
 }
