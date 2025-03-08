@@ -17,7 +17,5 @@ public class MainActivity extends AppCompatActivity {
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_main);
 
-        sessionManager = new SessionManager(getApplicationContext());
-        sessionManager.checkLogin();
     }
 }
