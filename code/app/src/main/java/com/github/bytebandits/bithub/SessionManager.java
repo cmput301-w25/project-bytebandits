@@ -3,6 +3,8 @@ package com.github.bytebandits.bithub;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.util.Log;
+
 import com.google.gson.Gson;
 
 public class SessionManager {
@@ -49,7 +51,7 @@ public class SessionManager {
     public void saveProfile(Profile profile) {
         String profileJson = gson.toJson(profile);
         editor.putString(KEY_PROFILE, profileJson);
-        editor.apply(); // Commit changes
+        editor.commit(); // Commit changes
     }
 
     // Get Profile object
