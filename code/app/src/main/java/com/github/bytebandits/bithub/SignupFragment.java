@@ -12,6 +12,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.textfield.TextInputEditText;
 
 /**
@@ -20,6 +21,8 @@ import com.google.android.material.textfield.TextInputEditText;
 public class SignupFragment extends Fragment {
     Button signup;
     TextView accountExists;
+    FloatingActionButton back;
+
 
     @Nullable
     @Override
@@ -27,12 +30,16 @@ public class SignupFragment extends Fragment {
         View view = inflater.inflate(R.layout.signup, container, false);
         signup = view.findViewById(R.id.registerBtn);
         accountExists = view.findViewById(R.id.accountExists);
+        back = view.findViewById(R.id.backActionButton2);
 
         signup.setOnClickListener(v -> {
             authenticate();
         });
         accountExists.setOnClickListener(v -> {
             ((StartupActivity) requireActivity()).loginFragment();
+        });
+        back.setOnClickListener(v -> {
+            ((StartupActivity) requireActivity()).popBackStack("signupFragment");
         });
 
         return view;

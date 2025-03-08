@@ -40,6 +40,7 @@ public class StartupActivity extends AppCompatActivity {
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
         StartupFragment startupFragment = new StartupFragment();
         fragmentTransaction.add(R.id.startupFrame, startupFragment);
+        fragmentTransaction.addToBackStack("startupFragment");
         fragmentTransaction.commit();
     }
 
@@ -51,6 +52,7 @@ public class StartupActivity extends AppCompatActivity {
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
         LoginFragment loginFragment = new LoginFragment();
         fragmentTransaction.replace(R.id.startupFrame, loginFragment);
+        fragmentTransaction.addToBackStack("loginFragment");
         fragmentTransaction.commit();
     }
 
@@ -62,6 +64,7 @@ public class StartupActivity extends AppCompatActivity {
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
         SignupFragment signupFragment = new SignupFragment();
         fragmentTransaction.replace(R.id.startupFrame, signupFragment);
+        fragmentTransaction.addToBackStack("signupFragment");
         fragmentTransaction.commit();
     }
 
@@ -78,6 +81,16 @@ public class StartupActivity extends AppCompatActivity {
     public void mainActivitySwitch(){
         Intent intent = new Intent(StartupActivity.this, MainActivity.class);
         startActivity(intent);
+    }
+
+    /**
+     * Back button functionality throughout Startup activity
+     */
+    public void popBackStack(String fragmentStr){
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        fragmentManager.popBackStack(fragmentStr, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+        fragmentTransaction.commit();
     }
 
     /**

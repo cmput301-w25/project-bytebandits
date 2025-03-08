@@ -6,6 +6,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
@@ -30,5 +31,21 @@ public class StartupFragment extends Fragment {
         });
 
         return view;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        // needed to override the back functionality when a user tries swipe back on this fragment. If we did not finish the activity
+        // the user will be stuck in frameLayout, which is a blank screen with no user input, which "softlocks" the user.
+        // Inspiration for code: https://www.youtube.com/watch?v=4rx3nLBwB0M
+        // Retrieved by: Hanss Rivera, On: March 8 2025, Type: Youtube Video, Youtube Channel Author: Coding Beast
+        requireActivity().getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                requireActivity().finish();
+            }
+        });
     }
 }

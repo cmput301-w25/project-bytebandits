@@ -4,6 +4,18 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/backActionButton2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="24dp"
+        android:clickable="true"
+        app:backgroundTint="#CC7698"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="?attr/actionModeCloseDrawable" />
+
     <TextView
         android:id="@+id/signupText"
         android:layout_width="wrap_content"
