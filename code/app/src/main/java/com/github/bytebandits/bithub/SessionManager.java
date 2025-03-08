@@ -66,10 +66,10 @@ public class SessionManager {
         editor.clear();
         editor.commit();
 
-        Intent i = new Intent(context, StartupActivity.class);
-        i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        // Intent i = new Intent(context, StartupActivity.class);
+        // i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        // i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 
-        context.startActivity(i);
+        // context.startActivity(i);
     }
 }

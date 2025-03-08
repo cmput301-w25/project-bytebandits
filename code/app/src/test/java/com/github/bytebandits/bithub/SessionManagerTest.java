@@ -54,16 +54,15 @@ public class SessionManagerTest {
             String key = invocation.getArgument(0);
             String value = invocation.getArgument(1);
 
-            System.out.println("Key: " +  key);
+            System.out.println("Key: " + key);
             System.out.println("Value: " + value);
             fakeSharedPrefs.put(key, value);
             return editor;
         });
 
         // Stub getBoolean()
-        when(sharedPreferences.getBoolean(anyString(), anyBoolean())).thenAnswer(invocation ->
-                fakeSharedPrefs.getOrDefault(invocation.getArgument(0), invocation.getArgument(1))
-        );
+        when(sharedPreferences.getBoolean(anyString(), anyBoolean())).thenAnswer(
+                invocation -> fakeSharedPrefs.getOrDefault(invocation.getArgument(0), invocation.getArgument(1)));
 
         // Stub getString() - Returns stored JSON when requested
         when(sharedPreferences.getString(anyString(), any())).thenAnswer(invocation -> {
@@ -71,7 +70,6 @@ public class SessionManagerTest {
             Object defaultValue = invocation.getArgument(1); // Allow null
             return fakeSharedPrefs.containsKey(key) ? (String) fakeSharedPrefs.get(key) : (String) defaultValue;
         });
-
 
         // Stub commit()
         when(editor.commit()).thenReturn(true);
@@ -83,17 +81,15 @@ public class SessionManagerTest {
             return editor;
         });
 
-// Stub clear() - Clears all stored values
+        // Stub clear() - Clears all stored values
         when(editor.clear()).thenAnswer(invocation -> {
             fakeSharedPrefs.clear();
             return editor;
         });
 
-
         // Initialize SessionManager
         sessionManager = new SessionManager(context);
     }
-
 
     @Test
     public void testCreateLoginSession() {
@@ -143,7 +139,6 @@ public class SessionManagerTest {
         assertEquals("john@example.com", savedProfile.getEmail());
     }
 
-
     @Test
     public void testLogoutUser() {
         System.out.println("Running testLogoutUser...");
@@ -178,5 +173,4 @@ public class SessionManagerTest {
         assertNull(sharedPreferences.getString("password", null));
         assertNull(sharedPreferences.getString("profile", null));
     }
-
 }
