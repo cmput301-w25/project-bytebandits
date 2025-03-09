@@ -89,10 +89,20 @@ public class LoginFragment extends Fragment {
         }
     }
 
+    /**
+     * Helper function to check if text is not null nor empty
+     * @param text
+     * @return true if it is null/empty, false if not
+     */
     private boolean isEmptyText(TextInputEditText text){
         return TextUtils.isEmpty(text.getText());
     }
 
+    /**
+     * Error text dialog logic
+     * @param msg
+     * @return the dialog
+     */
     AlertDialog createDialog(String msg){
         AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
         builder.setMessage(msg);

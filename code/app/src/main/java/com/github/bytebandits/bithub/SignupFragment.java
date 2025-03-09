@@ -55,6 +55,9 @@ public class SignupFragment extends Fragment {
         return view;
     }
 
+    /**
+     * Authenticates user input, displays an error if something is wrong, or switches to login fragment if everything is correct
+     */
     private void authenticate(){
 
         if (!(isEmptyText(userText) || isEmptyText(emailText) || isEmptyText(emailText) || isEmptyText(pswrdConText))){
@@ -89,10 +92,20 @@ public class SignupFragment extends Fragment {
 
     }
 
+    /**
+     * Helper function to check if text is not null nor empty
+     * @param text
+     * @return true if it is null/empty, false if not
+     */
     private boolean isEmptyText(TextInputEditText text){
         return TextUtils.isEmpty(text.getText());
     }
 
+    /**
+     * Error text dialog logic
+     * @param msg
+     * @return the dialog
+     */
     AlertDialog createDialog(String msg){
         AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
         builder.setMessage(msg);
