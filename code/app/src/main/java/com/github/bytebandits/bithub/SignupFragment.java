@@ -67,15 +67,15 @@ public class SignupFragment extends Fragment {
             // return true if both does not exist
 
             boolean querySuccess = true; // placeholder and for testing, set to false if you want to see error text, true for login switch
+            boolean usernameReqsValid = !userText.getText().toString().contains("@");
             boolean pswrdMatch = pswrdText.getText().toString().equals(pswrdConText.getText().toString());
-            boolean pswrdReqsValid = !pswrdText.getText().toString().contains("@");
 
-            if (querySuccess && pswrdMatch && pswrdReqsValid){
+            if (querySuccess && pswrdMatch && usernameReqsValid){
                 ((StartupActivity) requireActivity()).loginFragment();
             }
 
-            else if (!pswrdReqsValid){
-                AlertDialog dialog = createDialog("Password cannot have '@' within it");
+            else if (!usernameReqsValid){
+                AlertDialog dialog = createDialog("Username cannot have '@' within it");
                 dialog.show();
             }
 
