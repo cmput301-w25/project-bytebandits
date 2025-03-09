@@ -1,6 +1,5 @@
 package com.github.bytebandits.bithub;
 
-import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.activity.EdgeToEdge;
@@ -50,10 +49,11 @@ public class MainActivity extends AppCompatActivity {
 
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
-        replaceFragment(new HomeFragment());
+        replaceFragment(new HomeFragment());  // display the home fragment first when logged in
 
         binding.bottomNavigation.setOnItemSelectedListener(item -> {
 
+            // call replaceFragment when user selects one of the bottom navigaton bar's icons
             if (item.getItemId() == R.id.home) {
                 replaceFragment(new HomeFragment());
             } else if (item.getItemId() == R.id.explore) {
