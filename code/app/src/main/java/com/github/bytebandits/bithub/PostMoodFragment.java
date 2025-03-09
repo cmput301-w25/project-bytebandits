@@ -1,6 +1,7 @@
 package com.github.bytebandits.bithub;
 
 import android.content.Context;
+import android.graphics.Movie;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -12,6 +13,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.Spinner;
+import android.widget.SpinnerAdapter;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -29,20 +31,31 @@ public class PostMoodFragment extends Fragment {
     private SocialSituation selectedSocialSituation;
     private String selectedDescription;
 
+    public static PostMoodFragment newInstance(MoodPost moodPost, int position) {
+        // Use Bundle to get info between fragments
+        Bundle args = new Bundle();
+        args.putSerializable("mood post", moodPost);
+        args.putSerializable("position", position);
+        PostMoodFragment fragment = new PostMoodFragment();
+        fragment.setArguments(args);
+        return fragment;
+    }
+
     // Listener interface that will be implemented in and used to communicate with main activity
     // MAYBE DELETE LATER ONCE DATABASE IS IMPLEMENTED
-    interface AddMoodPostDialogListener {
+    interface MoodPostDialogListener {
         void addMoodPost(MoodPost moodPost);
+        void editMoodPost(MoodPost moodPost, int position);
     }
-    private AddMoodPostDialogListener listener;
+    private MoodPostDialogListener listener;
     @Override
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
         // Attach this fragment to the parent fragment that called it
-        if (getParentFragment() instanceof AddMoodPostDialogListener) {
-            listener = (AddMoodPostDialogListener) getParentFragment();
+        if (getParentFragment() instanceof MoodPostDialogListener) {
+            listener = (MoodPostDialogListener) getParentFragment();
         } else {
-            throw new RuntimeException(getParentFragment() + "must implement AddMoodPostDialogListener");
+            throw new RuntimeException(getParentFragment() + "must implement MoodPostDialogListener");
         }
     }
 
@@ -57,6 +70,20 @@ public class PostMoodFragment extends Fragment {
         EditText editDescription = view.findViewById(R.id.postMoodDescription);
         Button cancelButton = view.findViewById(R.id.postMoodCancelButton);
         Button confirmButton = view.findViewById(R.id.postMoodConfirmButton);
+
+        // Get the mood post if we need ot edit a mood post
+        String tag = getTag();
+        Bundle bundle = getArguments();
+        MoodPost postToEdit;
+        int postPosition;
+        if (tag != null && tag.equals("edit mood post") && bundle != null){
+            postToEdit = (MoodPost) bundle.getSerializable("mood post");
+            postPosition = (int) bundle.getSerializable("position");
+        }
+        else {
+            postPosition = 0;  // just initialize it so that IDE doesn't yell at me when passing it later
+            postToEdit = null;
+        }
 
         // Initialize the spinners
         // Create ArrayAdapters from the enumerations and a default spinner layout.
@@ -114,6 +141,14 @@ public class PostMoodFragment extends Fragment {
             }
         });
 
+        // If editing mood post, set the input views to mood post properties
+        if (postToEdit != null) {
+            selectSpinnerItemByValue(editEmotion, postToEdit.getEmotion());
+            selectSpinnerItemByValue(editSocialSituation, postToEdit.getSocialSituation());
+            if (postToEdit.getDescription() == null) { editDescription.setText(""); }
+            else { editDescription.setText(postToEdit.getDescription()); }
+        }
+
         confirmButton.setOnClickListener(v -> {
             // Get inputs
             if (editDescription.getText().toString().isEmpty()) { selectedDescription = null; }
@@ -126,9 +161,16 @@ public class PostMoodFragment extends Fragment {
             }
             else {
                 // Send mood post back to homepage fragment
-                listener.addMoodPost(new MoodPost(selectedEmotion, "Tony Yang",
-                        false, selectedSocialSituation, selectedDescription, null));
-
+                if (postToEdit == null) {
+                    listener.addMoodPost(new MoodPost(selectedEmotion, "Tony Yang",
+                            false, selectedSocialSituation, selectedDescription, null));
+                }
+                else {
+                    postToEdit.setEmotion(selectedEmotion);
+                    postToEdit.setSocialSituation(selectedSocialSituation);
+                    postToEdit.setDescription(selectedDescription);
+                    listener.editMoodPost(postToEdit, postPosition);
+                }
                 // Go back to homepage fragment
                 getParentFragmentManager().popBackStack();
             }
@@ -149,5 +191,16 @@ public class PostMoodFragment extends Fragment {
         if (string == null) { return false; }
         String[] words = string.split("\\s+"); // Groups all whitespace together and splits by the whitespace
         return (words.length > 3);
+    }
+
+    // Given a value wanted, select the item in the spinner given
+    public static void selectSpinnerItemByValue(Spinner spnr, Object value) {
+        SpinnerAdapter adapter = spnr.getAdapter();
+        for (int position = 0; position < adapter.getCount(); position++) {
+            if (adapter.getItem(position).equals(value)) {
+                spnr.setSelection(position);
+                return;
+            }
+        }
     }
 }

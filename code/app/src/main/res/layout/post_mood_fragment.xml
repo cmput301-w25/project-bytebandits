@@ -11,6 +11,7 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="25dp"
         android:text="Cancel"
+        android:textColor="@color/white"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/postMoodConfirmButton"
         app:layout_constraintStart_toStartOf="parent" />
@@ -40,6 +41,7 @@
         android:layout_width="match_parent"
         android:layout_height="70dp"
         android:layout_marginTop="50dp"
+        android:background="@color/Accent1"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -49,9 +51,11 @@
         android:layout_width="wrap_content"
         android:layout_height="70dp"
         android:layout_marginTop="50dp"
+        android:background="@color/Accent1"
         android:ems="10"
+        android:hint="(Optional Description)"
         android:inputType="text"
-        android:text="Name"
+        android:textColor="@color/black"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/postMoodSocialSituation" />
@@ -61,7 +65,9 @@
         android:layout_width="match_parent"
         android:layout_height="70dp"
         android:layout_marginTop="50dp"
+        android:background="@color/Accent1"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/postMoodEmotion" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

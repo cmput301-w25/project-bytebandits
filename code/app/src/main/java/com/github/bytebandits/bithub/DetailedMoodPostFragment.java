@@ -2,7 +2,9 @@ package com.github.bytebandits.bithub;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.content.Context;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageView;
@@ -12,13 +14,12 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
 
-import org.w3c.dom.Text;
-
 public class DetailedMoodPostFragment extends DialogFragment{
-    public static DetailedMoodPostFragment newInstance(MoodPost moodPost) {
+    public static DetailedMoodPostFragment newInstance(MoodPost moodPost, int position) {
         // Use Bundle to get info between fragments
         Bundle args = new Bundle();
         args.putSerializable("moodPost", moodPost);
+        args.putSerializable("position", position);
         DetailedMoodPostFragment fragment = new DetailedMoodPostFragment();
         fragment.setArguments(args);
         return fragment;
@@ -38,6 +39,7 @@ public class DetailedMoodPostFragment extends DialogFragment{
         TextView viewDescription = view.findViewById(R.id.detailedViewDescription);
         ImageView viewImage = view.findViewById(R.id.detailedViewImage);
         MoodPost moodPost = (MoodPost) getArguments().getSerializable("moodPost");
+        int position = (int) getArguments().getSerializable("position");
 
         // Set the text views to mood post data
         viewSocialStatus.setText(moodPost.getSocialSituationString());
@@ -49,12 +51,14 @@ public class DetailedMoodPostFragment extends DialogFragment{
         viewDescription.setText(moodPost.getDescription());
         viewImage.setImageResource(moodPost.getEmotion().getLogoID());
 
-        // Cancel this view on close button
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
         return builder
                 .setView(view)
                 .setTitle("Detailed View of Mood Post")
                 .setNegativeButton("Cancel", null)
+                .setPositiveButton("Edit", (dialog, which) -> {
+                    // ((MainActivity) requireActivity()).launchEditMoodFragment(moodPost, position);
+                })
                 .create();
     }
 }

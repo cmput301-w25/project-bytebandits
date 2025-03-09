@@ -173,11 +173,16 @@ public class MoodPost implements Serializable {
 
     /**
      * Sets the mood post's attached location
-     * @param showLocation
-     *       boolean representing whether or not we should attach our current location to the post
      */
-    public void setLocation(boolean showLocation) {
-        this.location = null;  // change later to save location based on showLocation
+    public void showLocation() {
+        this.location = null;  // change later to save location
+    }
+
+    /**
+     * Disables the mood post's attached location
+     */
+    public void hideLocation() {
+        this.location = null;  // change later
     }
 
     /**

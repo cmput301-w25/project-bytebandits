@@ -19,7 +19,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import java.util.ArrayList;
 
 public class HomepageFragment extends Fragment implements
-        PostMoodFragment.AddMoodPostDialogListener{
+        PostMoodFragment.MoodPostDialogListener{
     private ArrayList<MoodPost> dataList;
     private ListView moodPostList;
     private MoodPostArrayAdapter moodPostAdapter;
@@ -35,13 +35,31 @@ public class HomepageFragment extends Fragment implements
         FrameLayout layout = getView().findViewById(R.id.child_fragment_container);
         layout.setVisibility(View.GONE);
     }
+    @Override
+    public void editMoodPost(MoodPost moodPost, int position) {
+        dataList.set(position, moodPost);
+        moodPostAdapter.notifyDataSetChanged();
+        FrameLayout layout = getView().findViewById(R.id.child_fragment_container);
+        layout.setVisibility(View.GONE);
+    }
+
     private void launchPostMoodFragment() {
         FrameLayout layout = getView().findViewById(R.id.child_fragment_container);
         layout.setVisibility(View.VISIBLE);
         PostMoodFragment postMoodFragment = new PostMoodFragment();
         FragmentTransaction transaction = getChildFragmentManager().beginTransaction();
-        transaction.replace(R.id.child_fragment_container, postMoodFragment); // Use the parent fragment's container
-        transaction.addToBackStack(null); // Optional: Add to back stack
+        transaction.replace(R.id.child_fragment_container, postMoodFragment, "post mood post");
+        transaction.addToBackStack(null);
+        transaction.commit();
+    }
+
+    private void launchEditMoodFragment(MoodPost moodPost, int position) {
+        FrameLayout layout = getView().findViewById(R.id.child_fragment_container);
+        layout.setVisibility(View.VISIBLE);
+        PostMoodFragment postMoodFragment = PostMoodFragment.newInstance(moodPost, position);
+        FragmentTransaction transaction = getChildFragmentManager().beginTransaction();
+        transaction.replace(R.id.child_fragment_container, postMoodFragment, "edit mood post");
+        transaction.addToBackStack(null);
         transaction.commit();
     }
 
@@ -64,14 +82,24 @@ public class HomepageFragment extends Fragment implements
         dataList.add(new MoodPost(Emotion.DISGUST, "Tony Yang",
                 false, SocialSituation.PARTNER, null, null));
 
-        // on item click on list, select the item clicked then set edit and delete button as visible
+        // on item click on list, open detailed view of post
         moodPostList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view,
                                     int position, long id) {
                 DetailedMoodPostFragment detailedMoodPostFragment =
-                        DetailedMoodPostFragment.newInstance(dataList.get(position));
+                        DetailedMoodPostFragment.newInstance(dataList.get(position), position);
                 detailedMoodPostFragment.show(getActivity().getSupportFragmentManager(), "Detailed Mood Post View");
+            }
+        });
+
+        // FOR TESTING on long click on list, edit the post
+        moodPostList.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> parent, View view,
+                                    int position, long id) {
+                launchEditMoodFragment(dataList.get(position), position);
+                return true;
             }
         });
 
