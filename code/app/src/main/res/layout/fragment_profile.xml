@@ -44,16 +44,29 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent" />
 
+        <ImageButton
+            android:id="@+id/sort_button"
+            android:layout_width="39dp"
+            android:layout_height="42dp"
+            android:layout_weight="1"
+            android:backgroundTint="@color/background"
+            android:src="@drawable/baseline_keyboard_double_arrow_down_24"
+            app:tint="@color/white"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/searchView2"
+            app:layout_constraintTop_toBottomOf="@+id/divider" />
+
         <SearchView
             android:id="@+id/searchView2"
-            android:layout_width="419dp"
+            android:layout_width="364dp"
             android:layout_height="41dp"
-            android:layout_marginStart="1dp"
-            android:layout_marginEnd="1dp"
-            android:layout_marginBottom="3dp"
+            android:layout_marginBottom="4dp"
             app:layout_constraintBottom_toTopOf="@+id/listView3"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent" />
+            app:layout_constraintEnd_toStartOf="@+id/sort_button"
+            app:layout_constraintHorizontal_bias="1.0"
+            app:layout_constraintStart_toStartOf="parent">
+
+        </SearchView>
 
         <ListView
             android:id="@+id/listView3"
@@ -85,7 +98,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="111dp"
-            android:layout_marginEnd="67dp"
+            android:layout_marginEnd="60dp"
             android:layout_marginBottom="60dp"
             android:text="Followers"
             android:textColor="@color/gold"
@@ -108,13 +121,46 @@
 
         <ImageButton
             android:id="@+id/settings_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="45dp"
+            android:layout_height="49dp"
             android:backgroundTint="@color/background"
             android:src="@drawable/icons8_settings__2_"
-            android:tint="@color/white"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:tint="@color/white" />
+
+        <ImageButton
+            android:id="@+id/filter_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="2dp"
+            android:backgroundTint="@color/background"
+            android:src="@drawable/baseline_filter_alt_24"
+            app:tint="@color/white"
+            app:layout_constraintEnd_toStartOf="@+id/settings_button"
             app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/followers_count"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="96dp"
+            android:text="127"
+            android:textColor="@color/gold"
+            app:layout_constraintBottom_toTopOf="@+id/textView"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/textView4"
+            app:layout_constraintVertical_bias="1.0" />
+
+        <TextView
+            android:id="@+id/following_count"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="104dp"
+            android:text="170"
+            android:textColor="@color/gold"
+            app:layout_constraintBottom_toTopOf="@+id/textView3"
+            app:layout_constraintEnd_toEndOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

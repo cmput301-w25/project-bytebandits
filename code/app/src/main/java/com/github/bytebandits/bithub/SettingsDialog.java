@@ -45,7 +45,7 @@ public class SettingsDialog {
 
 
         // Redirect to login screen (or StartupActivity)
-//        SharedPreferences sharedPref = getSharedPreferences("UserPrefs", Context.MODE_PRIVATE);
+
 //        startupFragment();
     }
 }
