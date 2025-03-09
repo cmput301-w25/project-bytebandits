@@ -27,10 +27,11 @@ import java.util.List;
 import java.util.Objects;
 
 public class PostMoodFragment extends Fragment {
-    private Database db = Database.init();
     private Emotion selectedEmotion;
     private SocialSituation selectedSocialSituation;
     private String selectedDescription;
+
+    DatabaseManager.init() // Initalize Database
 
     public static PostMoodFragment newInstance(MoodPost moodPost) {
         // Use Bundle to get info between fragments
@@ -141,7 +142,7 @@ public class PostMoodFragment extends Fragment {
             else {
                 // Add mood post to database
                 if (postToEdit == null) {
-                    db.addPost(new MoodPost(selectedEmotion, ((MainActivity) requireActivity()).profile,
+                    DatabaseManager.addPost(new MoodPost(selectedEmotion, ((MainActivity) requireActivity()).profile,
                             false, selectedSocialSituation, selectedDescription, null));
                 }
                 else {
@@ -149,7 +150,7 @@ public class PostMoodFragment extends Fragment {
                     updateFields.put("emotion", selectedEmotion);
                     updateFields.put("situation", selectedSocialSituation);
                     updateFields.put("desc", selectedDescription);
-                    db.updatePost(postToEdit.getPostID(), updateFields);
+                    DatabaseManager.updatePost(postToEdit.getPostID(), updateFields);
                 }
                 // Go back to homepage fragment
                 ((MainActivity) requireActivity()).homepageFragment();

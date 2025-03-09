@@ -2,6 +2,7 @@ package com.github.bytebandits.bithub;
 
 import android.location.Location;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,11 +15,15 @@ import androidx.fragment.app.Fragment;
 
 import java.util.ArrayList;
 
-public class HomepageFragment extends Fragment{
-    private Database db = Database.init();
+public class HomepageFragment extends Fragment implements DatabaseManager.OnPostsFetchListener{
     private ArrayList<MoodPost> dataList;
     private ListView moodPostList;
     private MoodPostArrayAdapter moodPostAdapter;
+
+    @Override
+    public void onPostsFetched(ArrayList<MoodPost> posts) {
+        dataList = posts;
+    }
 
     @Nullable
     @Override
@@ -26,30 +31,28 @@ public class HomepageFragment extends Fragment{
         View view = inflater.inflate(R.layout.homepage_fragment, container, false);
 
         // Initialize dataList from database
-        dataList = db.getPosts(((MainActivity) requireActivity()).profile.getUserID());
+        DatabaseManager.init();
+        DatabaseManager.getPosts(((MainActivity) requireActivity()).profile.getUserID(),
+                new DatabaseManager.OnPostsFetchListener());
 
-        /* NEED TO ADD SOMETHING LIKE THIS SO THAT DATALIST GETS UPDATED WHENEVER THE DATABASE DOES
-           Here movieArrayList is equal to this file's dataList
-
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
-        CollectionReference moviesRef = db.collection("movies");
-
-        moviesRef.addSnapshotListener((value, error) -> {
+        // Listener so that dataList gets updated whenever the database does
+        CollectionReference moodPostRef = db.getPostsCollectionRef(); // Maybe change later if getter name is wrong
+        moodPostRef.addSnapshotListener((value, error) -> {
             if (error != null){
                 Log.e("Firestore", error.toString());
             }
             if (value != null){
-                movieArrayList.clear();
+                dataList.clear();
                 if (!value.isEmpty()) {
                     for (QueryDocumentSnapshot snapshot : value) {
-                        snapshot.toObject(Movie.class);
-                        movieArrayList.add(snapshot.toObject(Movie.class));
+                        snapshot.toObject(MoodPost.class);
+                        dataList.add(snapshot.toObject(MoodPost.class));
                     }
                 }
-                movieArrayAdapter.notifyDataSetChanged();
+                moodPostAdapter.notifyDataSetChanged();
             }
         });
-         */
+
 
         // Initialize views and adapters
         moodPostList = view.findViewById(R.id.homepageMoodPostList);

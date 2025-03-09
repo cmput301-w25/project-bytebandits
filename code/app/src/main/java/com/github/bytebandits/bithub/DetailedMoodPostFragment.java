@@ -15,8 +15,9 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
 
 public class DetailedMoodPostFragment extends DialogFragment{
-    private Database db = Database.init();
 
+    // Initialize database
+    DatabaseManager.init();
     public static DetailedMoodPostFragment newInstance(MoodPost moodPost) {
         // Use Bundle to get info between fragments
         Bundle args = new Bundle();
@@ -60,7 +61,7 @@ public class DetailedMoodPostFragment extends DialogFragment{
                     ((MainActivity) requireActivity()).editMoodFragment(moodPost);
                 })
                 .setPositiveButton("Delete", (dialog, which) -> {
-                    db.deletePost(moodPost.getPostID());
+                    DatabaseManager.deletePost(moodPost.getPostID());
                 })
                 .create();
     }

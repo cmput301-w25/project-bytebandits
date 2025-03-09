@@ -8,7 +8,6 @@ import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static androidx.test.espresso.matcher.ViewMatchers.withText;
 
-import android.graphics.Movie;
 import android.util.Log;
 
 import androidx.test.espresso.NoMatchingViewException;
@@ -67,9 +66,8 @@ public class MainActivityTest {
 
     @Before
     public void seedDatabase() {
-        // EDIT THIS BASED ON HOW DATABASE IS SET UP
         FirebaseFirestore db = FirebaseFirestore.getInstance();
-        CollectionReference moodPostRef = db.collection("moodposts");
+        CollectionReference moodPostRef = db.collection("posts");
         MoodPost[] moodPosts = {
                 new MoodPost(Emotion.HAPPINESS, new Profile("Tony Yang"), false, null, null, null),
                 new MoodPost(Emotion.SADNESS, new Profile("John Smith"), false, SocialSituation.ALONE, "Test Desc",
@@ -110,7 +108,7 @@ public class MainActivityTest {
     @Test
     public void addMoodPost() {
         // Click on button to open add mood post dialog
-        onView(withId(R.id.buttonAddMoodPost)).perform(click()); // CHANGE THIS LATER TO PROPER ID
+        onView(withId(R.id.create)).perform(click());
 
         // Test invalid description input
         onView(withId(R.id.postMoodDescription)).perform(ViewActions.typeText("This is a invalid desc"));
@@ -139,7 +137,7 @@ public class MainActivityTest {
     @Test
     public void addMoodPostMinData() {
         // Click on button to open add mood post dialog
-        onView(withId(R.id.buttonAddMoodPost)).perform(click()); // CHANGE THIS LATER TO PROPER ID
+        onView(withId(R.id.create)).perform(click());
 
         // Input proper mood post details
         onView(withId(R.id.postMoodEmotion)).perform(click());
@@ -161,7 +159,7 @@ public class MainActivityTest {
     @Test
     public void addMoodPostCancel() {
         // Click on button to open add mood post dialog
-        onView(withId(R.id.buttonAddMoodPost)).perform(click()); // CHANGE THIS LATER TO PROPER ID
+        onView(withId(R.id.create)).perform(click());
 
         // Test invalid description input
         onView(withId(R.id.postMoodDescription)).perform(ViewActions.typeText("This is a invalid desc"));
