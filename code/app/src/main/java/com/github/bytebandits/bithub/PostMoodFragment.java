@@ -22,41 +22,23 @@ import androidx.fragment.app.Fragment;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 
 public class PostMoodFragment extends Fragment {
-
+    private Database db = Database.init();
     private Emotion selectedEmotion;
     private SocialSituation selectedSocialSituation;
     private String selectedDescription;
 
-    public static PostMoodFragment newInstance(MoodPost moodPost, int position) {
+    public static PostMoodFragment newInstance(MoodPost moodPost) {
         // Use Bundle to get info between fragments
         Bundle args = new Bundle();
         args.putSerializable("mood post", moodPost);
-        args.putSerializable("position", position);
         PostMoodFragment fragment = new PostMoodFragment();
         fragment.setArguments(args);
         return fragment;
-    }
-
-    // Listener interface that will be implemented in and used to communicate with main activity
-    // MAYBE DELETE LATER ONCE DATABASE IS IMPLEMENTED
-    interface MoodPostDialogListener {
-        void addMoodPost(MoodPost moodPost);
-        void editMoodPost(MoodPost moodPost, int position);
-    }
-    private MoodPostDialogListener listener;
-    @Override
-    public void onAttach(@NonNull Context context) {
-        super.onAttach(context);
-        // Attach this fragment to the parent fragment that called it
-        if (getParentFragment() instanceof MoodPostDialogListener) {
-            listener = (MoodPostDialogListener) getParentFragment();
-        } else {
-            throw new RuntimeException(getParentFragment() + "must implement MoodPostDialogListener");
-        }
     }
 
     @Nullable
@@ -75,13 +57,10 @@ public class PostMoodFragment extends Fragment {
         String tag = getTag();
         Bundle bundle = getArguments();
         MoodPost postToEdit;
-        int postPosition;
         if (tag != null && tag.equals("edit mood post") && bundle != null){
             postToEdit = (MoodPost) bundle.getSerializable("mood post");
-            postPosition = (int) bundle.getSerializable("position");
         }
         else {
-            postPosition = 0;  // just initialize it so that IDE doesn't yell at me when passing it later
             postToEdit = null;
         }
 
@@ -160,41 +139,61 @@ public class PostMoodFragment extends Fragment {
                 editDescription.setError("Description can be max 20 characters or 3 words");
             }
             else {
-                // Send mood post back to homepage fragment
+                // Add mood post to database
                 if (postToEdit == null) {
-                    listener.addMoodPost(new MoodPost(selectedEmotion, "Tony Yang",
+                    db.addPost(new MoodPost(selectedEmotion, ((MainActivity) requireActivity()).profile,
                             false, selectedSocialSituation, selectedDescription, null));
                 }
                 else {
-                    postToEdit.setEmotion(selectedEmotion);
-                    postToEdit.setSocialSituation(selectedSocialSituation);
-                    postToEdit.setDescription(selectedDescription);
-                    listener.editMoodPost(postToEdit, postPosition);
+                    HashMap<String, Object> updateFields = new HashMap<>();
+                    updateFields.put("emotion", selectedEmotion);
+                    updateFields.put("situation", selectedSocialSituation);
+                    updateFields.put("desc", selectedDescription);
+                    db.updatePost(postToEdit.getPostID(), updateFields);
                 }
                 // Go back to homepage fragment
-                getParentFragmentManager().popBackStack();
+                ((MainActivity) requireActivity()).homepageFragment();
             }
         });
 
         cancelButton.setOnClickListener(v -> {
             // Just go back to homepage fragment
-            listener.addMoodPost(null);
-            getParentFragmentManager().popBackStack();
+            ((MainActivity) requireActivity()).homepageFragment();
         });
 
         return view;
     }
 
-    // Helper function that checks if a string has a max of three words
-    // Used for checking for valid description input
+    /**
+     * Checks if a given string contains more than three words.
+     * This method is primarily used to validate description inputs
+     * to ensure they do not exceed a specified word limit.
+     *
+     * @param string The input string to be checked. Can be {@code null}.
+     * @return {@code true} if the string contains more than three words,
+     *         {@code false} if the string is {@code null} or contains
+     *         three or fewer words.
+     *
+    */
     private boolean moreThanThreeWords(String string) {
         if (string == null) { return false; }
         String[] words = string.split("\\s+"); // Groups all whitespace together and splits by the whitespace
         return (words.length > 3);
     }
 
-    // Given a value wanted, select the item in the spinner given
-    public static void selectSpinnerItemByValue(Spinner spnr, Object value) {
+    /**
+     * Selects an item in a {@link Spinner} by matching its value.
+     * This method iterates through the items in the spinner's adapter
+     * and selects the item that matches the given value.
+     *
+     * @param spnr  The {@link Spinner} whose item is to be selected.
+     *             Must not be {@code null}.
+     * @param value The value to match against the spinner's items.
+     *             Must not be {@code null}.
+     *
+     * @throws NullPointerException If either {@code spnr} or {@code value} is {@code null}.
+    */
+    private void selectSpinnerItemByValue(Spinner spnr, Object value) {
         SpinnerAdapter adapter = spnr.getAdapter();
         for (int position = 0; position < adapter.getCount(); position++) {
             if (adapter.getItem(position).equals(value)) {

@@ -15,11 +15,12 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
 
 public class DetailedMoodPostFragment extends DialogFragment{
-    public static DetailedMoodPostFragment newInstance(MoodPost moodPost, int position) {
+    private Database db = Database.init();
+
+    public static DetailedMoodPostFragment newInstance(MoodPost moodPost) {
         // Use Bundle to get info between fragments
         Bundle args = new Bundle();
         args.putSerializable("moodPost", moodPost);
-        args.putSerializable("position", position);
         DetailedMoodPostFragment fragment = new DetailedMoodPostFragment();
         fragment.setArguments(args);
         return fragment;
@@ -39,7 +40,6 @@ public class DetailedMoodPostFragment extends DialogFragment{
         TextView viewDescription = view.findViewById(R.id.detailedViewDescription);
         ImageView viewImage = view.findViewById(R.id.detailedViewImage);
         MoodPost moodPost = (MoodPost) getArguments().getSerializable("moodPost");
-        int position = (int) getArguments().getSerializable("position");
 
         // Set the text views to mood post data
         viewSocialStatus.setText(moodPost.getSocialSituationString());
@@ -57,7 +57,10 @@ public class DetailedMoodPostFragment extends DialogFragment{
                 .setTitle("Detailed View of Mood Post")
                 .setNegativeButton("Cancel", null)
                 .setPositiveButton("Edit", (dialog, which) -> {
-                    // ((MainActivity) requireActivity()).launchEditMoodFragment(moodPost, position);
+                    ((MainActivity) requireActivity()).editMoodFragment(moodPost);
+                })
+                .setPositiveButton("Delete", (dialog, which) -> {
+                    db.deletePost(moodPost.getPostID());
                 })
                 .create();
     }

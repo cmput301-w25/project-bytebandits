@@ -2,7 +2,6 @@ package com.github.bytebandits.bithub;
 
 import android.graphics.Bitmap;
 import android.location.Location;
-import android.util.Base64;
 
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
@@ -17,11 +16,7 @@ import java.util.UUID;
 public class MoodPost implements Serializable {
     private UUID postID;
     private Emotion emotion;
-    // private Profile profile; // Profile class not implemented yet
-    // REMEMBER TO ADD PROFILE GETTERS AND SETTERS AND ADD IT TO THE CONSTRUCTOR AND CONSTRUCTOR JAVADOC
-
-    //temp variable for username
-    private String username; //REMOVE LATER
+    private Profile profile;
     private Date dateTime;
     private Location location;
     private SocialSituation situation;
@@ -32,6 +27,9 @@ public class MoodPost implements Serializable {
      * Constructor to make a mood post
      * @param emotion
      *      Emotion object representing the emotion of the mood post.
+     *      Cannot be null.
+     * @param profile
+     *      Profile object representing the profile of the user who posted the mood post
      *      Cannot be null.
      * @param showLocation
      *      boolean representing whether or not we should attach our current location to the post
@@ -46,11 +44,11 @@ public class MoodPost implements Serializable {
      *      A bitmap representing the image attached to the mood post
      *      When null is passed, it means that no image is attached to the mood post.
      */
-    public MoodPost(Emotion emotion, String username, boolean showLocation, SocialSituation situation,
+    public MoodPost(Emotion emotion, Profile profile, boolean showLocation, SocialSituation situation,
                     String desc, Bitmap image) {
         this.postID = UUID.randomUUID();
         this.emotion = emotion;
-        this.username = username;
+        this.profile = profile;
         this.dateTime = new Date();
         this.location = null; // change later to save location based on showLocation
         this.situation = situation;
@@ -103,13 +101,31 @@ public class MoodPost implements Serializable {
         return getEmotion().getState();
     }
 
-    //REMOVE LATER, temp getters and setters for username
-    public String getUsername() {
-        return username;
+    /**
+     * Returns the profile of the mood post
+     * @return
+     *      Returns a Profile object representing the profile of the user who posted the mood post
+     */
+    public Profile getProfile() {
+        return profile;
     }
 
-    public void setUsername(String username) {
-        this.username = username;
+    /**
+     * Sets the mood post's profile
+     * @param profile
+     *      Profile object representing the profile of the user who posted the mood post
+     */
+    public void setProfile(Profile profile) {
+        this.profile = profile;
+    }
+
+    /**
+     * Returns the mood post's profile's UserID/Username for database storage and display
+     * @return
+     *      Returns a String object representing the mood post's profile's username
+     */
+    public String getUsername() {
+        return getProfile().getUserID();
     }
 
     /**
