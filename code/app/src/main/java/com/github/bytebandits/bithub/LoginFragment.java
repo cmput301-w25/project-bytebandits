@@ -1,6 +1,8 @@
 package com.github.bytebandits.bithub;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -60,29 +62,48 @@ public class LoginFragment extends Fragment {
     private void authenticate(){
         if (!(isEmptyText(userEmailText) || isEmptyText(passwordText))){
 
+            // determine if text input is email or username by checking to see if it has an '@'
             // call db class
-            // make query and compare username or email, and password to the db info
-            // return boolean
+            // make query -> does provided email OR username exist? -> if so, does password input match in db?
+            // return true if all passes otherwise false
 
-            // if success
-            SharedPreferences sharedPref = requireActivity().getSharedPreferences("UserPrefs", Context.MODE_PRIVATE);
-            SharedPreferences.Editor editor = sharedPref.edit();
-            editor.putBoolean("LoggedIn", true);
-            editor.commit();
-            ((StartupActivity) requireActivity()).mainActivitySwitch();
+            boolean querySuccess = true; // placeholder and for testing, set to false if you want to see error text, true for main activity switch
 
-            // if fail
-            // show error text about invalid info and clear both input boxes
+            if (querySuccess){
+                SharedPreferences sharedPref = requireActivity().getSharedPreferences("UserPrefs", Context.MODE_PRIVATE);
+                SharedPreferences.Editor editor = sharedPref.edit();
+                editor.putBoolean("LoggedIn", true);
+                editor.commit();
+                ((StartupActivity) requireActivity()).mainActivitySwitch();
+            }
+
+            else{
+                AlertDialog dialog = createDialog("Invalid information!");
+                dialog.show();
+            }
         }
 
         else{
-            int placeholder = 0; // remove when done implementing
-            // show error text about not allowing empty inputs
+            AlertDialog dialog = createDialog("No null/empty strings allowed!");
+            dialog.show();
         }
     }
 
     private boolean isEmptyText(TextInputEditText text){
         return TextUtils.isEmpty(text.getText());
+    }
+
+    AlertDialog createDialog(String msg){
+        AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
+        builder.setMessage(msg);
+        builder.setPositiveButton("Close", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                userEmailText.setText("");
+                passwordText.setText("");
+            }
+        });
+        return builder.create();
     }
 
 }

@@ -1,5 +1,7 @@
 package com.github.bytebandits.bithub;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
@@ -22,6 +24,10 @@ public class SignupFragment extends Fragment {
     Button signup;
     TextView accountExists;
     FloatingActionButton back;
+    TextInputEditText userText;
+    TextInputEditText emailText;
+    TextInputEditText pswrdText;
+    TextInputEditText pswrdConText;
 
 
     @Nullable
@@ -31,6 +37,10 @@ public class SignupFragment extends Fragment {
         signup = view.findViewById(R.id.registerBtn);
         accountExists = view.findViewById(R.id.accountExists);
         back = view.findViewById(R.id.backActionButton2);
+        userText = view.findViewById(R.id.UserInputText);
+        emailText = view.findViewById(R.id.EmailInputText);
+        pswrdText = view.findViewById(R.id.PswrdInputText);
+        pswrdConText = view.findViewById(R.id.PswrdConInputText);
 
         signup.setOnClickListener(v -> {
             authenticate();
@@ -46,20 +56,55 @@ public class SignupFragment extends Fragment {
     }
 
     private void authenticate(){
-        // authenticate all info
-        // call db class and compare for: unique username, unique email
-        // make sure no empty texts
-        // password requirements (maybe): 1 special char, 1 capital, 1 number, at least 5>=words, no whitespace
-        // make sure confirmpass == pass
 
-        // if success
-        ((StartupActivity) requireActivity()).loginFragment();
+        if (!(isEmptyText(userText) || isEmptyText(emailText) || isEmptyText(emailText) || isEmptyText(pswrdConText))){
 
-        // if fail
-        // show error text, be a little specific on what was wrong-> unique username/unique email/password requirements etc.
+            // call db class
+            // make query -> does provided email exist? does username exist?
+            // return true if both does not exist
+
+            boolean querySuccess = true; // placeholder and for testing, set to false if you want to see error text, true for login switch
+            boolean pswrdMatch = pswrdText.getText().toString().equals(pswrdConText.getText().toString());
+            boolean pswrdReqsValid = !pswrdText.getText().toString().contains("@");
+
+            if (querySuccess && pswrdMatch && pswrdReqsValid){
+                ((StartupActivity) requireActivity()).loginFragment();
+            }
+
+            else if (!pswrdReqsValid){
+                AlertDialog dialog = createDialog("Password cannot have '@' within it");
+                dialog.show();
+            }
+
+            else{
+                AlertDialog dialog = createDialog("Invalid information! Or the provided username or email already has an account attached to it");
+                dialog.show();
+            }
+        }
+
+        else{
+            AlertDialog dialog = createDialog("No null/empty strings allowed!");
+            dialog.show();
+        }
+
     }
 
     private boolean isEmptyText(TextInputEditText text){
         return TextUtils.isEmpty(text.getText());
+    }
+
+    AlertDialog createDialog(String msg){
+        AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
+        builder.setMessage(msg);
+        builder.setPositiveButton("Close", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                userText.setText("");
+                emailText.setText("");
+                pswrdText.setText("");
+                pswrdConText.setText("");
+            }
+        });
+        return builder.create();
     }
 }
