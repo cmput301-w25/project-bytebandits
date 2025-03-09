@@ -31,8 +31,8 @@ public class HomepageFragment extends Fragment{
         /* NEED TO ADD SOMETHING LIKE THIS SO THAT DATALIST GETS UPDATED WHENEVER THE DATABASE DOES
            Here movieArrayList is equal to this file's dataList
 
-        db = FirebaseFirestore.getInstance();
-        moviesRef = db.collection("movies");
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        CollectionReference moviesRef = db.collection("movies");
 
         moviesRef.addSnapshotListener((value, error) -> {
             if (error != null){

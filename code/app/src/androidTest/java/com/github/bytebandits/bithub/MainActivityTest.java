@@ -8,6 +8,7 @@ import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static androidx.test.espresso.matcher.ViewMatchers.withText;
 
+import android.graphics.Movie;
 import android.util.Log;
 
 import androidx.test.espresso.NoMatchingViewException;
@@ -30,33 +31,22 @@ import java.net.URL;
 import java.util.Objects;
 
 @RunWith(AndroidJUnit4.class)
+@LargeTest
 public class MainActivityTest {
-
     @BeforeClass
-    public static void setup(){
-        //  address for emulated device
+    public static void setup() {
+        // Specific address for emulated device to access our localHost
         String androidLocalhost = "10.0.2.2";
 
         int portNumber = 8080;
         FirebaseFirestore.getInstance().useEmulator(androidLocalhost, portNumber);
-        CollectionReference moodPostRef = db.collection("posts");
-
-        // mock posts
-        MoodPost[] moodPosts = {
-                new MoodPost(Emotion.HAPPINESS, new Profile("Zaid"), false, SocialSituation.ALONE, "Test", null),
-                new MoodPost(Emotion.SADNESS, new Profile("Zaid"), false, SocialSituation.ALONE, "Test", null),
-        };
-        for (MoodPost moodPost : moodPosts) {
-            moodPostRef.document().set(moodPost);
-        }
     }
 
     @Rule
-    public ActivityScenarioRule<MainActivity> scenario = new
-            ActivityScenarioRule<MainActivity>(MainActivity.class);
+    public ActivityScenarioRule<MainActivity> scenario = new ActivityScenarioRule<MainActivity>(MainActivity.class);
 
     @Test
-    public void moodHistory(){
+    public void moodHistory() {
         // navigate to profile page
         onView(withId(R.id.profile)).perform(click());
 
@@ -73,6 +63,254 @@ public class MainActivityTest {
 
         // check if startup actvity is displayed
         onView(withId(R.layout.activity_startup)).check(matches(isDisplayed()));
+    }
+
+    @Before
+    public void seedDatabase() {
+        // EDIT THIS BASED ON HOW DATABASE IS SET UP
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        CollectionReference moodPostRef = db.collection("moodposts");
+        MoodPost[] moodPosts = {
+                new MoodPost(Emotion.HAPPINESS, new Profile("Tony Yang"), false, null, null, null),
+                new MoodPost(Emotion.SADNESS, new Profile("John Smith"), false, SocialSituation.ALONE, "Test Desc",
+                        null),
+        };
+        for (MoodPost moodPost : moodPosts) {
+            moodPostRef.document().set(moodPost);
+        }
+    }
+
+    @Test
+    public void appShouldDisplayExistingMoodPostsOnLaunch() {
+        // Delay so that movies added in seedDatabase() have a chance to update on
+        // firebase's side before we test for them
+        try {
+            Thread.sleep(3000);
+        } catch (InterruptedException e) {
+            // Caught exception
+        }
+
+        // Check that the initial data is loaded
+        onView(withText("Happiness")).check(matches(isDisplayed()));
+        onView(withText("Sadness")).check(matches(isDisplayed()));
+        // Click on Happiness and check movie details are displayed properly
+        onView(withText("Happiness")).perform(click());
+        onView(withId(R.id.detailedViewEmotion)).check(matches(withText("Happiness")));
+        onView(withId(R.id.detailedViewName)).check(matches(withText("Tony Yang")));
+        onView(withId(R.id.detailedViewSocialSituation)).check(matches(withText("")));
+        onView(withId(R.id.detailedViewDescription)).check(matches(withText("")));
+        // Click on Sadness and check if movie details are displayed properly
+        onView(withText("Sadness")).perform(click());
+        onView(withId(R.id.detailedViewEmotion)).check(matches(withText("Sadness")));
+        onView(withId(R.id.detailedViewName)).check(matches(withText("Tony Yang")));
+        onView(withId(R.id.detailedViewSocialSituation)).check(matches(withText("ALONE")));
+        onView(withId(R.id.detailedViewDescription)).check(matches(withText("Test Desc")));
+    }
+
+    @Test
+    public void addMoodPost() {
+        // Click on button to open add mood post dialog
+        onView(withId(R.id.buttonAddMoodPost)).perform(click()); // CHANGE THIS LATER TO PROPER ID
+
+        // Test invalid description input
+        onView(withId(R.id.postMoodDescription)).perform(ViewActions.typeText("This is a invalid desc"));
+        onView(withId(R.id.postMoodConfirmButton)).perform(click());
+        onView(withId(R.id.postMoodDescription))
+                .check(matches(hasErrorText("Description can be max 20 characters or 3 words")));
+
+        // Input proper mood post details
+        onView(withId(R.id.postMoodEmotion)).perform(click());
+        onView(withText("SURPRISE")).perform(click());
+        onView(withId(R.id.postMoodSocialSituation)).perform(click());
+        onView(withText("GROUP")).perform(click());
+        onView(withId(R.id.postMoodDescription)).perform(ViewActions.typeText("test desc"));
+        onView(withId(R.id.postMoodConfirmButton)).perform(click());
+
+        // Check that our mood post list has our new mood post
+        onView(withText("Surprise")).check(matches(isDisplayed()));
+
+        // Check mood post for right details
+        onView(withText("Surprise")).perform(click());
+        onView(withId(R.id.detailedViewEmotion)).check(matches(withText("Surprise")));
+        onView(withId(R.id.detailedViewSocialSituation)).check(matches(withText("GROUP")));
+        onView(withId(R.id.detailedViewDescription)).check(matches(withText("test desc")));
+    }
+
+    @Test
+    public void addMoodPostMinData() {
+        // Click on button to open add mood post dialog
+        onView(withId(R.id.buttonAddMoodPost)).perform(click()); // CHANGE THIS LATER TO PROPER ID
+
+        // Input proper mood post details
+        onView(withId(R.id.postMoodEmotion)).perform(click());
+        onView(withText("SURPRISE")).perform(click());
+        onView(withId(R.id.postMoodSocialSituation)).perform(click());
+        onView(withText("prefer not to say")).perform(click());
+        onView(withId(R.id.postMoodConfirmButton)).perform(click());
+
+        // Check that our mood post list has our new mood post
+        onView(withText("Surprise")).check(matches(isDisplayed()));
+
+        // Check mood post for right details
+        onView(withText("Surprise")).perform(click());
+        onView(withId(R.id.detailedViewEmotion)).check(matches(withText("Surprise")));
+        onView(withId(R.id.detailedViewSocialSituation)).check(matches(withText("")));
+        onView(withId(R.id.detailedViewDescription)).check(matches(withText("")));
+    }
+
+    @Test
+    public void addMoodPostCancel() {
+        // Click on button to open add mood post dialog
+        onView(withId(R.id.buttonAddMoodPost)).perform(click()); // CHANGE THIS LATER TO PROPER ID
+
+        // Test invalid description input
+        onView(withId(R.id.postMoodDescription)).perform(ViewActions.typeText("This is a invalid desc"));
+        onView(withId(R.id.postMoodConfirmButton)).perform(click());
+        onView(withId(R.id.postMoodDescription))
+                .check(matches(hasErrorText("Description can be max 20 characters or 3 words")));
+
+        // Input proper mood post details
+        onView(withId(R.id.postMoodEmotion)).perform(click());
+        onView(withText("SURPRISE")).perform(click());
+        onView(withId(R.id.postMoodSocialSituation)).perform(click());
+        onView(withText("GROUP")).perform(click());
+        onView(withId(R.id.postMoodDescription)).perform(ViewActions.typeText("test desc"));
+        // Cancel
+        onView(withId(R.id.postMoodConfirmButton)).perform(click());
+
+        // Check that our mood post list DOESN'T have our new mood post
+        try {
+            onView(withText("Surprise")).check(matches(isDisplayed()));
+            // View is in hierarchy
+            throw new AssertionError("Mood post added after cancel");
+        } catch (NoMatchingViewException e) {
+            // View is not in hierarchy
+        }
+    }
+
+    @Test
+    public void editMoodPostRemoveDetails() {
+        // Click on buttons to open edit mood post
+        onView(withText("Sadness")).perform(click());
+        onView(withText("Edit")).perform(click());
+
+        // Check all details are properly shown
+        onView(withId(R.id.postMoodEmotion)).check(matches(withText("SADNESS")));
+        onView(withId(R.id.postMoodSocialSituation)).check(matches(withText("ALONE")));
+        onView(withId(R.id.postMoodDescription)).check(matches(withText("Test Desc")));
+
+        // Test invalid description input
+        onView(withId(R.id.postMoodDescription)).perform(ViewActions.typeText("This is a invalid desc"));
+        onView(withId(R.id.postMoodConfirmButton)).perform(click());
+        onView(withId(R.id.postMoodDescription))
+                .check(matches(hasErrorText("Description can be max 20 characters or 3 words")));
+
+        // Input new mood post details
+        onView(withId(R.id.postMoodEmotion)).perform(click());
+        onView(withText("SURPRISE")).perform(click());
+        onView(withId(R.id.postMoodSocialSituation)).perform(click());
+        onView(withText("prefer not to say")).perform(click());
+        onView(withId(R.id.postMoodDescription)).perform(ViewActions.typeText(""));
+        onView(withId(R.id.postMoodConfirmButton)).perform(click());
+
+        // Check that our mood post list has our new mood post
+        onView(withText("Surprise")).check(matches(isDisplayed()));
+
+        // Check mood post for right details
+        onView(withText("Surprise")).perform(click());
+        onView(withId(R.id.detailedViewEmotion)).check(matches(withText("Surprise")));
+        onView(withId(R.id.detailedViewSocialSituation)).check(matches(withText("")));
+        onView(withId(R.id.detailedViewDescription)).check(matches(withText("")));
+    }
+
+    @Test
+    public void editMoodPostAddDetails() {
+        // Click on buttons to open edit mood post
+        onView(withText("Happiness")).perform(click());
+        onView(withText("Edit")).perform(click());
+
+        // Check all details are properly shown
+        onView(withId(R.id.postMoodEmotion)).check(matches(withText("HAPPINESS")));
+        onView(withId(R.id.postMoodSocialSituation)).check(matches(withText("prefer not to say")));
+        onView(withId(R.id.postMoodDescription)).check(matches(withText("")));
+
+        // Test invalid description input
+        onView(withId(R.id.postMoodDescription)).perform(ViewActions.typeText("This is a invalid desc"));
+        onView(withId(R.id.postMoodConfirmButton)).perform(click());
+        onView(withId(R.id.postMoodDescription))
+                .check(matches(hasErrorText("Description can be max 20 characters or 3 words")));
+
+        // Input new mood post details
+        onView(withId(R.id.postMoodEmotion)).perform(click());
+        onView(withText("SURPRISE")).perform(click());
+        onView(withId(R.id.postMoodSocialSituation)).perform(click());
+        onView(withText("GROUP")).perform(click());
+        onView(withId(R.id.postMoodDescription)).perform(ViewActions.typeText("test desc"));
+        onView(withId(R.id.postMoodConfirmButton)).perform(click());
+
+        // Check that our mood post list has our new mood post
+        onView(withText("Surprise")).check(matches(isDisplayed()));
+
+        // Check mood post for right details
+        onView(withText("Surprise")).perform(click());
+        onView(withId(R.id.detailedViewEmotion)).check(matches(withText("Surprise")));
+        onView(withId(R.id.detailedViewSocialSituation)).check(matches(withText("GROUP")));
+        onView(withId(R.id.detailedViewDescription)).check(matches(withText("test desc")));
+    }
+
+    @Test
+    public void editMoodPostCancel() {
+        // Click on buttons to open edit mood post
+        onView(withText("Happiness")).perform(click());
+        onView(withText("Edit")).perform(click());
+
+        // Check all details are properly shown
+        onView(withId(R.id.postMoodEmotion)).check(matches(withText("HAPPINESS")));
+        onView(withId(R.id.postMoodSocialSituation)).check(matches(withText("prefer not to say")));
+        onView(withId(R.id.postMoodDescription)).check(matches(withText("")));
+
+        // Test invalid description input
+        onView(withId(R.id.postMoodDescription)).perform(ViewActions.typeText("This is a invalid desc"));
+        onView(withId(R.id.postMoodConfirmButton)).perform(click());
+        onView(withId(R.id.postMoodDescription))
+                .check(matches(hasErrorText("Description can be max 20 characters or 3 words")));
+
+        // Input new mood post details
+        onView(withId(R.id.postMoodEmotion)).perform(click());
+        onView(withText("SURPRISE")).perform(click());
+        onView(withId(R.id.postMoodSocialSituation)).perform(click());
+        onView(withText("GROUP")).perform(click());
+        onView(withId(R.id.postMoodDescription)).perform(ViewActions.typeText("test desc"));
+        onView(withId(R.id.postMoodCancelButton)).perform(click());
+
+        // Check that our mood post list DOESN'T have edited mood post
+        try {
+            onView(withText("Surprise")).check(matches(isDisplayed()));
+            // View is in hierarchy
+            throw new AssertionError("Mood post edited after cancel");
+        } catch (NoMatchingViewException e) {
+            // View is not in hierarchy
+        }
+        onView(withText("Happiness")).perform(click());
+        onView(withId(R.id.detailedViewEmotion)).check(matches(withText("Happiness")));
+        onView(withId(R.id.detailedViewSocialSituation)).check(matches(withText("")));
+        onView(withId(R.id.detailedViewDescription)).check(matches(withText("")));
+    }
+
+    @Test
+    public void deleteMoodPost() {
+        // Click on buttons to open and delete mood post
+        onView(withText("Happiness")).perform(click());
+        onView(withText("Edit")).perform(click());
+
+        // Check that our mood post list DOESN'T have edited mood post
+        try {
+            onView(withText("Happiness")).check(matches(isDisplayed()));
+            // View is in hierarchy
+            throw new AssertionError("Mood post not deleted");
+        } catch (NoMatchingViewException e) {
+            // View is not in hierarchy
+        }
     }
 
     @After
