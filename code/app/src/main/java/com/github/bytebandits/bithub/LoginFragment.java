@@ -90,7 +90,12 @@ public class LoginFragment extends Fragment {
 
                 if (isValidAccount.get()) {
                     Log.d("LoginFragment", "Login successful, creating session");
-                    SessionManager.getInstance(requireContext()).createLoginSession(username);
+                    SessionManager sessionManagerIns = SessionManager.getInstance(requireContext());
+                    sessionManagerIns.createLoginSession(username);
+                    String profileJson = (String) user.get("profile");
+                    Profile profile = new Profile(username).fromJson(profileJson);
+
+                    sessionManagerIns.saveProfile(profile);
                     ((StartupActivity) requireActivity()).mainActivitySwitch();
                 } else {
                     Log.d("LoginFragment", "Login failed, showing error dialog");

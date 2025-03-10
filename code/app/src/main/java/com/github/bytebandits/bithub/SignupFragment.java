@@ -1,9 +1,14 @@
 package com.github.bytebandits.bithub;
 
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.os.AsyncTask;
+import android.os.Handler;
+import android.os.Looper;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,6 +24,9 @@ import com.google.android.material.textfield.TextInputEditText;
 
 import java.util.HashMap;
 import java.util.Optional;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Semaphore;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
@@ -33,6 +41,9 @@ public class SignupFragment extends Fragment {
     TextInputEditText pswrdText;
     TextInputEditText pswrdContext;
 
+    private final ExecutorService executor = Executors.newSingleThreadExecutor();
+    private final Handler mainHandler = new Handler(Looper.getMainLooper());
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
@@ -46,15 +57,15 @@ public class SignupFragment extends Fragment {
         pswrdText = view.findViewById(R.id.PswrdInputText);
         pswrdContext = view.findViewById(R.id.PswrdConInputText);
 
-        signup.setOnClickListener(v -> {
-            authenticate();
-        });
-        accountExists.setOnClickListener(v -> {
-            ((StartupActivity) requireActivity()).loginFragment();
-        });
-        back.setOnClickListener(v -> {
-            ((StartupActivity) requireActivity()).popBackStack("signupFragment");
-        });
+        signup.setOnClickListener(v ->
+            authenticate()
+        );
+        accountExists.setOnClickListener(v ->
+            ((StartupActivity) requireActivity()).loginFragment()
+        );
+        back.setOnClickListener(v ->
+            ((StartupActivity) requireActivity()).popBackStack("signupFragment")
+        );
 
         return view;
     }
@@ -65,50 +76,55 @@ public class SignupFragment extends Fragment {
      */
     private void authenticate() {
         if (!(isEmptyText(userText) || isEmptyText(emailText) || isEmptyText(emailText) || isEmptyText(pswrdContext))) {
-            AtomicBoolean userExists = new AtomicBoolean(false);
             String username = userText.getText().toString();
             String password = pswrdText.getText().toString();
             String email = emailText.getText().toString();
-            DatabaseManager.getUser(username, user -> {
-                // TODO: Need extra logic for emails
-                if (user != null) {
-                    userExists.set(true);
-                }
+
+            // Run DB check in background thread
+            executor.execute(() -> {
+                DatabaseManager.getUser(username, user -> {
+                    boolean userExists = (user != null);
+
+                    // Switch to UI thread to handle results
+                    mainHandler.post(() -> {
+                        Log.d("SignupFragment", "User exists: " + userExists);
+                        handleAuthenticationResult(userExists, username, email, password);
+                    });
+                });
             });
-
-            boolean usernameReqsValid = !username.contains("@");
-            boolean pswrdMatch = password.equals(pswrdContext.getText().toString());
-
-            boolean areCredentialsValid = !userExists.get() && usernameReqsValid && pswrdMatch;
-            if (areCredentialsValid) {
-                HashMap<String, Object> userDetails = new HashMap<>();
-                userDetails.put("username", username);
-                userDetails.put("email", email);
-                userDetails.put("password", password);
-
-                DatabaseManager.addUser(username, userDetails, Optional.empty());
-
-                ((StartupActivity) requireActivity()).loginFragment();
-            }
-
-            else if (!usernameReqsValid) {
-                AlertDialog dialog = createDialog("Username cannot have '@' within it");
-                dialog.show();
-            }
-
-            else {
-                AlertDialog dialog = createDialog(
-                        "Invalid information! Or the provided username or email already has an account attached to it");
-                dialog.show();
-            }
-        }
-
-        else {
+        } else {
             AlertDialog dialog = createDialog("No null/empty strings allowed!");
             dialog.show();
         }
 
     }
+
+    /**
+     * Handles the authentication result after checking the database.
+     */
+    private void handleAuthenticationResult(boolean userExists, String username, String email, String password) {
+        boolean usernameReqsValid = !username.contains("@");
+        boolean pswrdMatch = password.equals(pswrdContext.getText().toString());
+
+        if (!userExists && usernameReqsValid && pswrdMatch) {
+            Log.d("SignupFragment", "Credentials are valid. Creating user...");
+
+            HashMap<String, Object> userDetails = new HashMap<>();
+            userDetails.put("username", username);
+            userDetails.put("email", email);
+            userDetails.put("password", password);
+            userDetails.put("profile", new Profile(username).toJson());
+
+            DatabaseManager.addUser(username, userDetails, Optional.empty());
+
+            ((StartupActivity) requireActivity()).loginFragment();
+        } else if (!usernameReqsValid) {
+            createDialog("Username cannot have '@' within it").show();
+        } else {
+            createDialog("Invalid information! Username or email may already exist.").show();
+        }
+    }
+
 
     /**
      * Helper function to check if text is not null nor empty
@@ -139,5 +155,11 @@ public class SignupFragment extends Fragment {
             }
         });
         return builder.create();
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        executor.shutdown(); // Clean up executor when fragment is destroyed
     }
 }

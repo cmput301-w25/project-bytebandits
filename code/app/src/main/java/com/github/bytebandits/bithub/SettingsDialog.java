@@ -58,9 +58,7 @@ import android.widget.Button;
      * Handles user logout by clearing user data and redirecting to the startup screen.
      */
     private void logoutUser() {
-        //TODO:
-        SessionManager sessionManager = new SessionManager(context);
-        sessionManager.logoutUser();
+        SessionManager.getInstance(context).logoutUser();
     }
 }
 

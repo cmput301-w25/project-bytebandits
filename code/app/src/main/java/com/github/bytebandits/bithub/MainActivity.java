@@ -27,8 +27,6 @@ import com.github.bytebandits.bithub.databinding.ActivityMainBinding;
  */
 
 public class MainActivity extends AppCompatActivity {
-    SessionManager sessionManager;
-
     private ActivityMainBinding binding;
 
     /**
@@ -80,7 +78,7 @@ public class MainActivity extends AppCompatActivity {
      *
      * @param fragment The fragment to be displayed.
      */
-    private void replaceFragment(Fragment fragment) {
+    void replaceFragment(Fragment fragment) {
         FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
         fragmentTransaction.replace(R.id.frameLayout, fragment);

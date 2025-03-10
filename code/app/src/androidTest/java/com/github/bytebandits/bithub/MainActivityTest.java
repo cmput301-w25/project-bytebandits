@@ -16,6 +16,9 @@ import androidx.test.ext.junit.rules.ActivityScenarioRule;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.filters.LargeTest;
 
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.FirebaseFirestore;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -36,9 +39,8 @@ public class MainActivityTest {
     public static void setup() {
         // Specific address for emulated device to access our localHost
         String androidLocalhost = "10.0.2.2";
-
         int portNumber = 8080;
-        FirebaseFirestore.getInstance().useEmulator(androidLocalhost, portNumber);
+        DatabaseManager.getDb().getInstance().useEmulator(androidLocalhost, portNumber);
     }
 
     @Rule
@@ -84,8 +86,7 @@ public class MainActivityTest {
 
     @Before
     public void seedDatabase() {
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
-        CollectionReference moodPostRef = db.collection("posts");
+        CollectionReference moodPostRef = DatabaseManager.getPostsCollectionRef();
         MoodPost[] moodPosts = {
                 new MoodPost(Emotion.HAPPINESS, new Profile("Tony Yang"), false, null, null, null),
                 new MoodPost(Emotion.SADNESS, new Profile("John Smith"), false, SocialSituation.ALONE, "Test Desc",
