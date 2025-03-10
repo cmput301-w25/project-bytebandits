@@ -33,6 +33,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
 
+        // Possibly remove later
 //        Profile loggedInProfile = Database.loggedInUser();
 //
 //        // Check if user is logged in
@@ -49,17 +50,17 @@ public class MainActivity extends AppCompatActivity {
 
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
-        replaceFragment(new HomeFragment());  // display the home fragment first when logged in
+        replaceFragment(new HomepageFragment());  // display the home fragment first when logged in
 
         binding.bottomNavigation.setOnItemSelectedListener(item -> {
 
             // call replaceFragment when user selects one of the bottom navigaton bar's icons
             if (item.getItemId() == R.id.home) {
-                replaceFragment(new HomeFragment());
+                replaceFragment(new Homepageragment());
             } else if (item.getItemId() == R.id.explore) {
                 replaceFragment(new ExploreFragment());
             } else if (item.getItemId() == R.id.create) {
-                replaceFragment(new CreateFragment());
+                replaceFragment(new PostMoodFragment());
             } else if (item.getItemId() == R.id.notifications) {
                 replaceFragment(new NotificationsFragment());
             } else if (item.getItemId() == R.id.profile) {
@@ -83,6 +84,19 @@ public class MainActivity extends AppCompatActivity {
         fragmentTransaction.replace(R.id.frameLayout, fragment);
         fragmentTransaction.commit();
     }
+
+    /**
+     * Launches the editMoodPost fragment
+     */
+    public void editMoodFragment(MoodPost moodPost) {
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        PostMoodFragment postMoodFragment = PostMoodFragment.newInstance(moodPost);
+        fragmentTransaction.add(R.id.frameLayout, postMoodFragment, "edit mood post");
+        fragmentTransaction.commit();
+    }
+
+    // Possibly remove later
     // Access the global profile anywhere in the app
 //    public static Profile getGlobalProfile() {
 //        return globalProfile;
