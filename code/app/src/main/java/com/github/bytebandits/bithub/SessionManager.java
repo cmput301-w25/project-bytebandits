@@ -38,11 +38,19 @@ public class SessionManager {
     public void createLoginSession(String username) {
         editor.putBoolean(IS_LOGIN, true);
         editor.putString(KEY_USERNAME, username);
-        editor.apply();
+        editor.commit();
     }
 
     public boolean isLoggedIn() {
         return prefs.getBoolean(IS_LOGIN, false);
+    }
+
+    public SharedPreferences getSharedPreferences() {
+        return this.prefs;
+    }
+
+    public SharedPreferences.Editor getEditor() {
+        return this.editor;
     }
 
     public String getUsername() {

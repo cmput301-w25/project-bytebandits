@@ -23,12 +23,8 @@ public class StartupActivity extends AppCompatActivity {
         DatabaseManager.init();
 
         SessionManager sessionManager = SessionManager.getInstance(this);
-        // testingLogOut(); // comment this line to see logged in state functionality
 
-        SharedPreferences sharedPref = getSharedPreferences(SessionManager.getPrefName(), Context.MODE_PRIVATE);
-        boolean isLoggedIn = sharedPref.getBoolean(SessionManager.getIsLoginKey(), false); // second param is default
-                                                                                           // val if key does not exist
-        if (isLoggedIn) {
+        if (sessionManager.isLoggedIn()) {
             mainActivitySwitch();
         } else {
             startupFragment();

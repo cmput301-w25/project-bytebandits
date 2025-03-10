@@ -13,7 +13,7 @@ public final class DatabaseManager {
 
     static {
         firestoreDB = FirebaseFirestore.getInstance();
-        firestoreDB.useEmulator("10.0.2.2", 8080);
+//        firestoreDB.useEmulator("10.0.2.2", 8080);
     }
 
     public static FirebaseFirestore getDb() {

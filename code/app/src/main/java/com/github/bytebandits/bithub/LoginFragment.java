@@ -6,6 +6,7 @@ import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,6 +19,8 @@ import androidx.fragment.app.Fragment;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.textfield.TextInputEditText;
+
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Fragment that displays the login page
@@ -62,33 +65,41 @@ public class LoginFragment extends Fragment {
      */
     private void authenticate() {
         if (!(isEmptyText(userEmailText) || isEmptyText(passwordText))) {
+            String username = userEmailText.getText().toString();
+            String password = passwordText.getText().toString();
 
-            // determine if text input is email or username by checking to see if it has an
-            // '@'
-            // call db class
-            // make query -> does provided email OR username exist? -> if so, does password
-            // input match in db?
-            // return true if all passes otherwise false
+            Log.d("LoginFragment", "Attempting login for username: " + username);
 
-            boolean querySuccess = true; // placeholder and for testing, set to false if you want to see error text,
-                                         // true for main activity switch
+            AtomicBoolean isValidAccount = new AtomicBoolean(false);
+            DatabaseManager.getUser(username, user -> {
+                if (user != null) {
+                    String storedPassword = (String) user.get("password");
+                    Log.d("LoginFragment", "Fetched user data: " + user.toString());
+                    Log.d("LoginFragment", "Stored password: " + storedPassword);
+                    Log.d("LoginFragment", "Entered password: " + password);
 
-            if (querySuccess) {
-                SharedPreferences sharedPref = requireActivity().getSharedPreferences("UserPrefs",
-                        Context.MODE_PRIVATE);
-                SharedPreferences.Editor editor = sharedPref.edit();
-                editor.putBoolean("LoggedIn", true);
-                editor.commit();
-                ((StartupActivity) requireActivity()).mainActivitySwitch();
-            }
+                    if (password.matches(storedPassword)) {
+                        isValidAccount.set(true);
+                        Log.d("LoginFragment", "Password match successful");
+                    } else {
+                        Log.d("LoginFragment", "Password mismatch");
+                    }
+                } else {
+                    Log.d("LoginFragment", "User not found in database");
+                }
 
-            else {
-                AlertDialog dialog = createDialog("Invalid information!");
-                dialog.show();
-            }
-        }
-
-        else {
+                if (isValidAccount.get()) {
+                    Log.d("LoginFragment", "Login successful, creating session");
+                    SessionManager.getInstance(requireContext()).createLoginSession(username);
+                    ((StartupActivity) requireActivity()).mainActivitySwitch();
+                } else {
+                    Log.d("LoginFragment", "Login failed, showing error dialog");
+                    AlertDialog dialog = createDialog("Invalid information!");
+                    dialog.show();
+                }
+            });
+        } else {
+            Log.d("LoginFragment", "Empty username or password");
             AlertDialog dialog = createDialog("No null/empty strings allowed!");
             dialog.show();
         }
