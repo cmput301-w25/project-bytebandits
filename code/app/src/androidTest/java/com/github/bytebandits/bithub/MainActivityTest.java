@@ -46,22 +46,40 @@ public class MainActivityTest {
 
     @Test
     public void moodHistory() {
-        // navigate to profile page
+        // Click on the profile icon in the navigation bar
         onView(withId(R.id.profile)).perform(click());
 
-        // check if mood post list history is displayed
+        // Check if mood post list history is displayed
         onView(withId(R.id.mood_post_list_history)).check(matches(isDisplayed()));
     }
 
     @Test
     public void logout() {
-        // navigate to the settings dialog and click logout button
+        // Click on the profile icon in the navigation bar
         onView(withId(R.id.profile)).perform(click());
         onView(withId(R.id.settings_button)).perform(click());
         onView(withId(R.id.logout_button)).perform(click());
 
-        // check if startup actvity is displayed
+        // Check if startup activity is displayed
         onView(withId(R.layout.activity_startup)).check(matches(isDisplayed()));
+    }
+
+    @Test
+    public void navbar() {
+        // Click on the Home icon in the navigation bar
+        onView(withId(R.id.home)).perform(click());
+        // Check if a unique view within the home fragment is displayed
+        onView(withId(R.id.moodIcon)).check(matches(isDisplayed()));
+
+        // Click on the Profile icon in the navigation bar
+        onView(withId(R.id.profile)).perform(click());
+        // Check if a unique view within the profile fragment is displayed
+        onView(withId(R.id.history_textview)).check(matches(isDisplayed()));
+
+        // Click on the Create icon in the navigation bar
+        onView(withId(R.id.create)).perform(click());
+        // Check if a unique view within the post mood fragment is displayed
+        onView(withId(R.id.postMoodCancelButton)).check(matches(isDisplayed()));
     }
 
     @Before
