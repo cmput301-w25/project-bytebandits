@@ -1,5 +1,6 @@
 plugins {
     alias(libs.plugins.android.application)
+    alias(libs.plugins.google.services)
 }
 
 android {
@@ -14,6 +15,11 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+    }
+
+    buildFeatures {
+        viewBinding = true
     }
 
     buildTypes {
@@ -32,12 +38,21 @@ android {
 }
 
 dependencies {
-
     implementation(libs.appcompat)
     implementation(libs.material)
     implementation(libs.activity)
     implementation(libs.constraintlayout)
+    implementation(platform("com.google.firebase:firebase-bom:33.10.0"))
+    implementation(libs.gson)
+    implementation(libs.firebase.firestore)
     testImplementation(libs.junit)
+    testImplementation(libs.robolectric)
+    testImplementation("org.mockito:mockito-core:5.7.0")
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
+
+    // The following imports where just copied from Lab 7 (UI Testing with Espresso)
+    testImplementation("junit:junit:4.13.2")
+    androidTestImplementation("androidx.test.ext:junit:1.1.5")
+    androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
 }
