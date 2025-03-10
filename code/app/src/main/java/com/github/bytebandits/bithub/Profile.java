@@ -16,39 +16,64 @@ public class Profile {
     private Boolean locationServices;
     private Bitmap image = null;
 
-    // constructor that only sets the user ID
+    /**
+     * Constructs a Profile object with the specified user ID.
+     *
+     * @param userID The unique identifier for the user.
+     */
     public Profile(String userID) {
         this.userID = userID;
     }
 
-    // constructor that sets the user ID and profile picture
+    /**
+     * Constructs a Profile object with the specified user ID and profile picture.
+     *
+     * @param userID The unique identifier for the user.
+     * @param image The user's profile picture.
+     */
     public Profile(String userID, Bitmap image) {
         this.userID = userID;
         this.image = image;
     }
 
 
-    // returns the current user ID
+    /**
+     * Returns the current user ID.
+     *
+     * @return The user's unique identifier.
+     */
     public String getUserID() {
         return userID;
     }
 
-    // enables user's location services
+    /**
+     * Enables the user's location services.
+     */
     public void enableLocationServices() {
         this.locationServices = true;
     }
 
-    // disables user's location services
+    /**
+     * Disables the user's location services.
+     */
     public void disableLocationServices() {
         this.locationServices = false;
     }
 
-    // returns the user's profile picture
+    /**
+     * Returns the user's profile picture.
+     *
+     * @return The user's profile picture
+     */
     public Bitmap getImage() {
         return image;
     }
 
-    // sets te user's profile picture
+    /**
+     * Sets the user's profile picture.
+     *
+     * @param image The new profile picture
+     */
     public void setImage(Bitmap image) {
         this.image = image;
     }
