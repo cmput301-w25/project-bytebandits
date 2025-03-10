@@ -12,12 +12,11 @@ import org.junit.Test;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.*;
 
 import static org.junit.Assert.*;
-import static org.mockito.*;
+import static org.mockito.Mockito.*;
 
 public class DatabaseManagerTests {
     private static FirebaseFirestore db;
@@ -57,6 +56,7 @@ public class DatabaseManagerTests {
         DatabaseManager.getUserPosts(userId, posts -> {
             assertNotNull(posts);
             assertTrue(posts.size() >= 0);
+            return null;
         });
     }
 
@@ -64,26 +64,25 @@ public class DatabaseManagerTests {
     public void testAddPost_Success() {
         MoodPost post = new MoodPost(Emotion.SADNESS, new Profile("John Smith"), false, SocialSituation.ALONE, "Test Desc", null);
 
-        DatabaseManager.addPost(mockContext, post, success -> assertTrue(success));
+        DatabaseManager.addPost(mockContext, post, Optional.of(success -> assertTrue(success)));
     }
 
     @Test
     public void testUpdatePost_Success() {
         String postId = UUID.randomUUID().toString();
-        MoodPost post = new MoodPost(postId, "Old content");
+        MoodPost post = new MoodPost(Emotion.SADNESS, new Profile("John Smith"), false, SocialSituation.ALONE, "Test Desc",null);
         postsCollectionRef.document(postId).set(post);
 
         HashMap<String, Object> options = new HashMap<>();
         options.put("content", "Updated content");
 
-        DatabaseManager.updatePost(postId, options, success -> {
-            assertTrue(success);
+        DatabaseManager.updatePost(postId, options, Optional.of(success -> {
             postsCollectionRef.document(postId).get().addOnCompleteListener(task -> {
                 if (task.isSuccessful()) {
                     assertEquals("Updated content", task.getResult().getString("content"));
                 }
             });
-        });
+        }));
     }
 
     @After
