@@ -32,8 +32,7 @@ public class HomepageFragment extends Fragment implements DatabaseManager.OnPost
 
         // Initialize dataList from database
         DatabaseManager.init();
-        DatabaseManager.getPosts(((MainActivity) requireActivity()).profile.getUserID(),
-                new DatabaseManager.OnPostsFetchListener());
+        DatabaseManager.getPosts(new DatabaseManager.OnPostsFetchListener());
 
         // Listener so that dataList gets updated whenever the database does
         CollectionReference moodPostRef = db.getPostsCollectionRef(); // Maybe change later if getter name is wrong
