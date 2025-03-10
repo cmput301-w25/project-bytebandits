@@ -87,6 +87,7 @@ public class StartupActivity extends AppCompatActivity {
 
     /**
      * Back button functionality throughout Startup activity
+     * @param fragmentStr the fragment represented as a string to be popped
      */
     public void popBackStack(String fragmentStr) {
         FragmentManager fragmentManager = getSupportFragmentManager();
