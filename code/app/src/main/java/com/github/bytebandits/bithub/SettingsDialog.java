@@ -59,8 +59,8 @@ import android.widget.Button;
      */
     private void logoutUser() {
         //TODO:
-        // Clear the global profile (user logged out)
-        // Redirect to login screen (or StartupActivity)
+        SessionManager sessionManager = new SessionManager(context);
+        sessionManager.logoutUser();
     }
 }
 
