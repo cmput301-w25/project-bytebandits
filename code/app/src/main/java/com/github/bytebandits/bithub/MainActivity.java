@@ -14,47 +14,46 @@ import androidx.fragment.app.FragmentTransaction;
 import com.github.bytebandits.bithub.databinding.ActivityMainBinding;
 
 /**
- * MainActivity serves as the primary hub of the Bithub application after user authentication.
+ * MainActivity serves as the primary hub of the Bithub application after user
+ * authentication.
  * It is responsible for:
- * - Displaying and managing the main features of the app through different fragments
- *   (Home, Explore, Create, Notifications, Profile) using a BottomNavigationView.
- * - Initializing the UI with View Binding for improved performance and cleaner code.
- * - Handling fragment transactions to switch between different sections of the app.
+ * - Displaying and managing the main features of the app through different
+ * fragments
+ * (Home, Explore, Create, Notifications, Profile) using a BottomNavigationView.
+ * - Initializing the UI with View Binding for improved performance and cleaner
+ * code.
+ * - Handling fragment transactions to switch between different sections of the
+ * app.
  */
 
 public class MainActivity extends AppCompatActivity {
     SessionManager sessionManager;
 
-//    public static Profile globalProfile;
     private ActivityMainBinding binding;
+
+    /**
+     * Called when the activity is first created.
+     * Initializes the UI, sets up the BottomNavigationView, and manages fragment
+     * transactions.
+     *
+     * @param savedInstanceState Bundle contains the data it most recently supplied.
+     */
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
 
-        // Possibly remove later
-//        Profile loggedInProfile = Database.loggedInUser();
-//
-//        // Check if user is logged in
-//        if (loggedInProfile != null) {
-//            // There is some user logged in
-//            globalProfile = loggedInProfile;
-//            setContentView(R.layout.activity_main);
-//        } else {
-//            // If no user is logged in, go to the start activity
-//            Intent intent = new Intent(this, StartupActivity.class);
-//            startActivity(intent);
-//            finish();  // Prevents the user from going back to this activity by pressing the back button
-//        }
-
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
-        replaceFragment(new HomepageFragment());  // display the home fragment first when logged in
 
+        // Display the home fragment first when the user is logged in
+        replaceFragment(new HomepageFragment());
+
+        // Set up BottomNavigationView item selection listener
         binding.bottomNavigation.setOnItemSelectedListener(item -> {
 
-            // call replaceFragment when user selects one of the bottom navigaton bar's icons
+            // Replace fragment based on selected navigation item
             if (item.getItemId() == R.id.home) {
                 replaceFragment(new Homepageragment());
             } else if (item.getItemId() == R.id.explore) {
@@ -76,8 +75,11 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    // Replaces the current fragment with the selected fragment based on the clicked
-    // icon.
+    /**
+     * Replaces the current fragment with the specified fragment.
+     *
+     * @param fragment The fragment to be displayed.
+     */
     private void replaceFragment(Fragment fragment) {
         FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
@@ -95,16 +97,5 @@ public class MainActivity extends AppCompatActivity {
         fragmentTransaction.add(R.id.frameLayout, postMoodFragment, "edit mood post");
         fragmentTransaction.commit();
     }
-
-    // Possibly remove later
-    // Access the global profile anywhere in the app
-//    public static Profile getGlobalProfile() {
-//        return globalProfile;
-//    }
-//
-//    // Clear the global profile
-//    public static void clearGlobalProfile() {
-//        globalProfile = null;
-//    }
 
 }
