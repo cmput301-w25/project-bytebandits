@@ -17,6 +17,10 @@ import androidx.fragment.app.Fragment;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.textfield.TextInputEditText;
 
+import java.util.HashMap;
+import java.util.Optional;
+import java.util.concurrent.atomic.AtomicBoolean;
+
 /**
  * Fragment that displays the signup page
  */
@@ -27,12 +31,12 @@ public class SignupFragment extends Fragment {
     TextInputEditText userText;
     TextInputEditText emailText;
     TextInputEditText pswrdText;
-    TextInputEditText pswrdConText;
-
+    TextInputEditText pswrdContext;
 
     @Nullable
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
+            @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.signup, container, false);
         signup = view.findViewById(R.id.registerBtn);
         accountExists = view.findViewById(R.id.accountExists);
@@ -40,7 +44,7 @@ public class SignupFragment extends Fragment {
         userText = view.findViewById(R.id.UserInputText);
         emailText = view.findViewById(R.id.EmailInputText);
         pswrdText = view.findViewById(R.id.PswrdInputText);
-        pswrdConText = view.findViewById(R.id.PswrdConInputText);
+        pswrdContext = view.findViewById(R.id.PswrdConInputText);
 
         signup.setOnClickListener(v -> {
             authenticate();
@@ -56,36 +60,50 @@ public class SignupFragment extends Fragment {
     }
 
     /**
-     * Authenticates user input, displays an error if something is wrong, or switches to login fragment if everything is correct
+     * Authenticates user input, displays an error if something is wrong, or
+     * switches to login fragment if everything is correct
      */
-    private void authenticate(){
+    private void authenticate() {
+        if (!(isEmptyText(userText) || isEmptyText(emailText) || isEmptyText(emailText) || isEmptyText(pswrdContext))) {
+            AtomicBoolean userExists = new AtomicBoolean(false);
+            String username = userText.getText().toString();
+            String password = pswrdText.getText().toString();
+            String email = emailText.getText().toString();
+            DatabaseManager.getUser(username, user -> {
+                // TODO: Need extra logic for emails
+                if (user != null) {
+                    userExists.set(true);
+                }
+            });
 
-        if (!(isEmptyText(userText) || isEmptyText(emailText) || isEmptyText(emailText) || isEmptyText(pswrdConText))){
+            boolean usernameReqsValid = !username.contains("@");
+            boolean pswrdMatch = password.equals(pswrdContext.getText().toString());
 
-            // call db class
-            // make query -> does provided email exist? does username exist?
-            // return true if both does not exist
+            boolean areCredentialsValid = !userExists.get() && usernameReqsValid && pswrdMatch;
+            if (areCredentialsValid) {
+                HashMap<String, Object> userDetails = new HashMap<>();
+                userDetails.put("username", username);
+                userDetails.put("email", email);
+                userDetails.put("password", password);
 
-            boolean querySuccess = true; // placeholder and for testing, set to false if you want to see error text, true for login switch
-            boolean usernameReqsValid = !userText.getText().toString().contains("@");
-            boolean pswrdMatch = pswrdText.getText().toString().equals(pswrdConText.getText().toString());
+                DatabaseManager.addUser(username, userDetails, Optional.empty());
 
-            if (querySuccess && pswrdMatch && usernameReqsValid){
                 ((StartupActivity) requireActivity()).loginFragment();
             }
 
-            else if (!usernameReqsValid){
+            else if (!usernameReqsValid) {
                 AlertDialog dialog = createDialog("Username cannot have '@' within it");
                 dialog.show();
             }
 
-            else{
-                AlertDialog dialog = createDialog("Invalid information! Or the provided username or email already has an account attached to it");
+            else {
+                AlertDialog dialog = createDialog(
+                        "Invalid information! Or the provided username or email already has an account attached to it");
                 dialog.show();
             }
         }
 
-        else{
+        else {
             AlertDialog dialog = createDialog("No null/empty strings allowed!");
             dialog.show();
         }
@@ -94,19 +112,21 @@ public class SignupFragment extends Fragment {
 
     /**
      * Helper function to check if text is not null nor empty
+     * 
      * @param text
      * @return true if it is null/empty, false if not
      */
-    private boolean isEmptyText(TextInputEditText text){
+    private boolean isEmptyText(TextInputEditText text) {
         return TextUtils.isEmpty(text.getText());
     }
 
     /**
      * Error text dialog logic
+     * 
      * @param msg
      * @return the dialog
      */
-    AlertDialog createDialog(String msg){
+    AlertDialog createDialog(String msg) {
         AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
         builder.setMessage(msg);
         builder.setPositiveButton("Close", new DialogInterface.OnClickListener() {
@@ -115,7 +135,7 @@ public class SignupFragment extends Fragment {
                 userText.setText("");
                 emailText.setText("");
                 pswrdText.setText("");
-                pswrdConText.setText("");
+                pswrdContext.setText("");
             }
         });
         return builder.create();

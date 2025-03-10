@@ -12,12 +12,14 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 /**
- * Fragment that displays the entry point of the application, can login or register.
+ * Fragment that displays the entry point of the application, can login or
+ * register.
  */
 public class StartupFragment extends Fragment {
     @Nullable
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
+            @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.startup, container, false);
         Button login = view.findViewById(R.id.loginBtn);
         Button signup = view.findViewById(R.id.registerBtn);
@@ -37,10 +39,13 @@ public class StartupFragment extends Fragment {
     public void onResume() {
         super.onResume();
 
-        // needed to override the back functionality when a user tries swipe back on this fragment. If we did not finish the activity
-        // the user will be stuck in frameLayout, which is a blank screen with no user input, which "softlocks" the user.
+        // needed to override the back functionality when a user tries swipe back on
+        // this fragment. If we did not finish the activity
+        // the user will be stuck in frameLayout, which is a blank screen with no user
+        // input, which "softlocks" the user.
         // Inspiration for code: https://www.youtube.com/watch?v=4rx3nLBwB0M
-        // Retrieved by: Hanss Rivera, On: March 8 2025, Type: Youtube Video, Youtube Channel Author: Coding Beast
+        // Retrieved by: Hanss Rivera, On: March 8 2025, Type: Youtube Video, Youtube
+        // Channel Author: Coding Beast
         requireActivity().getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
             @Override
             public void handleOnBackPressed() {
