@@ -21,11 +21,18 @@ import android.widget.Button;
 
     private Context context;
 
-    // constructor
+    /**
+     * Constructs a SettingsDialog instance with the provided context.
+     *
+     * @param context The context used to display the dialog.
+     */
     public SettingsDialog(Context context) {
         this.context = context;
     }
 
+    /**
+     * Displays the custom settings dialog.
+     */
     public void showSettingsDialog() {
         // Inflate your custom settings dialog layout
         View dialogView = LayoutInflater.from(context).inflate(R.layout.settings_dialog, null);
@@ -47,14 +54,13 @@ import android.widget.Button;
         settingsDialog.show();
     }
 
-    // load the startup activity and set the current user to null when the user clicks the logout button
+    /**
+     * Handles user logout by clearing user data and redirecting to the startup screen.
+     */
     private void logoutUser() {
+        //TODO:
         // Clear the global profile (user logged out)
-
-
         // Redirect to login screen (or StartupActivity)
-
-//        startupFragment();
     }
 }
 

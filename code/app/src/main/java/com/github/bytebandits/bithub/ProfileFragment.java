@@ -21,6 +21,15 @@ public class ProfileFragment extends Fragment {
 
     ImageButton settingsButton;
 
+    /**
+     * Called to have the fragment instantiate its user interface view.
+     *
+     * @param inflater used to inflate views.
+     * @param container the parent view that the fragment's UI should attach to.
+     * @param savedInstanceState this fragment is being re-constructed from a previous saved state.
+     * @return The View for the fragment's UI
+     */
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -32,7 +41,9 @@ public class ProfileFragment extends Fragment {
         return view;
     }
 
-    // Displays the settings dialog if settings icon clicked
+    /**
+     * Displays the settings dialog when the settings button is clicked.
+     */
     private void openSettings() {
         SettingsDialog settingsDialog = new SettingsDialog(requireContext());
         settingsDialog.showSettingsDialog();
