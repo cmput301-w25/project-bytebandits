@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.se.omapi.Session;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -15,18 +16,19 @@ import androidx.fragment.app.FragmentTransaction;
  * related to starting up/authenticating your BitHub account.
  */
 public class StartupActivity extends AppCompatActivity {
-
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_startup);
+        DatabaseManager.init();
 
-        testingLogOut(); // comment this line to see logged in state functionality
+        SessionManager sessionManager = SessionManager.getInstance(this);
+        // testingLogOut(); // comment this line to see logged in state functionality
 
-        SharedPreferences sharedPref = getSharedPreferences("UserPrefs", Context.MODE_PRIVATE);
-        boolean loggedIn = sharedPref.getBoolean("LoggedIn", false); // second param is default val if key does not
-                                                                     // exist
-        if (loggedIn) {
+        SharedPreferences sharedPref = getSharedPreferences(SessionManager.getPrefName(), Context.MODE_PRIVATE);
+        boolean isLoggedIn = sharedPref.getBoolean(SessionManager.getIsLoginKey(), false); // second param is default
+                                                                                           // val if key does not exist
+        if (isLoggedIn) {
             mainActivitySwitch();
         } else {
             startupFragment();

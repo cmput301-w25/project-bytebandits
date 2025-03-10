@@ -18,12 +18,15 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+import android.content.Context;
 import android.util.Log;
+
 
 public class DatabaseManagerTests {
     private FirebaseFirestore db;
     private static CollectionReference usersCollectionRef;
     private static CollectionReference postsCollectionRef;
+    private Context mockContext;
 
     /**
      * Sets up the database before all tests run.
@@ -38,6 +41,7 @@ public class DatabaseManagerTests {
      */
     @Before
     public void seedDatabase() {
+        mockContext = mock(Context.class);
         db = DatabaseManager.getDb();
 
         // Create collections
