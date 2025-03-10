@@ -7,13 +7,12 @@ import org.jetbrains.annotations.NotNull;
 import java.util.*;
 
 public final class DatabaseManager {
-    private static FirebaseFirestore firestoreDB;
+    private static final FirebaseFirestore firestoreDB;
     private static CollectionReference usersCollectionRef;
     private static CollectionReference postsCollectionRef;
 
     static {
         firestoreDB = FirebaseFirestore.getInstance();
-//        firestoreDB.useEmulator("10.0.2.2", 8080);
     }
 
     public static FirebaseFirestore getDb() {
@@ -28,14 +27,14 @@ public final class DatabaseManager {
         postsCollectionRef = firestoreDB.collection("posts");
     }
 
-    public CollectionReference getUsersCollectionRef() {
+    public static CollectionReference getUsersCollectionRef() {
         if (usersCollectionRef == null) {
             throw new IllegalStateException("DatabaseManager.init() must be called before accessing Firestore collections.");
         }
         return usersCollectionRef;
     }
 
-    public CollectionReference getPostsCollectionRef() {
+    public static CollectionReference getPostsCollectionRef() {
         if (postsCollectionRef == null) {
             throw new IllegalStateException("DatabaseManager.init() must be called before accessing Firestore collections.");
         }
@@ -128,25 +127,40 @@ public final class DatabaseManager {
      * )
      */
     public static void getPosts(OnPostsFetchListener listener) {
+        Log.d("DatabaseManager", "getPosts() called");
+
         postsCollectionRef.get().addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
                 ArrayList<MoodPost> posts = new ArrayList<>();
                 for (QueryDocumentSnapshot doc : task.getResult()) {
                     posts.add(doc.toObject(MoodPost.class));
                 }
-                listener.onPostsFetched(posts);
+                Log.d("DatabaseManager", "getPosts() fetched " + posts.size() + " posts");
+
+                if (listener != null) {
+                    listener.onPostsFetched(posts);
+                } else {
+                    Log.e("DatabaseManager", "Listener is null in getPosts()");
+                }
             } else {
-                listener.onPostsFetched(null);
+                Log.e("DatabaseManager", "Firestore query failed: ", task.getException());
+
+                if (listener != null) {
+                    listener.onPostsFetched(null);
+                } else {
+                    Log.e("DatabaseManager", "Listener is null on Firestore query failure");
+                }
             }
         });
     }
+
 
     /**
      * Callback interface for fetching posts.
      * Implement this interface to handle the fetched posts.
      */
     public interface OnPostsFetchListener {
-        void onPostsFetched(ArrayList<MoodPost> posts);
+        OnPostsFetchListener onPostsFetched(ArrayList<MoodPost> posts);
     }
 
     /**
@@ -163,7 +177,7 @@ public final class DatabaseManager {
      *     }
      * });
      */
-    public static void getPosts(@NotNull String userId, OnPostsFetchListener listener) {
+    public static void getUserPosts(@NotNull String userId, OnPostsFetchListener listener) {
         ArrayList<MoodPost> posts = new ArrayList<>();
         usersCollectionRef.document(userId).get().addOnCompleteListener(task -> {
             if (task.isSuccessful() && task.getResult() != null) {
@@ -216,7 +230,7 @@ public final class DatabaseManager {
      *     }
      * });
      */
-    public static void getPosts(@NotNull ArrayList<String> userIds, OnMultipleUsersPostsFetchListener listener) {
+    public static void getUsersPosts(@NotNull ArrayList<String> userIds, OnMultipleUsersPostsFetchListener listener) {
         HashMap<String, ArrayList<MoodPost>> postsMap = new HashMap<>();
         int[] remaining = {userIds.size()}; // To track when all user posts are fetched
 
@@ -293,7 +307,7 @@ public final class DatabaseManager {
      * });
      */
     public static void addPost(@NotNull Context context, @NotNull MoodPost post, Optional<OnPostAddedListener> listener) {
-        String postId = post.getId().toString();
+        String postId = post.getPostID().toString();
 
         postsCollectionRef.document(postId).set(post)
                 .addOnSuccessListener(unused -> {
@@ -362,17 +376,17 @@ public final class DatabaseManager {
      *     }
      * });
      */
-    public static void updatePost(@NotNull UUID postId, HashMap<String, Object> options, OnPostUpdatedListener listener) {
+    public static void updatePost(@NotNull String postId, HashMap<String, Object> options, Optional<OnPostUpdatedListener> listener) {
         DocumentReference postRef = postsCollectionRef.document(postId.toString());
 
         postRef.update(options)
                 .addOnSuccessListener(unused -> {
                     defaultSuccessHandler("Post updated successfully");
-                    listener.onPostUpdated(true);
+                    listener.ifPresent(l -> l.onPostUpdated(true));
                 })
                 .addOnFailureListener(e -> {
                     defaultFailureHandler(e);
-                    listener.onPostUpdated(false);
+                    listener.ifPresent(l -> l.onPostUpdated(false));
                 });
     }
 
@@ -398,11 +412,11 @@ public final class DatabaseManager {
      *     }
      * });
      */
-    public static void deletePost(@NotNull Context context, @NotNull UUID postID, OnPostDeletedListener listener) {
+    public static void deletePost(@NotNull Context context, @NotNull String postID, Optional<OnPostDeletedListener> listener) {
         String userId = SessionManager.getInstance(context).getUsername();
         if (userId == null) {
             Log.e("DatabaseManager", "User not logged in. Cannot delete post.");
-            listener.onPostDeleted(false);
+            listener.ifPresent(l -> l.onPostDeleted(false));
             return;
         }
 
@@ -412,17 +426,12 @@ public final class DatabaseManager {
         postDocRef.delete()
                 .addOnSuccessListener(unused -> {
                     defaultSuccessHandler("Post deleted successfully");
-
-                    // Remove the post reference from the user's document
-                    userDocRef.update("postRefs", FieldValue.arrayRemove(postDocRef))
-                            .addOnSuccessListener(unused2 -> Log.d("DatabaseManager", "Post reference removed from user document"))
-                            .addOnFailureListener(e -> Log.e("DatabaseManager", "Failed to remove post reference", e));
-
-                    listener.onPostDeleted(true);
+                    userDocRef.update("postRefs", FieldValue.arrayRemove(postDocRef));
+                    listener.ifPresent(l -> l.onPostDeleted(true));
                 })
                 .addOnFailureListener(e -> {
                     defaultFailureHandler(e);
-                    listener.onPostDeleted(false);
+                    listener.ifPresent(l -> l.onPostDeleted(false));
                 });
     }
 

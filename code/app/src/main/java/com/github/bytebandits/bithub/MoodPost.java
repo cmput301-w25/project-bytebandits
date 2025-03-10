@@ -14,7 +14,7 @@ import java.util.UUID;
  */
 
 public class MoodPost implements Serializable {
-    private UUID postID;
+    private String postID;
     private Emotion emotion;
     private Profile profile;
     private Date dateTime;
@@ -22,6 +22,8 @@ public class MoodPost implements Serializable {
     private SocialSituation situation;
     private String desc;
     private Bitmap image;
+
+    public MoodPost() {}
 
     /**
      * Constructor to make a mood post
@@ -46,7 +48,7 @@ public class MoodPost implements Serializable {
      */
     public MoodPost(Emotion emotion, Profile profile, boolean showLocation, SocialSituation situation,
                     String desc, Bitmap image) {
-        this.postID = UUID.randomUUID();
+        this.postID = UUID.randomUUID().toString();
         this.emotion = emotion;
         this.profile = profile;
         this.dateTime = new Date();
@@ -57,21 +59,12 @@ public class MoodPost implements Serializable {
     }
 
     /**
-     * Returns the mood post's ID
-     * @return
-     *      Returns a UUID representing the mood post's ID.
-     */
-    public UUID getPostID() {
-        return postID;
-    }
-
-    /**
      * Returns the mood post's ID as a string for database storage
      * @return
      *      Returns a String object representing the mood post's ID
      */
-    public String getPostIDString() {
-        return getPostID().toString();
+    public String getPostID() {
+        return postID.toString();
     }
 
     /**

@@ -25,13 +25,12 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 public class PostMoodFragment extends Fragment {
     private Emotion selectedEmotion;
     private SocialSituation selectedSocialSituation;
     private String selectedDescription;
-
-    DatabaseManager.init() // Initalize Database
 
     public static PostMoodFragment newInstance(MoodPost moodPost) {
         // Use Bundle to get info between fragments
@@ -54,7 +53,7 @@ public class PostMoodFragment extends Fragment {
         Button cancelButton = view.findViewById(R.id.postMoodCancelButton);
         Button confirmButton = view.findViewById(R.id.postMoodConfirmButton);
 
-        // Get the mood post if we need ot edit a mood post
+        // Get the mood post if we need to edit a mood post
         String tag = getTag();
         Bundle bundle = getArguments();
         MoodPost postToEdit;
@@ -142,15 +141,15 @@ public class PostMoodFragment extends Fragment {
             else {
                 // Add mood post to database
                 if (postToEdit == null) {
-                    DatabaseManager.addPost(new MoodPost(selectedEmotion, ((MainActivity) requireActivity()).profile,
-                            false, selectedSocialSituation, selectedDescription, null));
+                    MoodPost moodPost = new MoodPost(selectedEmotion, SessionManager.getInstance(requireContext()).getProfile(), false, selectedSocialSituation, selectedDescription, null);
+                    DatabaseManager.addPost(requireContext(), moodPost, Optional.empty());
                 }
                 else {
                     HashMap<String, Object> updateFields = new HashMap<>();
                     updateFields.put("emotion", selectedEmotion);
                     updateFields.put("situation", selectedSocialSituation);
                     updateFields.put("desc", selectedDescription);
-                    DatabaseManager.updatePost(postToEdit.getPostID(), updateFields);
+                    DatabaseManager.updatePost(postToEdit.getPostID(), updateFields, Optional.empty());
                 }
                 // Go back to homepage fragment
                 ((MainActivity) requireActivity()).replaceFragment(new HomepageFragment());
