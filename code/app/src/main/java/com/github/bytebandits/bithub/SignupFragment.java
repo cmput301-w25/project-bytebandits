@@ -113,7 +113,7 @@ public class SignupFragment extends Fragment {
     /**
      * Helper function to check if text is not null nor empty
      * 
-     * @param text
+     * @param text the text to be checked if its is null or empty
      * @return true if it is null/empty, false if not
      */
     private boolean isEmptyText(TextInputEditText text) {
@@ -123,7 +123,7 @@ public class SignupFragment extends Fragment {
     /**
      * Error text dialog logic
      * 
-     * @param msg
+     * @param msg the message string to be displayed in the alert dialog
      * @return the dialog
      */
     AlertDialog createDialog(String msg) {
