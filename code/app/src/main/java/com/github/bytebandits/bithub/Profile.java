@@ -16,6 +16,18 @@ public class Profile {
     private Boolean locationServices;
     private Bitmap image = null;
 
+    // constructor that only sets the user ID
+    public Profile(String userID) {
+        this.userID = userID;
+    }
+
+    // constructor that sets the user ID and profile picture
+    public Profile(String userID, Bitmap image) {
+        this.userID = userID;
+        this.image = image;
+    }
+
+
     // returns the current user ID
     public String getUserID() {
         return userID;
