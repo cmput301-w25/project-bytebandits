@@ -55,7 +55,7 @@ public class MainActivity extends AppCompatActivity {
 
             // Replace fragment based on selected navigation item
             if (item.getItemId() == R.id.home) {
-                replaceFragment(new Homepageragment());
+                replaceFragment(new HomepageFragment());
             } else if (item.getItemId() == R.id.explore) {
                 replaceFragment(new ExploreFragment());
             } else if (item.getItemId() == R.id.create) {
@@ -94,7 +94,7 @@ public class MainActivity extends AppCompatActivity {
         FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
         PostMoodFragment postMoodFragment = PostMoodFragment.newInstance(moodPost);
-        fragmentTransaction.add(R.id.frameLayout, postMoodFragment, "edit mood post");
+        fragmentTransaction.replace(R.id.frameLayout, postMoodFragment, "edit mood post");
         fragmentTransaction.commit();
     }
 
