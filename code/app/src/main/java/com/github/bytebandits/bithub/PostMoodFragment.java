@@ -153,13 +153,13 @@ public class PostMoodFragment extends Fragment {
                     DatabaseManager.updatePost(postToEdit.getPostID(), updateFields);
                 }
                 // Go back to homepage fragment
-                ((MainActivity) requireActivity()).homepageFragment();
+                ((MainActivity) requireActivity()).replaceFragment(new HomepageFragment());
             }
         });
 
         cancelButton.setOnClickListener(v -> {
             // Just go back to homepage fragment
-            ((MainActivity) requireActivity()).homepageFragment();
+            ((MainActivity) requireActivity()).replaceFragment(new HomepageFragment());
         });
 
         return view;
