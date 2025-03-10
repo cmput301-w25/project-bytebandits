@@ -27,11 +27,23 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
+/**
+ * A fragment that allows users to post or edit a mood post.
+ * It provides options to select an emotion, social situation, and add a brief
+ * description.
+ */
 public class PostMoodFragment extends Fragment {
     private Emotion selectedEmotion;
     private SocialSituation selectedSocialSituation;
     private String selectedDescription;
 
+    /**
+     * Creates a new instance of {@code PostMoodFragment} with the given mood post.
+     *
+     * @param moodPost The {@link MoodPost} to be edited. Can be {@code null} for
+     *                 new posts.
+     * @return A new instance of {@code PostMoodFragment}.
+     */
     public static PostMoodFragment newInstance(MoodPost moodPost) {
         // Use Bundle to get info between fragments
         Bundle args = new Bundle();
@@ -41,10 +53,19 @@ public class PostMoodFragment extends Fragment {
         return fragment;
     }
 
+    /**
+     * Inflates the fragment layout and initializes UI components.
+     *
+     * @param inflater           The {@link LayoutInflater} to inflate the layout.
+     * @param container          The parent {@link ViewGroup} that holds the
+     *                           fragment's view.
+     * @param savedInstanceState The previously saved state, if available.
+     * @return The created {@link View} for this fragment.
+     */
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
-                             @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+            @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.post_mood_fragment, container, false);
         // Initialize views
         Spinner editEmotion = view.findViewById(R.id.postMoodEmotion);
@@ -57,10 +78,9 @@ public class PostMoodFragment extends Fragment {
         String tag = getTag();
         Bundle bundle = getArguments();
         MoodPost postToEdit;
-        if (tag != null && tag.equals("edit mood post") && bundle != null){
+        if (tag != null && tag.equals("edit mood post") && bundle != null) {
             postToEdit = (MoodPost) bundle.getSerializable("mood post");
-        }
-        else {
+        } else {
             postToEdit = null;
         }
 
@@ -73,15 +93,14 @@ public class PostMoodFragment extends Fragment {
         ArrayAdapter<Emotion> emotionAdapter = new ArrayAdapter<>(
                 getActivity(),
                 android.R.layout.simple_spinner_item,
-                emotions
-        );
+                emotions);
         ArrayAdapter<Object> socialSituationAdapter = new ArrayAdapter<>(
                 getActivity(),
                 android.R.layout.simple_spinner_item,
-                socialSituations
-        );
+                socialSituations);
 
-        // Specify the layout to use when the list of choices appears and apply the adapters
+        // Specify the layout to use when the list of choices appears and apply the
+        // adapters
         socialSituationAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         emotionAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         editEmotion.setAdapter(emotionAdapter);
@@ -95,9 +114,10 @@ public class PostMoodFragment extends Fragment {
         editEmotion.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parentView, View selectedItemView,
-                                       int position, long id) {
+                    int position, long id) {
                 selectedEmotion = (Emotion) parentView.getItemAtPosition(position);
             }
+
             @Override
             public void onNothingSelected(AdapterView<?> adapterView) {
                 // Default to first emotion on none selected
@@ -107,12 +127,17 @@ public class PostMoodFragment extends Fragment {
         editSocialSituation.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parentView, View selectedItemView,
-                                       int position, long id) {
+                    int position, long id) {
                 // if prefer not to say is selected, set social situation to null
-                if (position == 0) { selectedSocialSituation = null; }
+                if (position == 0) {
+                    selectedSocialSituation = null;
+                }
                 // else set it regularly
-                else { selectedSocialSituation = (SocialSituation) parentView.getItemAtPosition(position); }
+                else {
+                    selectedSocialSituation = (SocialSituation) parentView.getItemAtPosition(position);
+                }
             }
+
             @Override
             public void onNothingSelected(AdapterView<?> adapterView) {
                 // Default to null option on none selected
@@ -124,27 +149,34 @@ public class PostMoodFragment extends Fragment {
         if (postToEdit != null) {
             selectSpinnerItemByValue(editEmotion, postToEdit.getEmotion());
             selectSpinnerItemByValue(editSocialSituation, postToEdit.getSocialSituation());
-            if (postToEdit.getDescription() == null) { editDescription.setText(""); }
-            else { editDescription.setText(postToEdit.getDescription()); }
+            if (postToEdit.getDescription() == null) {
+                editDescription.setText("");
+            } else {
+                editDescription.setText(postToEdit.getDescription());
+            }
         }
 
         confirmButton.setOnClickListener(v -> {
             // Get inputs
-            if (editDescription.getText().toString().isEmpty()) { selectedDescription = null; }
-            else { selectedDescription = editDescription.getText().toString(); }
+            if (editDescription.getText().toString().isEmpty()) {
+                selectedDescription = null;
+            } else {
+                selectedDescription = editDescription.getText().toString();
+            }
 
-            // Check for valid description input (max 20 char. or 3 words), if valid, add mood post
+            // Check for valid description input (max 20 char. or 3 words), if valid, add
+            // mood post
             if (selectedDescription != null &&
                     ((moreThanThreeWords(selectedDescription)) || selectedDescription.length() > 20)) {
                 editDescription.setError("Description can be max 20 characters or 3 words");
-            }
-            else {
+            } else {
                 // Add mood post to database
                 if (postToEdit == null) {
-                    MoodPost moodPost = new MoodPost(selectedEmotion, SessionManager.getInstance(requireContext()).getProfile(), false, selectedSocialSituation, selectedDescription, null);
+                    MoodPost moodPost = new MoodPost(selectedEmotion,
+                            SessionManager.getInstance(requireContext()).getProfile(), false, selectedSocialSituation,
+                            selectedDescription, null);
                     DatabaseManager.addPost(requireContext(), moodPost, Optional.empty());
-                }
-                else {
+                } else {
                     HashMap<String, Object> updateFields = new HashMap<>();
                     updateFields.put("emotion", selectedEmotion);
                     updateFields.put("situation", selectedSocialSituation);
@@ -174,9 +206,11 @@ public class PostMoodFragment extends Fragment {
      *         {@code false} if the string is {@code null} or contains
      *         three or fewer words.
      *
-    */
+     */
     private boolean moreThanThreeWords(String string) {
-        if (string == null) { return false; }
+        if (string == null) {
+            return false;
+        }
         String[] words = string.split("\\s+"); // Groups all whitespace together and splits by the whitespace
         return (words.length > 3);
     }
@@ -187,12 +221,13 @@ public class PostMoodFragment extends Fragment {
      * and selects the item that matches the given value.
      *
      * @param spnr  The {@link Spinner} whose item is to be selected.
-     *             Must not be {@code null}.
+     *              Must not be {@code null}.
      * @param value The value to match against the spinner's items.
-     *             Must not be {@code null}.
+     *              Must not be {@code null}.
      *
-     * @throws NullPointerException If either {@code spnr} or {@code value} is {@code null}.
-    */
+     * @throws NullPointerException If either {@code spnr} or {@code value} is
+     *                              {@code null}.
+     */
     private void selectSpinnerItemByValue(Spinner spnr, Object value) {
         SpinnerAdapter adapter = spnr.getAdapter();
         for (int position = 0; position < adapter.getCount(); position++) {

@@ -16,7 +16,20 @@ import androidx.fragment.app.DialogFragment;
 
 import java.util.Optional;
 
-public class DetailedMoodPostFragment extends DialogFragment{
+/**
+ * A {@link DialogFragment} that displays the details of a {@link MoodPost} in a
+ * dialog window.
+ * Allows users to view, edit, or delete the mood post.
+ */
+public class DetailedMoodPostFragment extends DialogFragment {
+
+    /**
+     * Creates a new instance of {@code DetailedMoodPostFragment} with the provided
+     * mood post.
+     *
+     * @param moodPost The mood post to be displayed in detail.
+     * @return A new instance of {@code DetailedMoodPostFragment}.
+     */
     public static DetailedMoodPostFragment newInstance(MoodPost moodPost) {
         // Use Bundle to get info between fragments
         Bundle args = new Bundle();
@@ -26,6 +39,13 @@ public class DetailedMoodPostFragment extends DialogFragment{
         return fragment;
     }
 
+    /**
+     * Called to create the dialog instance when the fragment is displayed.
+     *
+     * @param savedInstanceState The previously saved state of the fragment, if
+     *                           available.
+     * @return A {@link Dialog} displaying the detailed mood post.
+     */
     @NonNull
     @Override
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {

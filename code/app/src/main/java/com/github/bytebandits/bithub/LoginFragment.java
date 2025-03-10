@@ -23,16 +23,27 @@ import com.google.android.material.textfield.TextInputEditText;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
- * Fragment that displays the login page
+ * Fragment that handles user login functionality.
+ * It allows users to input their email and password, authenticate against a
+ * database,
+ * and navigate to the main application upon successful login.
  */
 public class LoginFragment extends Fragment {
-
     TextInputEditText userEmailText;
     TextInputEditText passwordText;
     Button login;
     TextView pswrdReset;
     FloatingActionButton back;
 
+    /**
+     * Inflates the login fragment layout and initializes UI components.
+     *
+     * @param inflater           The LayoutInflater used to inflate the view.
+     * @param container          The parent ViewGroup that the fragment's UI should
+     *                           attach to.
+     * @param savedInstanceState A Bundle containing previously saved state data.
+     * @return The root view of the fragment.
+     */
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
@@ -61,7 +72,9 @@ public class LoginFragment extends Fragment {
     }
 
     /**
-     * Checks to see if provided information is valid
+     * Validates the user input and attempts authentication against the database.
+     * If successful, creates a session and navigates to the main activity.
+     * Otherwise, displays an error message.
      */
     private void authenticate() {
         if (!(isEmptyText(userEmailText) || isEmptyText(passwordText))) {
