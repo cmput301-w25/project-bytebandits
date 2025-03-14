@@ -13,9 +13,10 @@ import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
 import com.github.bytebandits.bithub.databinding.ActivityMainBinding;
+import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
-import com.google.android.gms.maps.SupportMapFragment;
-
+import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.LatLng;
 /**
  * MainActivity serves as the primary hub of the Bithub application after user
  * authentication.
@@ -29,8 +30,7 @@ import com.google.android.gms.maps.SupportMapFragment;
  * app.
  */
 
-public class MainActivity extends AppCompatActivity {
-    private ActivityMainBinding binding;
+public class MainActivity extends AppCompatActivity implements OnMapReadyCallback {
 
     /**
      * Called when the activity is first created.
@@ -45,7 +45,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
 
-        binding = ActivityMainBinding.inflate(getLayoutInflater());
+        ActivityMainBinding binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
         // Display the home fragment first when the user is logged in
@@ -58,9 +58,9 @@ public class MainActivity extends AppCompatActivity {
             if (item.getItemId() == R.id.home) {
                 replaceFragment(new HomepageFragment());
             } else if (item.getItemId() == R.id.explore) {
-                Intent myIntent = new Intent(this, MapsActivity.class);
-                startActivity(myIntent);
-                // replaceFragment(new ExploreFragment());
+                // Intent myIntent = new Intent(this, MapsActivity.class);
+                // startActivity(myIntent);
+                replaceFragment(new ExploreFragment());
             } else if (item.getItemId() == R.id.create) {
                 replaceFragment(new PostMoodFragment());
             } else if (item.getItemId() == R.id.notifications) {
@@ -100,5 +100,14 @@ public class MainActivity extends AppCompatActivity {
         fragmentTransaction.replace(R.id.frameLayout, postMoodFragment, "edit mood post");
         fragmentTransaction.commit();
     }
+
+    @Override
+    public void onMapReady(GoogleMap googleMap) {
+        googleMap.addMarker(new MarkerOptions()
+                .position(new LatLng(0, 0))
+                .title("Marker"));
+    }
+
+
 
 }
