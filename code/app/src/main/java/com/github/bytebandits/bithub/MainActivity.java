@@ -58,8 +58,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             if (item.getItemId() == R.id.home) {
                 replaceFragment(new HomepageFragment());
             } else if (item.getItemId() == R.id.explore) {
-                // Intent myIntent = new Intent(this, MapsActivity.class);
-                // startActivity(myIntent);
                 replaceFragment(new ExploreFragment());
             } else if (item.getItemId() == R.id.create) {
                 replaceFragment(new PostMoodFragment());

@@ -14,7 +14,7 @@ public class ExploreFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.activity_maps, container, false);
+        View view = inflater.inflate(R.layout.fragment_explore, container, false);
         return view;
     }
 }
