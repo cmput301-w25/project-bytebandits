@@ -10,6 +10,7 @@ activity = "1.10.0"
 constraintlayout = "2.1.4"
 firebaseFirestore = "25.1.2"
 robolectric = "4.10"
+playServicesMaps = "19.1.0"
 
 [libraries]
 gson = { module = "com.google.code.gson:gson", version.ref = "gson" }
@@ -22,6 +23,7 @@ activity = { group = "androidx.activity", name = "activity", version.ref = "acti
 constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayout", version.ref = "constraintlayout" }
 firebase-firestore = { group = "com.google.firebase", name = "firebase-firestore", version.ref = "firebaseFirestore" }
 robolectric = { module = "org.robolectric:robolectric", version.ref = "robolectric" }
+play-services-maps = { group = "com.google.android.gms", name = "play-services-maps", version.ref = "playServicesMaps" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

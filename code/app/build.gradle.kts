@@ -1,6 +1,18 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.google.services)
+    id("com.google.android.libraries.mapsplatform.secrets-gradle-plugin")
+}
+secrets {
+    // To add your Maps API key to this project:
+    // 1. If the secrets.properties file does not exist, create it in the same folder as the local.properties file.
+    // 2. Add this line, where YOUR_API_KEY is your API key:
+    //        MAPS_API_KEY=YOUR_API_KEY
+    propertiesFileName = "secrets.properties"
+
+    // A properties file containing default secret values. This file can be
+    // checked in version control.
+    defaultPropertiesFileName = "local.defaults.properties"
 }
 
 android {
@@ -20,6 +32,8 @@ android {
 
     buildFeatures {
         viewBinding = true
+        buildConfig = true
+        dataBinding = true
     }
 
     buildTypes {
@@ -45,12 +59,14 @@ dependencies {
     implementation(platform("com.google.firebase:firebase-bom:33.10.0"))
     implementation(libs.gson)
     implementation(libs.firebase.firestore)
+    implementation(libs.play.services.maps)
     testImplementation(libs.junit)
     testImplementation(libs.robolectric)
     testImplementation("org.mockito:mockito-core:5.7.0")
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
-
+    // Google Play services for Maps
+    implementation("com.google.android.gms:play-services-maps:19.0.0")
     // The following imports where just copied from Lab 7 (UI Testing with Espresso)
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")

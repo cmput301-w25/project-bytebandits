@@ -1,7 +1,8 @@
 package com.github.bytebandits.bithub;
 
-import androidx.fragment.app.Fragment;
+import android.content.Intent;
 
+import androidx.fragment.app.Fragment;
 
 public class ExploreFragment extends Fragment {
 

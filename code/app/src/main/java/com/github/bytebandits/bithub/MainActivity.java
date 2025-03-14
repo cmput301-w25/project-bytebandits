@@ -1,5 +1,6 @@
 package com.github.bytebandits.bithub;
 
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.activity.EdgeToEdge;
@@ -12,6 +13,8 @@ import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
 import com.github.bytebandits.bithub.databinding.ActivityMainBinding;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.SupportMapFragment;
 
 /**
  * MainActivity serves as the primary hub of the Bithub application after user
@@ -55,7 +58,9 @@ public class MainActivity extends AppCompatActivity {
             if (item.getItemId() == R.id.home) {
                 replaceFragment(new HomepageFragment());
             } else if (item.getItemId() == R.id.explore) {
-                replaceFragment(new ExploreFragment());
+                Intent myIntent = new Intent(this, MapsActivity.class);
+                startActivity(myIntent);
+                // replaceFragment(new ExploreFragment());
             } else if (item.getItemId() == R.id.create) {
                 replaceFragment(new PostMoodFragment());
             } else if (item.getItemId() == R.id.notifications) {
