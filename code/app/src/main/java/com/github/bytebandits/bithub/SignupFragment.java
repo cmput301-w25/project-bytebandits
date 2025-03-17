@@ -1,10 +1,8 @@
 package com.github.bytebandits.bithub;
 
 import android.app.AlertDialog;
-import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
-import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.Looper;
 import android.text.TextUtils;
@@ -26,8 +24,6 @@ import java.util.HashMap;
 import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.Semaphore;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Fragment that displays the signup page
@@ -51,7 +47,7 @@ public class SignupFragment extends Fragment {
         View view = inflater.inflate(R.layout.signup, container, false);
         signup = view.findViewById(R.id.registerBtn);
         accountExists = view.findViewById(R.id.accountExists);
-        back = view.findViewById(R.id.backActionButton2);
+        back = view.findViewById(R.id.backActionButton);
         userText = view.findViewById(R.id.UserInputText);
         emailText = view.findViewById(R.id.EmailInputText);
         pswrdText = view.findViewById(R.id.PswrdInputText);
