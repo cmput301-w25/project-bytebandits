@@ -1,11 +1,14 @@
 package com.github.bytebandits.bithub;
 
+import androidx.test.core.app.ApplicationProvider;
 import androidx.test.ext.junit.rules.ActivityScenarioRule;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.filters.LargeTest;
 import androidx.test.platform.app.InstrumentationRegistry;
 
+import org.junit.After;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -32,22 +35,56 @@ import androidx.fragment.app.Fragment;
 import android.app.Activity;
 import android.app.Instrumentation;
 import android.content.Context;
+import android.util.Log;
+
+import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.Objects;
 
 
 @RunWith(AndroidJUnit4.class)
 @LargeTest
 public class StartupActivityTest {
 
+    @BeforeClass
+    public static void setup(){
+        // Specific address for emulated device to access our localHost
+        String androidLocalhost = "10.0.2.2";
+        int portNumber = 8080;
+        DatabaseManager.getDb().useEmulator(androidLocalhost, portNumber);
+    }
+
+    @After
+    public void tearDown() {
+        Context context = ApplicationProvider.getApplicationContext();
+        SessionManager.getInstance(context).logoutUser();
+        String projectId = "byte-bandits-project\n";
+        URL url = null;
+        try {
+            url = new URL("http://10.0.2.2:8080/emulator/v1/projects/" + projectId + "/databases/(default)/documents");
+        } catch (MalformedURLException exception) {
+            Log.e("URL Error", Objects.requireNonNull(exception.getMessage()));
+        }
+        HttpURLConnection urlConnection = null;
+        try {
+            urlConnection = (HttpURLConnection) url.openConnection();
+            urlConnection.setRequestMethod("DELETE");
+            int response = urlConnection.getResponseCode();
+            Log.i("Response Code", "Response Code: " + response);
+        } catch (IOException exception) {
+            Log.e("IO Error", Objects.requireNonNull(exception.getMessage()));
+        } finally {
+            if (urlConnection != null) {
+                urlConnection.disconnect();
+            }
+        }
+    }
+
     @Rule
     public ActivityScenarioRule<StartupActivity> scenario = new ActivityScenarioRule<>(StartupActivity.class);
 
-    /**
-     * Ensures clearing of logged in state from shared preferences, (logged in = true -> logged in = false) so the tests starts from startup page always.
-     */
-    @Before
-    public void clearLoggedInState(){
-
-    }
 
     /**
      * Tests StartupFragment is displaying what it is supposed to
@@ -142,14 +179,12 @@ public class StartupActivityTest {
     }
 
     /**
-     * Tests if signup page input validation works, assuming user inputs correct info
+     * Tests if signup page input validation works, assuming user inputs correct info (info is not in the db)
      */
     @Test
     public void signupFragmentTestValidInput(){
 
         onView(withId(R.id.registerBtn)).perform(click());
-        // remove this comment and the second one when db connection is implemented, for now assume query always succeeds
-        // meaning that the username and email lookup is assumed to be unique
         onView(withId(R.id.UserInputText)).perform(typeText("usernameTest"));
         onView(withId(R.id.EmailInputText)).perform(typeText("email@test.com"));
         onView(withId(R.id.PswrdInputText)).perform(typeText("abc123"));
@@ -168,32 +203,38 @@ public class StartupActivityTest {
     public void signupFragmentTestPasswordMatchError(){
 
         onView(withId(R.id.registerBtn)).perform(click());
-        // remove this comment and the second one when db connection is implemented, for now assume query always succeeds
-        // meaning that the username and email lookup is assumed to be unique
         onView(withId(R.id.UserInputText)).perform(typeText("usernameTest"));
         onView(withId(R.id.EmailInputText)).perform(typeText("email@test.com"));
         onView(withId(R.id.PswrdInputText)).perform(typeText("abc123"));
         onView(withId(R.id.PswrdConInputText)).perform(typeText("123abc"));
         onView(withId(R.id.registerBtn)).perform(click());
-        onView(withText("Invalid information! Or the provided username or email already has an account attached to it"))
+        onView(withText("Invalid information! Username or email may already exist."))
                 .inRoot(isDialog()).check(matches(isDisplayed()));
     }
 
     /**
-     * Tests if signup page username requirements error text displays
+     * Tests if signup page provides appropriate error message when attempting to register with info already within the DB
      */
     @Test
-    public void signupFragmentTestUsernameReqError(){
+    public void signupFragmentTestExistingUserError(){
 
         onView(withId(R.id.registerBtn)).perform(click());
-        // remove this comment and the second one when db connection is implemented, for now assume query always succeeds
-        // meaning that the username and email lookup is assumed to be unique
-        onView(withId(R.id.UserInputText)).perform(typeText("@usernameTest"));
+        onView(withId(R.id.UserInputText)).perform(typeText("usernameTest"));
         onView(withId(R.id.EmailInputText)).perform(typeText("email@test.com"));
         onView(withId(R.id.PswrdInputText)).perform(typeText("abc123"));
         onView(withId(R.id.PswrdConInputText)).perform(typeText("abc123"));
         onView(withId(R.id.registerBtn)).perform(click());
-        onView(withText("Username cannot have '@' within it"))
+
+        onView(withId(R.id.backActionButton)).perform(click());
+        onView(withId(R.id.backActionButton)).perform(click());
+
+        onView(withId(R.id.registerBtn)).perform(click());
+        onView(withId(R.id.UserInputText)).perform(typeText("usernameTest"));
+        onView(withId(R.id.EmailInputText)).perform(typeText("email@test.com"));
+        onView(withId(R.id.PswrdInputText)).perform(typeText("abc123"));
+        onView(withId(R.id.PswrdConInputText)).perform(typeText("abc123"));
+        onView(withId(R.id.registerBtn)).perform(click());
+        onView(withText("Invalid information! Username or email may already exist."))
                 .inRoot(isDialog()).check(matches(isDisplayed()));
     }
 
@@ -228,10 +269,10 @@ public class StartupActivityTest {
     }
 
     /**
-     * Tests if correct login page input validation by switching to main activity from login page
+     * Tests if a successful sign up -> login process  by testing to see if main activity is reached
      */
     @Test
-    public void loginFragmentTestInputValidation(){
+    public void loginFragmentTestValidInput(){
         // Parts a & b where retrieved from Claude LLM, had to ask an LLM due to not a lot of results coming up with the right syntax to reference an activity
         // and observe how it is transitioning. Retrived by: Hanss Rivera, On: March 8 2025.
 
@@ -240,9 +281,15 @@ public class StartupActivityTest {
                 .addMonitor(MainActivity.class.getName(), null, false);
 
 
-        onView(withId(R.id.loginBtn)).perform(click());
-        // remove this comment and the second one when db connection is implemented, for now assume query always succeeds
-        // meaning that the username OR email lookup is assumed to exist AND password lookup matches the provided password
+        // register a user
+        onView(withId(R.id.registerBtn)).perform(click());
+        onView(withId(R.id.UserInputText)).perform(typeText("usernameTest"));
+        onView(withId(R.id.EmailInputText)).perform(typeText("email@test.com"));
+        onView(withId(R.id.PswrdInputText)).perform(typeText("abc123"));
+        onView(withId(R.id.PswrdConInputText)).perform(typeText("abc123"));
+        onView(withId(R.id.registerBtn)).perform(click());
+
+        // login
         onView(withId(R.id.UserEmailInputText)).perform(typeText("usernameTest"));
         onView(withId(R.id.PswrdInputText)).perform(typeText("abc123"));
         onView(withId(R.id.loginBtn)).perform(click());
@@ -252,5 +299,18 @@ public class StartupActivityTest {
         Activity mainActivity = monitor.waitForActivityWithTimeout(5000);
         assertNotNull("MainActivity should have been launched", mainActivity);
         assertTrue(mainActivity instanceof MainActivity);
+    }
+
+    /**
+     * Tests if appropriate error message appears when attempting to log in with credentials that are not in the DB
+     */
+    @Test
+    public void loginFragmentTestInvalidUserInfo(){
+        onView(withId(R.id.loginBtn)).perform(click());
+        onView(withId(R.id.UserEmailInputText)).perform(typeText("usernameTest"));
+        onView(withId(R.id.PswrdInputText)).perform(typeText("abc123"));
+        onView(withId(R.id.loginBtn)).perform(click());
+        onView(withText("Invalid information!"))
+                .inRoot(isDialog()).check(matches(isDisplayed()));
     }
 }
