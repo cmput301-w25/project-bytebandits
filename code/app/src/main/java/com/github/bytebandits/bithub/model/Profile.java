@@ -1,4 +1,4 @@
-package com.github.bytebandits.bithub;
+package com.github.bytebandits.bithub.model;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;

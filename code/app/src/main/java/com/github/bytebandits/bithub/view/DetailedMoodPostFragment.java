@@ -1,10 +1,8 @@
-package com.github.bytebandits.bithub;
+package com.github.bytebandits.bithub.view;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
-import android.content.Context;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageView;
@@ -13,6 +11,11 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
+
+import com.github.bytebandits.bithub.controller.DatabaseManager;
+import com.github.bytebandits.bithub.MainActivity;
+import com.github.bytebandits.bithub.model.MoodPost;
+import com.github.bytebandits.bithub.R;
 
 import java.util.Optional;
 

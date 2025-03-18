@@ -1,4 +1,4 @@
-package com.github.bytebandits.bithub;
+package com.github.bytebandits.bithub.view;
 
 import android.app.AlertDialog;
 
@@ -8,6 +8,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 
 import android.widget.Button;
+
+import com.github.bytebandits.bithub.R;
+import com.github.bytebandits.bithub.controller.SessionManager;
 
 /**
  * This class handles the display and functionality of the settings dialog in the Bithub application.
@@ -61,4 +64,3 @@ import android.widget.Button;
         SessionManager.getInstance(context).logoutUser();
     }
 }
-

@@ -1,9 +1,6 @@
-package com.github.bytebandits.bithub;
+package com.github.bytebandits.bithub.view;
 
-import android.content.Context;
-import android.graphics.Movie;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,20 +8,25 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.FrameLayout;
 import android.widget.Spinner;
 import android.widget.SpinnerAdapter;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import com.github.bytebandits.bithub.controller.DatabaseManager;
+import com.github.bytebandits.bithub.model.Emotion;
+import com.github.bytebandits.bithub.MainActivity;
+import com.github.bytebandits.bithub.model.MoodPost;
+import com.github.bytebandits.bithub.R;
+import com.github.bytebandits.bithub.controller.SessionManager;
+import com.github.bytebandits.bithub.model.SocialSituation;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 
 public class PostMoodFragment extends Fragment {

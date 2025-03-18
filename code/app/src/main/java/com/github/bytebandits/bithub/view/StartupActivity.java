@@ -1,15 +1,19 @@
-package com.github.bytebandits.bithub;
+package com.github.bytebandits.bithub.view;
 
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.se.omapi.Session;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
+
+import com.github.bytebandits.bithub.controller.DatabaseManager;
+import com.github.bytebandits.bithub.MainActivity;
+import com.github.bytebandits.bithub.R;
+import com.github.bytebandits.bithub.controller.SessionManager;
 
 /**
  * The Startup activity, entry point of the application. Governs anything

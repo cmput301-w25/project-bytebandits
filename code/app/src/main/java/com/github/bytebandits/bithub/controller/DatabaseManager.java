@@ -1,7 +1,9 @@
-package com.github.bytebandits.bithub;
+package com.github.bytebandits.bithub.controller;
 
 import android.content.Context;
 import android.util.Log;
+
+import com.github.bytebandits.bithub.model.MoodPost;
 import com.google.firebase.firestore.*;
 import org.jetbrains.annotations.NotNull;
 import java.util.*;

@@ -33,6 +33,10 @@ import android.app.Activity;
 import android.app.Instrumentation;
 import android.content.Context;
 
+import com.github.bytebandits.bithub.view.LoginFragment;
+import com.github.bytebandits.bithub.view.SignupFragment;
+import com.github.bytebandits.bithub.view.StartupActivity;
+
 
 @RunWith(AndroidJUnit4.class)
 @LargeTest

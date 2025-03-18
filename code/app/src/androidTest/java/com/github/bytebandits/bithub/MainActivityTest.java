@@ -16,8 +16,12 @@ import androidx.test.ext.junit.rules.ActivityScenarioRule;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.filters.LargeTest;
 
+import com.github.bytebandits.bithub.controller.DatabaseManager;
+import com.github.bytebandits.bithub.model.Emotion;
+import com.github.bytebandits.bithub.model.MoodPost;
+import com.github.bytebandits.bithub.model.Profile;
+import com.github.bytebandits.bithub.model.SocialSituation;
 import com.google.firebase.firestore.CollectionReference;
-import com.google.firebase.firestore.FirebaseFirestore;
 
 import org.junit.After;
 import org.junit.Before;
