@@ -2,6 +2,9 @@ package com.github.bytebandits.bithub;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+
+import com.github.bytebandits.bithub.controller.SessionManager;
+import com.github.bytebandits.bithub.model.Profile;
 import com.google.gson.Gson;
 import org.junit.Before;
 import org.junit.Test;

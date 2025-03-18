@@ -1,9 +1,11 @@
-package com.github.bytebandits.bithub;
+package com.github.bytebandits.bithub.controller;
 
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.util.Log;
+
+import com.github.bytebandits.bithub.model.Profile;
+import com.github.bytebandits.bithub.view.StartupActivity;
 import com.google.gson.Gson;
 
 public class SessionManager {

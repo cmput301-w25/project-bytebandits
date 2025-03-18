@@ -1,4 +1,4 @@
-package com.github.bytebandits.bithub;
+package com.github.bytebandits.bithub.view;
 
 import static java.lang.Thread.sleep;
 
@@ -16,6 +16,9 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import com.github.bytebandits.bithub.controller.DatabaseManager;
+import com.github.bytebandits.bithub.model.MoodPost;
+import com.github.bytebandits.bithub.R;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
@@ -112,4 +115,3 @@ public class HomepageFragment extends Fragment {
         return view;
     }
 }
-

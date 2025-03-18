@@ -1,4 +1,4 @@
-package com.github.bytebandits.bithub;
+package com.github.bytebandits.bithub.view;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -10,6 +10,8 @@ import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+
+import com.github.bytebandits.bithub.R;
 
 /**
  * Fragment that displays the entry point of the application, can login or

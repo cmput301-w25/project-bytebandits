@@ -12,6 +12,12 @@ import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
 import com.github.bytebandits.bithub.databinding.ActivityMainBinding;
+import com.github.bytebandits.bithub.model.MoodPost;
+import com.github.bytebandits.bithub.view.ExploreFragment;
+import com.github.bytebandits.bithub.view.HomepageFragment;
+import com.github.bytebandits.bithub.view.NotificationsFragment;
+import com.github.bytebandits.bithub.view.PostMoodFragment;
+import com.github.bytebandits.bithub.view.ProfileFragment;
 
 /**
  * MainActivity serves as the primary hub of the Bithub application after user
@@ -78,7 +84,7 @@ public class MainActivity extends AppCompatActivity {
      *
      * @param fragment The fragment to be displayed.
      */
-    void replaceFragment(Fragment fragment) {
+    public void replaceFragment(Fragment fragment) {
         FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
         fragmentTransaction.replace(R.id.frameLayout, fragment);

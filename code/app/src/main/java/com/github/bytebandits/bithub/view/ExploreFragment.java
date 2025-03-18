@@ -1,4 +1,4 @@
-package com.github.bytebandits.bithub;
+package com.github.bytebandits.bithub.view;
 
 import androidx.fragment.app.Fragment;
 

@@ -1,4 +1,4 @@
-package com.github.bytebandits.bithub;
+package com.github.bytebandits.bithub.model;
 
 /**
  * This is a enumeration that represents each possible social situation for a mood post

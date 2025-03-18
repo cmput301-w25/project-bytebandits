@@ -3,6 +3,11 @@ package com.github.bytebandits.bithub;
 import android.content.Context;
 import android.util.Log;
 
+import com.github.bytebandits.bithub.controller.DatabaseManager;
+import com.github.bytebandits.bithub.model.Emotion;
+import com.github.bytebandits.bithub.model.MoodPost;
+import com.github.bytebandits.bithub.model.Profile;
+import com.github.bytebandits.bithub.model.SocialSituation;
 import com.google.firebase.firestore.*;
 
 import org.junit.After;

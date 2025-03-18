@@ -1,4 +1,6 @@
-package com.github.bytebandits.bithub;
+package com.github.bytebandits.bithub.model;
+
+import com.github.bytebandits.bithub.R;
 
 /**
  * This is a enumeration that represents each possible emotion for a mood post

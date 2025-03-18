@@ -1,9 +1,7 @@
-package com.github.bytebandits.bithub;
+package com.github.bytebandits.bithub.view;
 
 import android.app.AlertDialog;
-import android.content.Context;
 import android.content.DialogInterface;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
@@ -17,6 +15,10 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import com.github.bytebandits.bithub.controller.DatabaseManager;
+import com.github.bytebandits.bithub.model.Profile;
+import com.github.bytebandits.bithub.R;
+import com.github.bytebandits.bithub.controller.SessionManager;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.textfield.TextInputEditText;
 
