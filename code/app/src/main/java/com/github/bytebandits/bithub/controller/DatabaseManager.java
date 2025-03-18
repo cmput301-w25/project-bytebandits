@@ -3,10 +3,13 @@ package com.github.bytebandits.bithub.controller;
 import android.content.Context;
 import android.util.Log;
 
+import com.github.bytebandits.bithub.model.DocumentReferences;
 import com.github.bytebandits.bithub.model.MoodPost;
 import com.google.firebase.firestore.*;
 import org.jetbrains.annotations.NotNull;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 
 public final class DatabaseManager {
     private final FirebaseFirestore firestoreDb;
@@ -92,20 +95,38 @@ public final class DatabaseManager {
                 });
     }
 
+    public List<DocumentSnapshot> searchUsers(String query) throws ExecutionException, InterruptedException {
+        CollectionReference localUserRef = this.usersCollectionRef; // unsure if needed
+
+        Query users = localUserRef.orderBy("userId").startAt(query).endAt(query+"~");
+
+        CompletableFuture<QuerySnapshot> userFuture = CompletableFuture.supplyAsync(() -> {
+            try {
+                return users.get().getResult();
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        });
+
+        return userFuture.get().getDocuments();
+    }
+
     private void sendNotification(String recipientUserId, DocumentReference docRef){
         DocumentReference recipientDocRef = this.usersCollectionRef.document(recipientUserId);
-        recipientDocRef.update("notificationRefs", FieldValue.arrayUnion(docRef));
+        recipientDocRef.update(DocumentReferences.NOTIFICATIONS.getDocRefString(), FieldValue.arrayUnion(docRef));
     }
 
     private void acceptUserFollow(String currentUserId, DocumentReference requestedUserDocRef) {
         DocumentReference currentUserDocRef = this.usersCollectionRef.document(currentUserId);
 
-        currentUserDocRef.update("followerRefs", FieldValue.arrayUnion(requestedUserDocRef));
-        currentUserDocRef.update("notificationsRefs", FieldValue.arrayRemove(requestedUserDocRef));
+        currentUserDocRef.update(DocumentReferences.FOLLOWERS.getDocRefString(), FieldValue.arrayUnion(requestedUserDocRef));
+        currentUserDocRef.update(DocumentReferences.NOTIFICATIONS.getDocRefString(), FieldValue.arrayRemove(requestedUserDocRef));
     }
 
-    private void rejectUserFollow() {
+    private void rejectUserFollow(String currentUserId, DocumentReference requestedUserDocRef) {
+        DocumentReference currentUserDocRef = this.usersCollectionRef.document(currentUserId);
 
+        currentUserDocRef.update(DocumentReferences.NOTIFICATIONS.getDocRefString(), FieldValue.arrayRemove(requestedUserDocRef));
     }
 
     // Post Management
@@ -141,7 +162,7 @@ public final class DatabaseManager {
 
         DocumentReference postDocRef = postsCollectionRef.document(postId);
         DocumentReference userDocRef = usersCollectionRef.document(userId);
-        userDocRef.update("postRefs", FieldValue.arrayUnion(postDocRef));
+        userDocRef.update(DocumentReferences.POSTS.getDocRefString(), FieldValue.arrayUnion(postDocRef));
 
         sendPostNotifications(userDocRef, postDocRef);
     }
@@ -351,7 +372,7 @@ public final class DatabaseManager {
         postDocRef.delete()
                 .addOnSuccessListener(unused -> {
                     defaultSuccessHandler("Post deleted successfully");
-                    userDocRef.update("postRefs", FieldValue.arrayRemove(postDocRef));
+                    userDocRef.update(DocumentReferences.POSTS.getDocRefString(), FieldValue.arrayRemove(postDocRef));
                     listener.ifPresent(l -> l.onPostDeleted(true));
                 })
                 .addOnFailureListener(e -> {
@@ -369,11 +390,19 @@ public final class DatabaseManager {
                     ArrayList<DocumentReference> followersRef = (ArrayList<DocumentReference>) followersRefsObject;
 
                     for (DocumentReference followerRef : followersRef) {
-                        followerRef.update("notificationsRef", FieldValue.arrayUnion(postDocRef));
+                        followerRef.update(DocumentReferences.NOTIFICATIONS.getDocRefString(), FieldValue.arrayUnion(postDocRef));
                     }
                 }
             }
         });
+    }
+
+    private void addComment(String postId, String userId, String comment) {
+        postsCollectionRef.document(postId).update("comments", FieldValue.arrayUnion(Map.entry(userId, comment)));
+    }
+
+    private void deleteComment(String postId, Map.Entry<String, String> comment) {
+        postsCollectionRef.document(postId).update("comments", FieldValue.arrayRemove(comment));
     }
 
     /**
