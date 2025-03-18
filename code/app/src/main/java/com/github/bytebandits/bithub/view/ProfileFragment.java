@@ -90,7 +90,8 @@ public class ProfileFragment extends Fragment {
         }
 
         executor.execute(() -> {
-            DatabaseManager.getUserPosts(username, posts -> {
+//            String username = SessionManager.getInstance(requireContext()).getUsername();
+            DatabaseManager.getInstance().getUserPosts(username, posts -> {
                 if (posts == null) {
                     Log.e("ProfileFragment", "Error: posts is null");
                     return null;
@@ -130,7 +131,7 @@ public class ProfileFragment extends Fragment {
         });
 
         // Listener so that dataList gets updated whenever the database does
-        CollectionReference moodPostRef = DatabaseManager.getPostsCollectionRef();
+        CollectionReference moodPostRef = DatabaseManager.getInstance().getPostsCollectionRef();
         moodPostRef.addSnapshotListener((value, error) -> {
             if (error != null){
                 Log.e("Firestore", error.toString());
