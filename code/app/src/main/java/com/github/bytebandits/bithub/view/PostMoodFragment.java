@@ -141,17 +141,19 @@ public class PostMoodFragment extends Fragment {
                 editDescription.setError("Description can be max 20 characters or 3 words");
             }
             else {
+                DatabaseManager databaseManager = DatabaseManager.getInstance();
                 // Add mood post to database
                 if (postToEdit == null) {
-                    MoodPost moodPost = new MoodPost(selectedEmotion, SessionManager.getInstance(requireContext()).getProfile(), false, selectedSocialSituation, selectedDescription, null);
-                    DatabaseManager.addPost(requireContext(), moodPost, Optional.empty());
+                    SessionManager sessionManager = SessionManager.getInstance(requireContext());
+                    MoodPost moodPost = new MoodPost(selectedEmotion, sessionManager.getProfile(), false, selectedSocialSituation, selectedDescription, null);
+                    databaseManager.addPost(moodPost, sessionManager.getUsername(), Optional.empty());
                 }
                 else {
                     HashMap<String, Object> updateFields = new HashMap<>();
                     updateFields.put("emotion", selectedEmotion);
                     updateFields.put("situation", selectedSocialSituation);
                     updateFields.put("desc", selectedDescription);
-                    DatabaseManager.updatePost(postToEdit.getPostID(), updateFields, Optional.empty());
+                    databaseManager.updatePost(postToEdit.getPostID(), updateFields, Optional.empty());
                 }
                 // Go back to homepage fragment
                 ((MainActivity) requireActivity()).replaceFragment(new HomepageFragment());

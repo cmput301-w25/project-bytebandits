@@ -24,8 +24,6 @@ public class StartupActivity extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_startup);
-        DatabaseManager.init();
-
         SessionManager sessionManager = SessionManager.getInstance(this);
 
         if (sessionManager.isLoggedIn()) {

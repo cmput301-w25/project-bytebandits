@@ -81,7 +81,7 @@ public class SignupFragment extends Fragment {
 
             // Run DB check in background thread
             executor.execute(() -> {
-                DatabaseManager.getUser(username, user -> {
+                DatabaseManager.getInstance().getUser(username, user -> {
                     boolean userExists = (user != null);
 
                     // Switch to UI thread to handle results
@@ -114,7 +114,7 @@ public class SignupFragment extends Fragment {
             userDetails.put("password", password);
             userDetails.put("profile", new Profile(username).toJson());
 
-            DatabaseManager.addUser(username, userDetails, Optional.empty());
+            DatabaseManager.getInstance().addUser(username, userDetails, Optional.empty());
 
             ((StartupActivity) requireActivity()).loginFragment();
         } else if (!usernameReqsValid) {

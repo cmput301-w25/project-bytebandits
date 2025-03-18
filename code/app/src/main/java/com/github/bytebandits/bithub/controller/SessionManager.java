@@ -25,8 +25,6 @@ public class SessionManager {
         this.context = context.getApplicationContext();
         this.prefs = this.context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
         this.editor = prefs.edit();
-//        this.editor.clear();
-//        this.editor.commit();
         this.gson = new Gson();
     }
 
