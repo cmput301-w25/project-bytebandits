@@ -32,7 +32,14 @@ public final class DatabaseManager {
         return instance;
     }
 
-    public FirebaseFirestore getDb() { return firestoreDb; }
+    public void useEmulation(String address, int portNumber) {
+        this.firestoreDb.useEmulator(address, portNumber);
+    }
+
+    public void useEmulation() {
+        useEmulation("10.0.2.2", 8080);
+    }
+
     public CollectionReference getUsersCollectionRef() { return usersCollectionRef; }
     public CollectionReference getPostsCollectionRef() { return postsCollectionRef; }
 
@@ -110,6 +117,8 @@ public final class DatabaseManager {
 
         return userFuture.get().getDocuments();
     }
+
+    // Get Followers, Edit Post,
 
     private void sendNotification(String recipientUserId, DocumentReference docRef){
         DocumentReference recipientDocRef = this.usersCollectionRef.document(recipientUserId);
