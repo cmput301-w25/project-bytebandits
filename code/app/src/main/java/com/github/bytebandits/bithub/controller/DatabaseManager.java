@@ -5,6 +5,7 @@ import android.util.Log;
 
 import com.github.bytebandits.bithub.model.DocumentReferences;
 import com.github.bytebandits.bithub.model.MoodPost;
+import com.github.bytebandits.bithub.model.Profile;
 import com.google.firebase.firestore.*;
 import org.jetbrains.annotations.NotNull;
 import java.util.*;
@@ -125,17 +126,27 @@ public final class DatabaseManager {
         recipientDocRef.update(DocumentReferences.NOTIFICATIONS.getDocRefString(), FieldValue.arrayUnion(docRef));
     }
 
-    private void acceptUserFollow(String currentUserId, DocumentReference requestedUserDocRef) {
+    private void acceptUserFollow(String currentUserId, String requestedUserId) {
+        DocumentReference requestedUserDocRef = this.usersCollectionRef.document(requestedUserId);
         DocumentReference currentUserDocRef = this.usersCollectionRef.document(currentUserId);
 
         currentUserDocRef.update(DocumentReferences.FOLLOWERS.getDocRefString(), FieldValue.arrayUnion(requestedUserDocRef));
         currentUserDocRef.update(DocumentReferences.NOTIFICATIONS.getDocRefString(), FieldValue.arrayRemove(requestedUserDocRef));
     }
 
-    private void rejectUserFollow(String currentUserId, DocumentReference requestedUserDocRef) {
+    private void rejectUserFollow(String currentUserId, String requestedUserId) {
+        DocumentReference requestedUserDocRef = this.usersCollectionRef.document(requestedUserId);
         DocumentReference currentUserDocRef = this.usersCollectionRef.document(currentUserId);
 
         currentUserDocRef.update(DocumentReferences.NOTIFICATIONS.getDocRefString(), FieldValue.arrayRemove(requestedUserDocRef));
+    }
+
+    private void getFollowers(String userId, OnFollowersFetchListener listener) {
+        DocumentReference currentUserDocRef = this.usersCollectionRef.document(userId);
+        ArrayList<Profile> followers;
+
+//        currentUserDocRef.get().addOnCompleteListener(
+//        );
     }
 
     // Post Management
@@ -424,6 +435,10 @@ public final class DatabaseManager {
 
     public interface OnUserAddListener {
         void onUsersAdded(boolean added);
+    }
+
+    public interface OnFollowersFetchListener {
+        void onFollowersFetch(ArrayList<Profile> followers);
     }
 
 
