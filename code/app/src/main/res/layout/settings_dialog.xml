@@ -13,38 +13,45 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="57dp"
         android:text="Settings"
-        android:textColor="@color/gold"
+        android:textColor="@color/white"
         android:textSize="34sp" />
 
     <EditText
         android:id="@+id/name_edit_text"
         android:layout_width="293dp"
-        android:layout_height="wrap_content"
+        android:layout_height="0dp"
         android:layout_margin="20dp"
+        android:layout_weight="1"
         android:ems="10"
+        android:hint="Name"
         android:inputType="text"
-        android:text="Name"
-        android:textColor="@color/gold" />
+        android:textColor="@color/gold"
+        android:textColorHint="@color/gold" />
 
     <EditText
         android:id="@+id/email_edit_text"
         android:layout_width="298dp"
-        android:layout_height="wrap_content"
+        android:layout_height="0dp"
         android:layout_margin="20dp"
+        android:layout_weight="1"
         android:ems="10"
-        android:hint="johndoe@email.com"
+        android:hint="email"
         android:inputType="textEmailAddress"
-        android:textColor="@color/gold" />
+        android:textColor="@color/gold"
+        android:textColorHint="@color/gold"
+        android:textColorLink="@color/gold" />
 
     <EditText
         android:id="@+id/password_edit_text"
         android:layout_width="294dp"
-        android:layout_height="wrap_content"
+        android:layout_height="0dp"
         android:layout_margin="20dp"
+        android:layout_weight="1"
         android:ems="10"
-        android:hint="*******"
+        android:hint="password"
         android:inputType="textPassword"
-        android:textColor="@color/gold" />
+        android:textColor="@color/gold"
+        android:textColorHint="@color/gold" />
 
     <CheckBox
         android:id="@+id/location_checkbox"
