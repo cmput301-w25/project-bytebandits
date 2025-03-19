@@ -20,7 +20,7 @@ jobs:
           cache: gradle
     
     - name: Create Google Services JSON File
-      run: cat ./code/app/google-services.json
+      run: touch ./code/app/google-services.json
     - name: Populate Google Services JSON File
       env:
         GOOGLE_SERVICES_JSON: ${{ secrets.GOOGLE_SERVICES_JSON }}
