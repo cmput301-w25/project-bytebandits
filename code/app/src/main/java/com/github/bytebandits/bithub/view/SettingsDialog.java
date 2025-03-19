@@ -8,6 +8,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ImageView;
 
 import com.github.bytebandits.bithub.R;
 import com.github.bytebandits.bithub.controller.SessionManager;
@@ -19,9 +21,10 @@ import com.github.bytebandits.bithub.controller.SessionManager;
  * - Providing a logout button to clear user data and redirect to the startup screen.
  */
 
- public class SettingsDialog {
+public class SettingsDialog {
     private Button logoutButton;
-
+    private EditText nameText;
+    private EditText emailText;
     private Context context;
 
     /**
@@ -46,8 +49,12 @@ import com.github.bytebandits.bithub.controller.SessionManager;
                 .setCancelable(true)
                 .create();
 
-
+        nameText = dialogView.findViewById(R.id.name_edit_text);
+        emailText = dialogView.findViewById(R.id.email_edit_text);
         logoutButton = dialogView.findViewById(R.id.logout_button);
+
+//        String currentUsername = SessionManager.getUsername();
+//        String currentEmail = SessionManager;
 
         logoutButton.setOnClickListener(v -> {
             logoutUser();
