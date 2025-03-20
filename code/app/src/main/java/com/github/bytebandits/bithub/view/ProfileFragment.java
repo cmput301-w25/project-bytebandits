@@ -92,6 +92,7 @@ public class ProfileFragment extends Fragment {
         executor.execute(() -> {
 //            String username = SessionManager.getInstance(requireContext()).getUsername();
             DatabaseManager.getInstance().getUserPosts(username, posts -> {
+            DatabaseManager.getUserPosts(username, posts -> {
                 if (posts == null) {
                     Log.e("ProfileFragment", "Error: posts is null");
                     return null;
