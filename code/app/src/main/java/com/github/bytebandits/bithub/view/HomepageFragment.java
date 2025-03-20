@@ -49,7 +49,7 @@ public class HomepageFragment extends Fragment {
         }
 
         executor.execute(() -> {
-                    DatabaseManager.getPosts(posts -> {
+                    DatabaseManager.getInstance().getAllPosts(posts -> {
                         if (posts == null) {
                             Log.e("HomepageFragment", "Error: posts is null");
                         }
@@ -90,7 +90,7 @@ public class HomepageFragment extends Fragment {
                 });
 
         // Listener so that dataList gets updated whenever the database does
-        CollectionReference moodPostRef = DatabaseManager.getPostsCollectionRef();
+        CollectionReference moodPostRef = DatabaseManager.getInstance().getPostsCollectionRef();
         moodPostRef.addSnapshotListener((value, error) -> {
             if (error != null){
                 Log.e("Firestore", error.toString());

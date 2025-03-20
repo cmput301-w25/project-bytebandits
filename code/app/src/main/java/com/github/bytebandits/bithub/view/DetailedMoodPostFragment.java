@@ -14,6 +14,7 @@ import androidx.fragment.app.DialogFragment;
 
 import com.github.bytebandits.bithub.controller.DatabaseManager;
 import com.github.bytebandits.bithub.MainActivity;
+import com.github.bytebandits.bithub.controller.SessionManager;
 import com.github.bytebandits.bithub.model.MoodPost;
 import com.github.bytebandits.bithub.R;
 
@@ -63,7 +64,7 @@ public class DetailedMoodPostFragment extends DialogFragment{
                     ((MainActivity) requireActivity()).editMoodFragment(moodPost);
                 })
                 .setPositiveButton("Delete", (dialog, which) -> {
-                    DatabaseManager.deletePost(requireContext(), moodPost.getPostID(), Optional.empty());
+                    DatabaseManager.getInstance().deletePost(moodPost.getPostID(), SessionManager.getInstance(requireContext()).getUsername(),Optional.empty());
                 })
                 .create();
     }
