@@ -116,6 +116,19 @@ public class ProfileFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_profile, container, false); // display profile fragment layout
         profile = (Profile) getArguments().getSerializable(PROFILE);
 
+        settingsButton = view.findViewById(R.id.settings_button);
+
+        String userId = profile.getUserID();
+        String loggedInUser = SessionManager.getInstance(requireContext()).getUsername();
+
+        // Hide settings button if viewing another user's profile
+        if (!userId.equals(loggedInUser)) {
+            settingsButton.setVisibility(View.GONE);
+        } else {
+            settingsButton.setVisibility(View.VISIBLE);
+            settingsButton.setOnClickListener(v -> openSettings());
+        }
+
         // Initialize dataList to avoid NullPointerException
         if (dataList == null) {
             dataList = new ArrayList<>();
@@ -125,14 +138,14 @@ public class ProfileFragment extends Fragment {
         }
 
         executor.execute(() -> {
-            String username;
+            String targetUserId;
             if (isOtherProfile) {
-                username = getOtherProfile().getUserID();
+                targetUserId = getOtherProfile().getUserID();
             } else {
-                username = SessionManager.getInstance(requireContext()).getUsername();
+                targetUserId = SessionManager.getInstance(requireContext()).getUsername();
             }
 
-            DatabaseManager.getInstance().getUserPosts(username, posts -> {
+            DatabaseManager.getInstance().getUserPosts(targetUserId, posts -> {
                 if (posts == null) {
                     Log.e("ProfileFragment", "Error: posts is null");
                     return null;
@@ -167,9 +180,6 @@ public class ProfileFragment extends Fragment {
                                     "Detailed Mood Post View");
                         }
                     });
-
-                    settingsButton = view.findViewById(R.id.settings_button);
-                    settingsButton.setOnClickListener(v -> openSettings());
                 });
                 return null;
             });
