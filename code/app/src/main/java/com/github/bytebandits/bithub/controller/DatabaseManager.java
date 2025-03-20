@@ -7,6 +7,8 @@ import com.github.bytebandits.bithub.model.DocumentReferences;
 import com.github.bytebandits.bithub.model.MoodPost;
 import com.github.bytebandits.bithub.model.Profile;
 import com.google.firebase.firestore.*;
+import com.google.firebase.firestore.auth.User;
+
 import org.jetbrains.annotations.NotNull;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
@@ -91,6 +93,13 @@ public final class DatabaseManager {
         });
     }
 
+    /**
+     * Adds a new user to the Firestore database.
+     *
+     * @param userId      The unique identifier for the user.
+     * @param userDetails A HashMap containing user details to be stored.
+     * @param listener    An optional listener to handle success or failure callbacks.
+     */
     public void addUser(String userId, HashMap<String, Object> userDetails, Optional<OnUserAddListener> listener) {
         usersCollectionRef.document(userId).set(userDetails)
                 .addOnSuccessListener(unused -> {
@@ -103,29 +112,63 @@ public final class DatabaseManager {
                 });
     }
 
-    public List<DocumentSnapshot> searchUsers(String query) throws ExecutionException, InterruptedException {
-        CollectionReference localUserRef = this.usersCollectionRef; // unsure if needed
+    /**
+     * Searches for users whose userId matches or starts with the given query.
+     *
+     * @param query The search term used to find users.
+     * @param listener A listener to handle the searched users
+     * @throws ExecutionException   If an error occurs while executing the query.
+     * @throws InterruptedException If the execution is interrupted.
+     */
+    public void searchUsers(String query, OnUserSearchFetchListener listener) {
+        Query users =  this.usersCollectionRef.orderBy("userId").startAt(query).endAt(query + "~");
 
-        Query users = localUserRef.orderBy("userId").startAt(query).endAt(query+"~");
-
-        CompletableFuture<QuerySnapshot> userFuture = CompletableFuture.supplyAsync(() -> {
+        CompletableFuture.supplyAsync(() -> {
             try {
-                return users.get().getResult();
+                QuerySnapshot querySnapshot = users.get().getResult();
+                List<HashMap<String, Object>> userList = new ArrayList<>();
+
+                for (DocumentSnapshot doc : querySnapshot.getDocuments()) {
+                    userList.add(doc.toObject(HashMap.class));
+                }
+
+                return userList; // Return the fetched user list
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
+        }).thenAccept(userList -> {
+            if (listener != null) {
+                listener.onUsersFetched(userList); // Pass the fetched users to the listener
+            }
+        }).exceptionally(e -> {
+            Log.e("DatabaseManager", "Error fetching users", e);
+            if (listener != null) {
+                listener.onUsersFetched(null); // Handle errors
+            }
+            return null;
         });
-
-        return userFuture.get().getDocuments();
     }
+
 
     // Get Followers, Edit Post,
 
+    /**
+     * Sends a notification to a specific user.
+     *
+     * @param recipientUserId The ID of the user who will receive the notification.
+     * @param docRef          A reference to the document associated with the notification.
+     */
     private void sendNotification(String recipientUserId, DocumentReference docRef){
         DocumentReference recipientDocRef = this.usersCollectionRef.document(recipientUserId);
         recipientDocRef.update(DocumentReferences.NOTIFICATIONS.getDocRefString(), FieldValue.arrayUnion(docRef));
     }
 
+    /**
+     * Accepts a follow request from another user.
+     *
+     * @param currentUserId   The ID of the current user.
+     * @param requestedUserId The ID of the user requesting to follow.
+     */
     private void acceptUserFollow(String currentUserId, String requestedUserId) {
         DocumentReference requestedUserDocRef = this.usersCollectionRef.document(requestedUserId);
         DocumentReference currentUserDocRef = this.usersCollectionRef.document(currentUserId);
@@ -134,6 +177,12 @@ public final class DatabaseManager {
         currentUserDocRef.update(DocumentReferences.NOTIFICATIONS.getDocRefString(), FieldValue.arrayRemove(requestedUserDocRef));
     }
 
+    /**
+     * Rejects a follow request from another user.
+     *
+     * @param currentUserId   The ID of the current user.
+     * @param requestedUserId The ID of the user whose request is being rejected.
+     */
     private void rejectUserFollow(String currentUserId, String requestedUserId) {
         DocumentReference requestedUserDocRef = this.usersCollectionRef.document(requestedUserId);
         DocumentReference currentUserDocRef = this.usersCollectionRef.document(currentUserId);
@@ -141,12 +190,45 @@ public final class DatabaseManager {
         currentUserDocRef.update(DocumentReferences.NOTIFICATIONS.getDocRefString(), FieldValue.arrayRemove(requestedUserDocRef));
     }
 
+    /**
+     * Retrieves a list of followers for a given user.
+     *
+     * @param userId   The ID of the user whose followers are being fetched.
+     * @param listener A listener to handle the list of fetched followers.
+     */
     private void getFollowers(String userId, OnFollowersFetchListener listener) {
         DocumentReference currentUserDocRef = this.usersCollectionRef.document(userId);
-        ArrayList<Profile> followers;
+        ArrayList<Profile> followers = new ArrayList<>();
 
-//        currentUserDocRef.get().addOnCompleteListener(
-//        );
+        currentUserDocRef.get().addOnCompleteListener(task -> {
+            if (task.isSuccessful() && task.getResult() != null) {
+                DocumentSnapshot userSnapshot = task.getResult();
+                ArrayList<DocumentReference> followerRefs =
+                        (ArrayList<DocumentReference>) userSnapshot.get(DocumentReferences.FOLLOWERS.getDocRefString());
+
+                // User does not have any followers
+                if (followerRefs == null || followerRefs.isEmpty()) {
+                    listener.onFollowersFetched(followers);
+                    return;
+                }
+
+                int[] remainingFollowers = {followerRefs.size()}; // Track pending follower retrievals
+
+                for (DocumentReference followerRef : followerRefs) {
+                    followerRef.get().addOnCompleteListener(followerTask -> {
+                        if (followerTask.isSuccessful() && followerTask.getResult().exists()) {
+                            followers.add(followerTask.getResult().toObject(Profile.class));
+                        }
+                        remainingFollowers[0]--;
+
+                        // When all followerRefs are processed, invoke the listener
+                        if (remainingFollowers[0] == 0) {
+                            listener.onFollowersFetched(followers);
+                        }
+                    });
+                }
+            }
+        });
     }
 
     // Post Management
@@ -238,6 +320,10 @@ public final class DatabaseManager {
                 for (QueryDocumentSnapshot doc : task.getResult()) {
                     posts.add(doc.toObject(MoodPost.class));
                 }
+
+                // Sort the posts by dateTime in descending order (most recent first)
+                posts.sort((p1, p2) -> p2.getPostedDateTime().compareTo(p1.getPostedDateTime()));
+
                 if (listener != null) {
                     listener.onPostsFetched(posts);
                 } else {
@@ -417,14 +503,6 @@ public final class DatabaseManager {
         });
     }
 
-    private void addComment(String postId, String userId, String comment) {
-        postsCollectionRef.document(postId).update("comments", FieldValue.arrayUnion(Map.entry(userId, comment)));
-    }
-
-    private void deleteComment(String postId, Map.Entry<String, String> comment) {
-        postsCollectionRef.document(postId).update("comments", FieldValue.arrayRemove(comment));
-    }
-
     /**
      * Callback interface for fetching a user.
      * Implement this interface to handle the fetched user data.
@@ -433,12 +511,28 @@ public final class DatabaseManager {
         void onUserFetched(HashMap<String, Object> user);
     }
 
+    /**
+     * Callback interface for fetching multiple users.
+     * Implement this interface to handle the fetched users data.
+     */
+    public interface OnUserSearchFetchListener {
+        void onUsersFetched(List<HashMap<String, Object>> users);
+    }
+
+    /**
+     * Callback interface for adding a user.
+     * Implement this interface to check if successful.
+     */
     public interface OnUserAddListener {
         void onUsersAdded(boolean added);
     }
 
+    /**
+     * Callback interface for fetching a user's followers.
+     * Implement this interface to handle the fetched user data.
+     */
     public interface OnFollowersFetchListener {
-        void onFollowersFetch(ArrayList<Profile> followers);
+        void onFollowersFetched(ArrayList<Profile> followers);
     }
 
 
