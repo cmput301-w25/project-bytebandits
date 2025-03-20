@@ -16,6 +16,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import com.github.bytebandits.bithub.controller.DatabaseManager;
+import com.github.bytebandits.bithub.model.Profile;
 import com.github.bytebandits.bithub.model.MoodPost;
 import com.github.bytebandits.bithub.R;
 import com.github.bytebandits.bithub.controller.SessionManager;
@@ -42,9 +43,13 @@ public class ProfileFragment extends Fragment {
 
     private final ExecutorService executor = Executors.newSingleThreadExecutor();
     private final Handler mainHandler = new Handler(Looper.getMainLooper());
+    private Profile profile;
+    private static final String PROFILE = "profile";
 
     /**
-     * Getter method to get the state on whether a profile fragment represents another person's profile
+     * Getter method to get the state on whether a profile fragment represents
+     * another person's profile
+     * 
      * @return boolean value on whether the above is true or false
      */
     public boolean getIsOtherProfile() {
@@ -52,8 +57,10 @@ public class ProfileFragment extends Fragment {
     }
 
     /**
-     * Setter method to set the state on whether a profile fragment represents another person's profile
-     * @param newIsOtherProfile  boolean value on whether the above is true or false
+     * Setter method to set the state on whether a profile fragment represents
+     * another person's profile
+     * 
+     * @param newIsOtherProfile boolean value on whether the above is true or false
      */
     public void setIsOtherProfile(boolean newIsOtherProfile) {
         isOtherProfile = newIsOtherProfile;
@@ -62,7 +69,9 @@ public class ProfileFragment extends Fragment {
     public boolean isOtherProfile = false;
 
     /**
-     * Getter method to get the profile object if the fragment represents another person (not the current user)
+     * Getter method to get the profile object if the fragment represents another
+     * person (not the current user)
+     * 
      * @return profile object
      */
     public Profile getOtherProfile() {
@@ -71,7 +80,9 @@ public class ProfileFragment extends Fragment {
 
     /**
      * Setter method to set the profile object of the fragment
-     * @param otherProfile profile object that represents another profile (not the current user)
+     * 
+     * @param otherProfile profile object that represents another profile (not the
+     *                     current user)
      */
     public void setOtherProfile(Profile otherProfile) {
         this.otherProfile = otherProfile;
@@ -79,21 +90,32 @@ public class ProfileFragment extends Fragment {
 
     public Profile otherProfile = null;
 
-
+    public static ProfileFragment newInstance(Profile profile) {
+        ProfileFragment fragment = new ProfileFragment();
+        Bundle args = new Bundle();
+        args.putSerializable(PROFILE, profile);
+        fragment.setArguments(args);
+        return fragment;
+    }
 
     /**
      * Called to have the fragment instantiate its user interface view.
      *
-     * @param inflater used to inflate views.
-     * @param container the parent view that the fragment's UI should attach to.
-     * @param savedInstanceState this fragment is being re-constructed from a previous saved state.
+     * @param inflater           used to inflate views.
+     * @param container          the parent view that the fragment's UI should
+     *                           attach to.
+     * @param savedInstanceState this fragment is being re-constructed from a
+     *                           previous saved state.
      * @return The View for the fragment's UI
      */
 
     @Nullable
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_profile, container, false);  // display profile fragment layout
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
+            @Nullable Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.fragment_profile, container, false); // display profile fragment layout
+        profile = (Profile) getArguments().getSerializable(PROFILE);
+
         // Initialize dataList to avoid NullPointerException
         if (dataList == null) {
             dataList = new ArrayList<>();
@@ -104,10 +126,9 @@ public class ProfileFragment extends Fragment {
 
         executor.execute(() -> {
             String username;
-            if (isOtherProfile){
+            if (isOtherProfile) {
                 username = getOtherProfile().getUserID();
-            }
-            else{
+            } else {
                 username = SessionManager.getInstance(requireContext()).getUsername();
             }
 
@@ -139,10 +160,11 @@ public class ProfileFragment extends Fragment {
                     moodPostListHistory.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                         @Override
                         public void onItemClick(AdapterView<?> parent, View view,
-                                                int position, long id) {
-                            DetailedMoodPostFragment detailedMoodPostFragment =
-                                    DetailedMoodPostFragment.newInstance(dataList.get(position));
-                            detailedMoodPostFragment.show(getActivity().getSupportFragmentManager(), "Detailed Mood Post View");
+                                int position, long id) {
+                            DetailedMoodPostFragment detailedMoodPostFragment = DetailedMoodPostFragment
+                                    .newInstance(dataList.get(position));
+                            detailedMoodPostFragment.show(getActivity().getSupportFragmentManager(),
+                                    "Detailed Mood Post View");
                         }
                     });
 
@@ -156,10 +178,10 @@ public class ProfileFragment extends Fragment {
         // Listener so that dataList gets updated whenever the database does
         CollectionReference moodPostRef = DatabaseManager.getInstance().getPostsCollectionRef();
         moodPostRef.addSnapshotListener((value, error) -> {
-            if (error != null){
+            if (error != null) {
                 Log.e("Firestore", error.toString());
             }
-            if (value != null){
+            if (value != null) {
                 dataList.clear();
                 if (!value.isEmpty()) {
                     for (QueryDocumentSnapshot snapshot : value) {
