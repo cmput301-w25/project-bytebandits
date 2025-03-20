@@ -357,12 +357,33 @@ public final class DatabaseManager {
         usersCollectionRef.document(userId).get().addOnCompleteListener(task -> {
             if (task.isSuccessful() && task.getResult() != null) {
                 DocumentSnapshot userSnapshot = task.getResult();
-                ArrayList<DocumentReference> postRefs = (ArrayList<DocumentReference>) userSnapshot.get("postRefs");
+                Object postRefsObject = userSnapshot.get("postRefs");
 
-                // User does not have any posts
-                if (postRefs == null || postRefs.isEmpty()) {
+                List<DocumentReference> postRefs = new ArrayList<>();
+
+                if (postRefsObject instanceof List) {
+                    List<?> rawList = (List<?>) postRefsObject;
+                    for (Object item : rawList) {
+                        if (item instanceof DocumentReference) {
+                            postRefs.add((DocumentReference) item);
+                        } else if (item instanceof String) {
+                            // Convert string to DocumentReference
+                            postRefs.add(firestoreDb.document((String) item));
+                        } else {
+                            Log.e("getUserPosts", "Unexpected item in postRefs: " + item);
+                        }
+                    }
+                }
+
+                if (postRefs.isEmpty()) {
+                    Log.d("getUserPosts", "postRefs is empty");
                     listener.onPostsFetched(posts);
                     return;
+                } else {
+                    Log.d("getUserPosts", "postRefs size: " + postRefs.size());
+                    for (DocumentReference ref : postRefs) {
+                        Log.d("getUserPosts", "postRef: " + ref.getPath());
+                    }
                 }
 
                 int[] postRemaining = {postRefs.size()}; // Track individual post retrieval
@@ -370,20 +391,26 @@ public final class DatabaseManager {
                 for (DocumentReference postRef : postRefs) {
                     postRef.get().addOnCompleteListener(postTask -> {
                         if (postTask.isSuccessful() && postTask.getResult().exists()) {
-                            posts.add(postTask.getResult().toObject(MoodPost.class));
+                            MoodPost moodPost = postTask.getResult().toObject(MoodPost.class);
+                            posts.add(moodPost);
+                            Log.d("getUserPosts", "Fetched post: " + moodPost);
+                        } else {
+                            Log.d("getUserPosts", "Failed to fetch post: " + postRef.getPath());
                         }
                         postRemaining[0]--;
 
                         // When all postRefs are processed, update the map
                         if (postRemaining[0] == 0) {
+                            Log.d("getUserPosts", "All posts fetched, returning list");
                             listener.onPostsFetched(posts);
                         }
                     });
                 }
+            } else {
+                Log.e("getUserPosts", "Failed to fetch user document", task.getException());
             }
         });
     }
-
     /**
      * Fetches posts from multiple users based on their userIds.
      * The result is returned via the provided listener.
