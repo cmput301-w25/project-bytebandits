@@ -16,6 +16,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import com.github.bytebandits.bithub.controller.DatabaseManager;
+import com.github.bytebandits.bithub.model.Profile;
 import com.github.bytebandits.bithub.model.MoodPost;
 import com.github.bytebandits.bithub.R;
 import com.github.bytebandits.bithub.controller.SessionManager;
@@ -41,7 +42,16 @@ public class ProfileFragment extends Fragment {
 
     private final ExecutorService executor = Executors.newSingleThreadExecutor();
     private final Handler mainHandler = new Handler(Looper.getMainLooper());
+    private Profile profile;
+    private static final String PROFILE = "profile";
 
+    public static ProfileFragment newInstance(Profile profile) {
+        ProfileFragment fragment = new ProfileFragment();
+        Bundle args = new Bundle();
+        args.putSerializable(PROFILE, profile);
+        fragment.setArguments(args);
+        return fragment;
+    }
 
     /**
      * Called to have the fragment instantiate its user interface view.
@@ -56,6 +66,8 @@ public class ProfileFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_profile, container, false);  // display profile fragment layout
+        profile = (Profile) getArguments().getSerializable(PROFILE);
+
         // Initialize dataList to avoid NullPointerException
         if (dataList == null) {
             dataList = new ArrayList<>();
