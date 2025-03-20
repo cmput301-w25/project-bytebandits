@@ -3,6 +3,7 @@ package com.github.bytebandits.bithub.view;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
@@ -16,10 +17,13 @@ import androidx.fragment.app.DialogFragment;
 import com.github.bytebandits.bithub.controller.DatabaseManager;
 import com.github.bytebandits.bithub.MainActivity;
 import com.github.bytebandits.bithub.controller.SessionManager;
+import com.github.bytebandits.bithub.model.Comment;
+import com.github.bytebandits.bithub.model.Emotion;
 import com.github.bytebandits.bithub.model.MoodPost;
 import com.github.bytebandits.bithub.R;
 import com.github.bytebandits.bithub.model.Profile;
 
+import java.util.ArrayList;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -53,11 +57,12 @@ public class DetailedMoodPostFragment extends DialogFragment{
         Profile profile = SessionManager.getInstance(getContext()).getProfile();
 
         // Set the text views to mood post data
-        viewSocialStatus.setText(moodPost.getSocialSituationString());
+        if (moodPost.getSocialSituation() == null) { viewSocialStatus.setText(null); }
+        else { viewSocialStatus.setText(moodPost.getSocialSituation().name()); }
         viewName.setText(moodPost.getUsername());
         viewDate.setText(moodPost.getFormattedPostedDate());
         viewTime.setText(moodPost.getFormattedPostedTime());
-        viewEmotion.setText(moodPost.getEmotionString());
+        viewEmotion.setText(moodPost.getEmotion().getState());
         viewDescription.setText(moodPost.getDescription());
         viewImage.setImageResource(moodPost.getEmotion().getLogoID());
 
@@ -71,7 +76,8 @@ public class DetailedMoodPostFragment extends DialogFragment{
 
         commentsButton.setOnClickListener(v -> {
             // TODO: display the comments
-            dialog.dismiss();
+            CommentsFragment commentsFragment = CommentsFragment.newInstance(moodPost);
+            commentsFragment.show(getActivity().getSupportFragmentManager(), "Comments View");
         });
 
         // Show and set edit and delete buttons if this post is ours

@@ -150,10 +150,10 @@ public class PostMoodFragment extends Fragment {
                 }
                 else {
                     HashMap<String, Object> updateFields = new HashMap<>();
+                    updateFields.put("socialSituation", selectedSocialSituation);
                     updateFields.put("emotion", selectedEmotion);
-                    updateFields.put("situation", selectedSocialSituation);
-                    updateFields.put("desc", selectedDescription);
-                    databaseManager.updatePost(postToEdit.getPostID(), updateFields, Optional.empty());
+                    updateFields.put("description", selectedDescription);
+                    DatabaseManager.updatePost(postToEdit.getPostID(), updateFields, Optional.empty());
                 }
                 // Go back to homepage fragment
                 ((MainActivity) requireActivity()).replaceFragment(new HomepageFragment());

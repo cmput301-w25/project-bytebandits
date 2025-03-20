@@ -8,7 +8,7 @@ import java.util.UUID;
  * This is a class that represents a comment on a mood post
  * @author Tony Yang
  */
-public class Comment {
+public class Comment{
     private String commentID;
     private Profile profile;
     private Date dateTime;
@@ -82,17 +82,6 @@ public class Comment {
      */
     public void setPostedDateTime(Date dateTime) {
         this.dateTime = dateTime;
-    }
-
-    /**
-     * Returns the comment's date and time posted as a string for database storage
-     * @return
-     *      Returns a String object representing the comment's date and time posted
-     */
-    public String getPostedDateTimeString() {
-        // Format the string before returning
-        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
-        return formatter.format(getPostedDateTime());
     }
 
     /**
