@@ -153,7 +153,7 @@ public class PostMoodFragment extends Fragment {
                     updateFields.put("socialSituation", selectedSocialSituation);
                     updateFields.put("emotion", selectedEmotion);
                     updateFields.put("description", selectedDescription);
-                    DatabaseManager.updatePost(postToEdit.getPostID(), updateFields, Optional.empty());
+                    databaseManager.updatePost(postToEdit.getPostID(), updateFields, Optional.empty());
                 }
                 // Go back to homepage fragment
                 ((MainActivity) requireActivity()).replaceFragment(new HomepageFragment());
