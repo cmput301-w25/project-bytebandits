@@ -69,7 +69,7 @@ public class MainActivity extends AppCompatActivity {
             } else if (item.getItemId() == R.id.notifications) {
                 replaceFragment(new NotificationsFragment());
             } else if (item.getItemId() == R.id.profile) {
-                Profile userProfile = SessionManager.getInstance(this).getProfile(); // Assume getProfile() fetches the logged-in user
+                Profile userProfile = SessionManager.getInstance(this).getProfile(); // get currently logged in profile
                 replaceFragment(ProfileFragment.newInstance(userProfile));
             }
             return true;
