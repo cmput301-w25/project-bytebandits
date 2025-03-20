@@ -15,11 +15,21 @@ import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
 
 import com.github.bytebandits.bithub.R;
+import com.github.bytebandits.bithub.model.MoodPost;
 
 public class AddCommentFragment extends DialogFragment {
+    public static AddCommentFragment newInstance(MoodPost moodPost) {
+        // Use Bundle to get info between fragments
+        Bundle args = new Bundle();
+        args.putSerializable("moodPost", moodPost);
+        AddCommentFragment fragment = new AddCommentFragment();
+        fragment.setArguments(args);
+        return fragment;
+    }
+
     // Listener interface that will be implemented in and used to communicate with comments fragment
     interface AddCommentDialogListener {
-        void addComment(String commentText);
+        void addComment(MoodPost moodPost, String commentText);
     }
 
     private AddCommentDialogListener listener;
@@ -40,11 +50,12 @@ public class AddCommentFragment extends DialogFragment {
     @NonNull
     @Override
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
-        // Get views
+        // Get views and mood post
         View view = LayoutInflater.from(getContext()).inflate(R.layout.add_comment_fragment, null);
         EditText editCommentText = view.findViewById(R.id.addCommentText);
         Button cancelButton = view.findViewById(R.id.addCommentCancelButton);
         Button confirmButton = view.findViewById(R.id.addCommentConfirmButton);
+        MoodPost moodPost = (MoodPost) getArguments().getSerializable("moodPost");
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
         builder.setView(view);
@@ -62,7 +73,7 @@ public class AddCommentFragment extends DialogFragment {
                 editCommentText.setError("Comment cannot be blank");
             }
             else {
-                listener.addComment(commentText);
+                listener.addComment(moodPost, commentText);
                 dialog.dismiss();
             }
         });

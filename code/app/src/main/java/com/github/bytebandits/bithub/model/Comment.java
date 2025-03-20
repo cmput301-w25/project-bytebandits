@@ -14,6 +14,8 @@ public class Comment{
     private Date dateTime;
     private String text;
 
+    public Comment() {}
+
     /**
      * Constructor to make a comment
      * @param profile
