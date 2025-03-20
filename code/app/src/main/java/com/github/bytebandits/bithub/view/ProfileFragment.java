@@ -218,6 +218,7 @@ public class ProfileFragment extends Fragment {
         SettingsDialog settingsDialog = new SettingsDialog(requireContext());
         settingsDialog.showSettingsDialog();
     }
+
     /**
      * Displays the filter dialog when the settings button is clicked.
      */
@@ -226,4 +227,3 @@ public class ProfileFragment extends Fragment {
         filterDialog.showFilterDialog();
     }
 }
-
