@@ -17,13 +17,10 @@ import androidx.fragment.app.DialogFragment;
 import com.github.bytebandits.bithub.controller.DatabaseManager;
 import com.github.bytebandits.bithub.MainActivity;
 import com.github.bytebandits.bithub.controller.SessionManager;
-import com.github.bytebandits.bithub.model.Comment;
-import com.github.bytebandits.bithub.model.Emotion;
 import com.github.bytebandits.bithub.model.MoodPost;
 import com.github.bytebandits.bithub.R;
 import com.github.bytebandits.bithub.model.Profile;
 
-import java.util.ArrayList;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -75,7 +72,6 @@ public class DetailedMoodPostFragment extends DialogFragment{
         });
 
         commentsButton.setOnClickListener(v -> {
-            // TODO: display the comments
             CommentsFragment commentsFragment = CommentsFragment.newInstance(moodPost);
             commentsFragment.show(getActivity().getSupportFragmentManager(), "Comments View");
         });
