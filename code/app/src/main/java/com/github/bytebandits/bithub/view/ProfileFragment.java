@@ -40,7 +40,7 @@ public class ProfileFragment extends Fragment {
     private ListView moodPostListHistory;
     private MoodPostArrayAdapter moodPostAdapter;
     private ImageButton settingsButton;
-
+    private ImageButton filterButton;
     private final ExecutorService executor = Executors.newSingleThreadExecutor();
     private final Handler mainHandler = new Handler(Looper.getMainLooper());
     private Profile profile;
@@ -117,6 +117,7 @@ public class ProfileFragment extends Fragment {
         profile = (Profile) getArguments().getSerializable(PROFILE);
 
         settingsButton = view.findViewById(R.id.settings_button);
+        filterButton = view.findViewById(R.id.filter_button);
 
         String userId = profile.getUserID();
         String loggedInUser = SessionManager.getInstance(requireContext()).getUsername();
@@ -128,6 +129,8 @@ public class ProfileFragment extends Fragment {
             settingsButton.setVisibility(View.VISIBLE);
             settingsButton.setOnClickListener(v -> openSettings());
         }
+
+        filterButton.setOnClickListener(v -> openFilterDialog());
 
         // Initialize dataList to avoid NullPointerException
         if (dataList == null) {
@@ -215,4 +218,12 @@ public class ProfileFragment extends Fragment {
         SettingsDialog settingsDialog = new SettingsDialog(requireContext());
         settingsDialog.showSettingsDialog();
     }
+    /**
+     * Displays the filter dialog when the settings button is clicked.
+     */
+    private void openFilterDialog() {
+        FilterDialog filterDialog = new FilterDialog(requireContext());
+        filterDialog.showFilterDialog();
+    }
 }
+

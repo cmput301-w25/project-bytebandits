@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/Primary1"
+    android:gravity="center_horizontal"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/filter_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="57dp"
+        android:layout_marginBottom="20dp"
+        android:text="Filter by Mood"
+        android:textAllCaps="false"
+        android:textColor="@color/gold"
+        android:textSize="34dp" />
+
+    <RadioGroup
+        android:id="@+id/radioGroup"
+        android:layout_width="match_parent"
+        android:layout_height="482dp">
+
+        <RadioButton
+            android:id="@+id/anger_radio_button"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:text="Anger" />
+
+        <RadioButton
+            android:id="@+id/confusion_radio_button"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:text="Confusion" />
+
+        <RadioButton
+            android:id="@+id/disgust_radio_button"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:text="Disgust" />
+
+        <RadioButton
+            android:id="@+id/fear_radio_button"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:text="Fear" />
+
+        <RadioButton
+            android:id="@+id/happiness_radio_button"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:text="Happiness" />
+
+        <RadioButton
+            android:id="@+id/sadness_radio_button"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:text="Sadness" />
+
+        <RadioButton
+            android:id="@+id/shame_radio_button"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:text="Shame" />
+
+        <RadioButton
+            android:id="@+id/suprise_radio_button"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:text="Suprise" />
+    </RadioGroup>
+
+    <Button
+        android:id="@+id/sortby_button"
+        android:layout_width="107dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="30dp"
+        android:text="Sort By" />
+</LinearLayout>
