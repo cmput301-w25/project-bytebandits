@@ -109,7 +109,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="111dp"
-            android:layout_marginTop="3dp"
             android:layout_marginEnd="60dp"
             android:layout_marginBottom="84dp"
             android:text="Followers"
@@ -124,7 +123,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="67dp"
-            android:layout_marginTop="3dp"
             android:layout_marginEnd="111dp"
             android:layout_marginBottom="84dp"
             android:text="Folllowing"
@@ -184,8 +182,8 @@
             android:layout_width="409dp"
             android:layout_height="1dp"
             android:background="?android:attr/listDivider"
-            tools:layout_editor_absoluteX="3dp"
-            tools:layout_editor_absoluteY="125dp" />
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/textView4" />
 
         <View
             android:id="@+id/divider4"

@@ -10,14 +10,12 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ImageButton;
 import android.widget.ListView;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import com.github.bytebandits.bithub.controller.DatabaseManager;
-import com.github.bytebandits.bithub.controller.PostFilterManager;
 import com.github.bytebandits.bithub.model.Profile;
 import com.github.bytebandits.bithub.model.MoodPost;
 import com.github.bytebandits.bithub.R;
@@ -27,7 +25,6 @@ import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -38,9 +35,8 @@ import java.util.concurrent.Executors;
  * - Providing access to the settings dialog via a settings button.
  */
 
-public class ProfileFragment extends Fragment implements FilterDialog.FilterListener {
+public class ProfileFragment extends Fragment {
     private ArrayList<MoodPost> dataList;
-    private ArrayList<MoodPost> filteredDataList;
     private ListView moodPostListHistory;
     private MoodPostArrayAdapter moodPostAdapter;
     private ImageButton settingsButton;
@@ -48,16 +44,52 @@ public class ProfileFragment extends Fragment implements FilterDialog.FilterList
     private final ExecutorService executor = Executors.newSingleThreadExecutor();
     private final Handler mainHandler = new Handler(Looper.getMainLooper());
     private Profile profile;
-    private TextView usernameTextView;
     private static final String PROFILE = "profile";
 
+    /**
+     * Getter method to get the state on whether a profile fragment represents
+     * another person's profile
+     * 
+     * @return boolean value on whether the above is true or false
+     */
+    public boolean getIsOtherProfile() {
+        return isOtherProfile;
+    }
 
     /**
-     * Creates a new instance of ProfileFragment with the given profile.
-     *
-     * @param profile The Profile object to be displayed in the fragment.
-     * @return A new instance of ProfileFragment.
+     * Setter method to set the state on whether a profile fragment represents
+     * another person's profile
+     * 
+     * @param newIsOtherProfile boolean value on whether the above is true or false
      */
+    public void setIsOtherProfile(boolean newIsOtherProfile) {
+        isOtherProfile = newIsOtherProfile;
+    }
+
+    public boolean isOtherProfile = false;
+
+    /**
+     * Getter method to get the profile object if the fragment represents another
+     * person (not the current user)
+     * 
+     * @return profile object
+     */
+    public Profile getOtherProfile() {
+        return otherProfile;
+    }
+
+    /**
+     * Setter method to set the profile object of the fragment
+     * 
+     * @param otherProfile profile object that represents another profile (not the
+     *                     current user)
+     */
+    public void setOtherProfile(Profile otherProfile) {
+        this.otherProfile = otherProfile;
+    }
+
+    public Profile otherProfile = null;
+
     public static ProfileFragment newInstance(Profile profile) {
         ProfileFragment fragment = new ProfileFragment();
         Bundle args = new Bundle();
@@ -86,12 +118,9 @@ public class ProfileFragment extends Fragment implements FilterDialog.FilterList
 
         settingsButton = view.findViewById(R.id.settings_button);
         filterButton = view.findViewById(R.id.filter_button);
-        usernameTextView = view.findViewById(R.id.username_textview);
 
-        String userId = profile.getUserId();
-        String loggedInUser = SessionManager.getInstance(requireContext()).getUserId();
-
-        usernameTextView.setText(userId);
+        String userId = profile.getUserID();
+        String loggedInUser = SessionManager.getInstance(requireContext()).getUsername();
 
         // Hide settings button if viewing another user's profile
         if (!userId.equals(loggedInUser)) {
@@ -103,25 +132,23 @@ public class ProfileFragment extends Fragment implements FilterDialog.FilterList
 
         filterButton.setOnClickListener(v -> openFilterDialog());
 
-        // Initialize both dataList and filteredDataList to avoid NullPointerException
+        // Initialize dataList to avoid NullPointerException
         if (dataList == null) {
             dataList = new ArrayList<>();
-        }
-        if (filteredDataList == null) {
-            filteredDataList = new ArrayList<>();
+            Log.d("ProfileFragment", "dataList initialized as empty list");
+        } else {
+            Log.d("ProfileFragment", "dataList already initialized with size: " + dataList.size());
         }
 
         executor.execute(() -> {
-            String userIdToBeRendered;
-            String localUserId = SessionManager.getInstance(requireContext()).getUserId();
-
-            if (userId.equals(localUserId)) {
-                userIdToBeRendered = localUserId;  // render the current user
+            String targetUserId;
+            if (isOtherProfile) {
+                targetUserId = getOtherProfile().getUserID();
             } else {
-                userIdToBeRendered = userId;   // render another user
+                targetUserId = SessionManager.getInstance(requireContext()).getUsername();
             }
 
-            DatabaseManager.getInstance().getUserPosts(userIdToBeRendered, posts -> {
+            DatabaseManager.getInstance().getUserPosts(targetUserId, posts -> {
                 if (posts == null) {
                     Log.e("ProfileFragment", "Error: posts is null");
                     return null;
@@ -133,8 +160,6 @@ public class ProfileFragment extends Fragment implements FilterDialog.FilterList
                 mainHandler.post(() -> {
                     dataList.clear();
                     dataList.addAll(posts);
-                    filteredDataList.clear();
-                    filteredDataList.addAll(posts);
 
                     if (moodPostAdapter != null) {
                         moodPostAdapter.notifyDataSetChanged();
@@ -144,7 +169,7 @@ public class ProfileFragment extends Fragment implements FilterDialog.FilterList
 
                     // Initialize views and adapters
                     moodPostListHistory = view.findViewById(R.id.mood_post_list_history);
-                    moodPostAdapter = new MoodPostArrayAdapter(getContext(), filteredDataList);
+                    moodPostAdapter = new MoodPostArrayAdapter(getContext(), dataList);
                     moodPostListHistory.setAdapter(moodPostAdapter);
 
                     // open detailed view of the user's clicked post
@@ -163,8 +188,7 @@ public class ProfileFragment extends Fragment implements FilterDialog.FilterList
             });
         });
 
-        // Listener to update dataList and filteredDataList whenever the database
-        // changes
+        // Listener so that dataList gets updated whenever the database does
         CollectionReference moodPostRef = DatabaseManager.getInstance().getPostsCollectionRef();
         moodPostRef.addSnapshotListener((value, error) -> {
             if (error != null) {
@@ -172,96 +196,34 @@ public class ProfileFragment extends Fragment implements FilterDialog.FilterList
             }
             if (value != null) {
                 dataList.clear();
-                filteredDataList.clear();
                 if (!value.isEmpty()) {
                     for (QueryDocumentSnapshot snapshot : value) {
-                        MoodPost post = snapshot.toObject(MoodPost.class);
-                        dataList.add(post);
+                        snapshot.toObject(MoodPost.class);
+                        dataList.add(snapshot.toObject(MoodPost.class));
                     }
-                    filteredDataList.addAll(dataList); // Copy the entire list to filteredDataList
                 }
                 if (moodPostAdapter != null) {
                     moodPostAdapter.notifyDataSetChanged();
                 }
             }
         });
+
         return view;
     }
 
     /**
-     * Opens the settings dialog for the user.
-     * This method is only accessible when the user is viewing their own profile.
+     * Displays the settings dialog when the settings button is clicked.
      */
     private void openSettings() {
         SettingsDialog settingsDialog = new SettingsDialog(requireContext());
         settingsDialog.showSettingsDialog();
     }
-
     /**
      * Displays the filter dialog when the settings button is clicked.
      */
     private void openFilterDialog() {
-        FilterDialog filterDialog = new FilterDialog(requireContext(), this);
+        FilterDialog filterDialog = new FilterDialog(requireContext());
         filterDialog.showFilterDialog();
     }
-
-    /**
-     * Handles the filter selection event from the filter dialog.
-     * Updates the list of displayed mood posts based on the selected mood filter.
-     *
-     * @param mood The mood selected by the user for filtering.
-     */
-    @Override
-    public void onFilterSelected(String mood) {
-        filteredDataList.clear();
-        if (mood.equals("last_week")) {
-            filteredDataList.addAll(filterPostsFromLastWeek(dataList));
-        } else {
-            filteredDataList.addAll(PostFilterManager.filterPostsByMood(dataList, mood));
-        }
-        moodPostAdapter.notifyDataSetChanged();
-    }
-
-    /**
-     * Filters the list of mood posts to include only those that are recent (last 7
-     * days).
-     *
-     * @param posts The full list of mood posts.
-     * @return A list of mood posts from the last week.
-     */
-    private List<MoodPost> filterPostsFromLastWeek(List<MoodPost> posts) {
-        List<MoodPost> filteredPosts = new ArrayList<>();
-        long currentTime = System.currentTimeMillis();
-        long oneWeekInMillis = 7 * 24 * 60 * 60 * 1000; // 7 days in milliseconds
-
-        for (MoodPost post : posts) {
-            long postTime = post.getPostedDateTime().getTime();
-            if ((currentTime - postTime) <= oneWeekInMillis) {
-                filteredPosts.add(post);
-            }
-        }
-        return filteredPosts;
-    }
-
-    /**
-     * Updates the displayed list of mood posts based on the user's search query.
-     *
-     * @param query The search query entered by the user.
-     */
-    @Override
-    public void onSearchQueryChanged(String query) {
-        filteredDataList.clear();
-
-        if (query.isEmpty()) {
-            filteredDataList.addAll(dataList);
-        } else {
-            for (MoodPost post : dataList) {
-                if (post.getDescription() != null
-                        && post.getDescription().toLowerCase().contains(query.toLowerCase())) {
-                    filteredDataList.add(post);
-                }
-            }
-        }
-        moodPostAdapter.notifyDataSetChanged();
-    }
 }
+
