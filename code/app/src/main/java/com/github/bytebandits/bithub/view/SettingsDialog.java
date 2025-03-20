@@ -53,9 +53,6 @@ public class SettingsDialog {
         emailText = dialogView.findViewById(R.id.email_edit_text);
         logoutButton = dialogView.findViewById(R.id.logout_button);
 
-//        String currentUsername = SessionManager.getUsername();
-//        String currentEmail = SessionManager;
-
         logoutButton.setOnClickListener(v -> {
             logoutUser();
             settingsDialog.dismiss();  // Close the dialog after logout
