@@ -29,7 +29,7 @@ public class AddCommentFragment extends DialogFragment {
 
     // Listener interface that will be implemented in and used to communicate with comments fragment
     interface AddCommentDialogListener {
-        void addComment(MoodPost moodPost, String commentText);
+        void addComment(String commentText);
     }
 
     private AddCommentDialogListener listener;
@@ -73,7 +73,7 @@ public class AddCommentFragment extends DialogFragment {
                 editCommentText.setError("Comment cannot be blank");
             }
             else {
-                listener.addComment(moodPost, commentText);
+                listener.addComment(commentText);
                 dialog.dismiss();
             }
         });

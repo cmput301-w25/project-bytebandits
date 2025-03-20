@@ -2,7 +2,6 @@ package com.github.bytebandits.bithub.view;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
-import android.graphics.Movie;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -25,11 +24,13 @@ import java.util.HashMap;
 import java.util.Optional;
 
 public class CommentsFragment extends DialogFragment implements
-        AddCommentFragment.AddCommentDialogListener {
+        AddCommentFragment.AddCommentDialogListener,
+        CommentArrayAdapter.DeleteCommentListener {
     private ListView commentList;
     private ArrayList<Comment> dataList;
     private CommentArrayAdapter commentAdapter;
     private Profile profile = SessionManager.getInstance(getContext()).getProfile();
+    private MoodPost moodPost;
     public static CommentsFragment newInstance(MoodPost moodPost) {
         // Use Bundle to get info between fragments
         Bundle args = new Bundle();
@@ -41,11 +42,21 @@ public class CommentsFragment extends DialogFragment implements
 
     // Add the comment given to the display and database and notify a change
     @Override
-    public void addComment(MoodPost moodPost, String commentText) {
+    public void addComment(String commentText) {
         dataList.add(new Comment(profile, commentText));
         HashMap<String, Object> updateFields = new HashMap<>();
         updateFields.put("comments", dataList);
-        DatabaseManager.updatePost(moodPost.getPostID(), updateFields, Optional.empty());
+        DatabaseManager.getInstance().updatePost(moodPost.getPostID(), updateFields, Optional.empty());
+        commentAdapter.notifyDataSetChanged();
+    }
+
+    // Delete the comment given from display and database and notify a change
+    @Override
+    public void deleteComment(int position) {
+        dataList.remove(position);
+        HashMap<String, Object> updateFields = new HashMap<>();
+        updateFields.put("comments", dataList);
+        DatabaseManager.getInstance().updatePost(moodPost.getPostID(), updateFields, Optional.empty());
         commentAdapter.notifyDataSetChanged();
     }
 
@@ -57,11 +68,11 @@ public class CommentsFragment extends DialogFragment implements
         commentList = view.findViewById(R.id.commentsList);
         Button backButton = view.findViewById(R.id.commentsBackButton);
         Button addButton = view.findViewById(R.id.commentsAddButton);
-        MoodPost moodPost = (MoodPost) getArguments().getSerializable("moodPost");
+        moodPost = (MoodPost) getArguments().getSerializable("moodPost");
 
         // Create comment array
         dataList = moodPost.getComments();
-        commentAdapter = new CommentArrayAdapter(getContext(), dataList);
+        commentAdapter = new CommentArrayAdapter(getContext(), dataList, this);
         commentList.setAdapter(commentAdapter);
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());

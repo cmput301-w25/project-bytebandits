@@ -44,7 +44,7 @@
             app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
-            android:id="@+id/textEmotion"
+            android:id="@+id/textCommentText"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="21dp"
@@ -71,6 +71,16 @@
             android:textSize="20sp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/textDate" />
+
+        <Button
+            android:id="@+id/deleteCommentButton"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_marginTop="21dp"
+            android:layout_marginEnd="21dp"
+            android:background="@android:drawable/ic_menu_delete"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>

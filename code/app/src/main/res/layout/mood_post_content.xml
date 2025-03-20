@@ -55,7 +55,7 @@
             app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
-            android:id="@+id/textEmotion"
+            android:id="@+id/textCommentText"
             android:layout_width="wrap_content"
             android:layout_height="51dp"
             android:layout_marginStart="21dp"
