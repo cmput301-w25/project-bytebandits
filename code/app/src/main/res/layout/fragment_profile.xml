@@ -11,6 +11,32 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
+        <SearchView
+            android:id="@+id/profileSearch"
+            android:layout_width="309dp"
+            android:layout_height="0dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:background="@drawable/profile_search_bg"
+            android:queryHint="Profile Search"
+            android:theme="@style/profile_SearchView"
+            app:layout_constraintEnd_toStartOf="@+id/filter_button"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+        </SearchView>
+
+        <ListView
+            android:id="@+id/profileResults"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:background="@color/Accent1"
+            android:elevation="10dp"
+            android:visibility="invisible"
+            app:layout_constraintEnd_toStartOf="@+id/filter_button"
+            app:layout_constraintStart_toStartOf="@+id/profileSearch"
+            app:layout_constraintTop_toBottomOf="@+id/profileSearch" />
+
         <TextView
             android:id="@+id/textView2"
             android:layout_width="wrap_content"
