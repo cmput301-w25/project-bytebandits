@@ -60,15 +60,6 @@ public class Comment{
     }
 
     /**
-     * Returns the comment's profile's UserID/Username for database storage and display
-     * @return
-     *      Returns a String object representing the comment's profile's username
-     */
-    public String getUsername() {
-        return getProfile().getUserID();
-    }
-
-    /**
      * Returns the comment's date and time posted
      * @return
      *      Returns a Date object representing the date and time the comment was posted.

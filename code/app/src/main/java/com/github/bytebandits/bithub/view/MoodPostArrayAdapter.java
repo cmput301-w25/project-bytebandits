@@ -43,7 +43,7 @@ public class MoodPostArrayAdapter extends ArrayAdapter<MoodPost> {
         TextView emotionView = view.findViewById(R.id.textCommentText);
 
         // Set the text views of the view based on the movie object
-        nameView.setText(moodPost.getUsername());
+        nameView.setText(moodPost.getProfile().getUserID());
         dateView.setText(moodPost.getFormattedPostedDate());
         timeView.setText(moodPost.getFormattedPostedTime());
         emotionView.setText(moodPost.getEmotion().getState());

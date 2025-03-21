@@ -108,15 +108,6 @@ public class MoodPost implements Serializable {
     }
 
     /**
-     * Returns the mood post's profile's UserID/Username for display
-     * @return
-     *      Returns a String object representing the mood post's profile's username
-     */
-    public String getUsername() {
-        return getProfile().getUserID();
-    }
-
-    /**
      * Returns the mood post's date and time posted
      * @return
      *      Returns a Date object representing the date and time the mood post was posted.

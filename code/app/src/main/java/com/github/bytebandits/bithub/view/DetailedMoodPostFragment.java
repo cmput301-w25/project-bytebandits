@@ -56,7 +56,7 @@ public class DetailedMoodPostFragment extends DialogFragment{
         // Set the text views to mood post data
         if (moodPost.getSocialSituation() == null) { viewSocialStatus.setText(null); }
         else { viewSocialStatus.setText(moodPost.getSocialSituation().name()); }
-        viewName.setText(moodPost.getUsername());
+        viewName.setText(moodPost.getProfile().getUserID());
         viewDate.setText(moodPost.getFormattedPostedDate());
         viewTime.setText(moodPost.getFormattedPostedTime());
         viewEmotion.setText(moodPost.getEmotion().getState());
@@ -77,9 +77,9 @@ public class DetailedMoodPostFragment extends DialogFragment{
         });
 
         // Show and set edit and delete buttons if this post is ours
-        if (Objects.equals(moodPost.getUsername(), profile.getUserID())) {
+        if (Objects.equals(moodPost.getProfile().getUserID(), profile.getUserID())) {
             deleteButton.setOnClickListener(v -> {
-                DatabaseManager.getInstance().deletePost(moodPost.getPostID(), moodPost.getUsername(), Optional.empty());
+                DatabaseManager.getInstance().deletePost(moodPost.getPostID(), moodPost.getProfile().getUserID(), Optional.empty());
                 dialog.dismiss();
             });
 

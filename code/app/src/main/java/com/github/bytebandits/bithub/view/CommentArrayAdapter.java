@@ -53,11 +53,11 @@ public class CommentArrayAdapter extends ArrayAdapter<Comment> {
         Button deleteButton = view.findViewById(R.id.deleteCommentButton);
 
         // Set the text views of the view based on the comment object
-        nameView.setText(comment.getUsername());
+        nameView.setText(comment.getProfile().getUserID());
         dateView.setText(comment.getFormattedPostedDate());
         timeView.setText(comment.getFormattedPostedTime());
         commentTextView.setText(comment.getText());
-        if (!Objects.equals(comment.getUsername(), SessionManager.getInstance(getContext()).getUsername())) {
+        if (!Objects.equals(comment.getProfile().getUserID(), SessionManager.getInstance(getContext()).getUsername())) {
             deleteButton.setVisibility(View.GONE);
         }
         else {
