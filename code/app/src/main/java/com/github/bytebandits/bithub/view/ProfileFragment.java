@@ -152,66 +152,48 @@ public class ProfileFragment extends Fragment {
      * Manages and encapsulates all logic relating to searching profiles within the profile fragment
      * @param view the view in question, so the method can reference the various UI elements of the layout
      */
-    private void profileSearchManager(View view){
-        ArrayList<Profile> profiles = new ArrayList<Profile>();
-        ProfileSearchAdapter profileSearchAdapter = new ProfileSearchAdapter(requireContext(), profiles);
+private void profileSearchManager(View view) {
+    ArrayList<Profile> profiles = new ArrayList<>();
+    ProfileSearchAdapter profileSearchAdapter = new ProfileSearchAdapter(requireContext(), profiles);
 
-        SearchView profileSearch = view.findViewById((R.id.profileSearch));
-        ListView profileResults = view.findViewById(R.id.profileResults);
-        profileResults.setAdapter(profileSearchAdapter);
+    SearchView profileSearch = view.findViewById(R.id.profileSearch);
+    ListView profileResults = view.findViewById(R.id.profileResults);
+    profileResults.setAdapter(profileSearchAdapter);
 
-        profileResults.setOnItemClickListener(new AdapterView.OnItemClickListener(){
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                // all for manual testing and setup for transitioning to different fragments
-                Profile profile = profiles.get(i);
-                Toast.makeText(requireContext(), "Clicked: " + profile.getUserID(), Toast.LENGTH_SHORT).show();
-                ((MainActivity) requireActivity()).replaceFragment(new HomepageFragment());
-                // and update state of navbar
-            }
-        });
+    profileResults.setOnItemClickListener((adapterView, view1, i, l) -> {
+        Profile profile = profiles.get(i);
+        Toast.makeText(requireContext(), "Clicked: " + profile.getUserID(), Toast.LENGTH_SHORT).show();
+        ((MainActivity) requireActivity()).replaceFragment(new HomepageFragment());
+    });
 
-        Log.d("BEFORE_DB_CALL", "BEFORE_DB_CALL BEFORE_DB_CALL BEFORE_DB_CALL BEFORE_DB_CALL BEFORE_DB_CALL");
-        DatabaseManager.getInstance().searchUsers("test", new DatabaseManager.OnUserSearchFetchListener(){
-            @Override
-            public void onUsersFetched(List<HashMap<String, Object>> users) {
-//                HashMap<String, ?> userHashMap = (HashMap<String, ?>) users.get(0).get("test");
-//                Object object = users.get(0).get("test");
-                for (HashMap<String, Object> user: users){
-                    for (String key : user.keySet()){
+    profileSearch.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+        @Override
+        public boolean onQueryTextSubmit(String s) {
+            return false;
+        }
 
-                        Log.d("UsersFetched", "Key: " + key + ", Value: " + user.get(key).toString());
-
-                    }
-                }
-                Log.d("AFTER_DB_CALL", "AFTER_DB_CALL AFTER_DB_CALL AFTER_DB_CALL AFTER_DB_CALL AFTER_DB_CALL");
-
-                profileSearch.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-                    @Override
-                    public boolean onQueryTextSubmit(String s) {
-                        return false;
-                    }
-
-                    @Override
-                    public boolean onQueryTextChange(String s) {
-                        profileResults.setVisibility(View.VISIBLE);
-                        if (s.isEmpty()){
-                            profiles.clear();
-                            profileSearchAdapter.notifyDataSetChanged();
-                            profileResults.setVisibility(View.INVISIBLE);
+        @Override
+        public boolean onQueryTextChange(String s) {
+            if (s.isEmpty()) {
+                profiles.clear();
+                profileSearchAdapter.notifyDataSetChanged();
+                profileResults.setVisibility(View.INVISIBLE);
+            } else {
+                profileResults.setVisibility(View.VISIBLE);
+                DatabaseManager.getInstance().searchUsers(s, users -> {
+                    profiles.clear();
+                    for (HashMap<String, Object> user : users) {
+                        for (String key : user.keySet()) {
+                            Log.d("UsersFetched", "Key: " + key + ", Value: " + user.get(key).toString());
+                            profiles.add(new Profile(key)); // Assuming key is the user ID
                         }
-                        else{
-                            // remove comment and call db method here
-                            profiles.add(new Profile("zzzzzzzzzzz"));
-                            profileSearchAdapter.notifyDataSetChanged();
-                        }
-
-                        return true;
                     }
+                    profileSearchAdapter.notifyDataSetChanged();
                 });
             }
-        });
+            return true;
+        }
+    });
+}
 
-
-    }
 }
