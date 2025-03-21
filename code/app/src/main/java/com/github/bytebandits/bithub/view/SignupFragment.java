@@ -109,7 +109,7 @@ public class SignupFragment extends Fragment {
             Log.d("SignupFragment", "Credentials are valid. Creating user...");
 
             HashMap<String, Object> userDetails = new HashMap<>();
-            userDetails.put("username", username);
+            userDetails.put("userId", username);
             userDetails.put("email", email);
             userDetails.put("password", password);
             userDetails.put("profile", new Profile(username).toJson());

@@ -43,6 +43,16 @@ public final class DatabaseManager {
         useEmulation("10.0.2.2", 8080);
     }
 
+    // Testing functions for offline persistence
+
+    public void setOffline() {
+        this.firestoreDb.disableNetwork();
+    }
+
+    public void setOnline(){
+        this.firestoreDb.enableNetwork();
+    }
+
     public CollectionReference getUsersCollectionRef() { return usersCollectionRef; }
     public CollectionReference getPostsCollectionRef() { return postsCollectionRef; }
 
