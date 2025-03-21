@@ -10,6 +10,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ImageButton;
 import android.widget.ListView;
+import android.widget.SearchView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -19,6 +20,7 @@ import com.github.bytebandits.bithub.controller.DatabaseManager;
 import com.github.bytebandits.bithub.model.MoodPost;
 import com.github.bytebandits.bithub.R;
 import com.github.bytebandits.bithub.controller.SessionManager;
+import com.github.bytebandits.bithub.model.Profile;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
@@ -128,6 +130,8 @@ public class ProfileFragment extends Fragment {
             }
         });
 
+        profileSearchManager(view);
+
         return view;
     }
 
@@ -137,5 +141,42 @@ public class ProfileFragment extends Fragment {
     private void openSettings() {
         SettingsDialog settingsDialog = new SettingsDialog(requireContext());
         settingsDialog.showSettingsDialog();
+    }
+
+    /**
+     * Manages and encapsulates all logic relating to searching profiles within the profile fragment
+     * @param view the view in question, so the method can reference the various UI elements of the layout
+     */
+    private void profileSearchManager(View view){
+        ArrayList<Profile> profiles = new ArrayList<Profile>();
+        ProfileSearchAdapter profileSearchAdapter = new ProfileSearchAdapter(requireContext(), profiles);
+
+        SearchView profileSearch = view.findViewById((R.id.profileSearch));
+        ListView profileResults = view.findViewById(R.id.profileResults);
+        profileResults.setAdapter(profileSearchAdapter);
+
+        profileSearch.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String s) {
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String s) {
+                profileResults.setVisibility(View.VISIBLE);
+                if (s.isEmpty()){
+                    profiles.clear();
+                    profileSearchAdapter.notifyDataSetChanged();
+                    profileResults.setVisibility(View.INVISIBLE);
+                }
+                else{
+                    // remove comment and call db method here a
+                    profiles.add(new Profile("zzzzzzzzzzz"));
+                    profileSearchAdapter.notifyDataSetChanged();
+                }
+
+                return true;
+            }
+        });
     }
 }
