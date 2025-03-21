@@ -11,11 +11,13 @@ import android.widget.AdapterView;
 import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.SearchView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import com.github.bytebandits.bithub.MainActivity;
 import com.github.bytebandits.bithub.controller.DatabaseManager;
 import com.github.bytebandits.bithub.model.MoodPost;
 import com.github.bytebandits.bithub.R;
@@ -25,6 +27,8 @@ import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -155,28 +159,49 @@ public class ProfileFragment extends Fragment {
         ListView profileResults = view.findViewById(R.id.profileResults);
         profileResults.setAdapter(profileSearchAdapter);
 
-        profileSearch.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+        profileResults.setOnItemClickListener(new AdapterView.OnItemClickListener(){
             @Override
-            public boolean onQueryTextSubmit(String s) {
-                return false;
-            }
-
-            @Override
-            public boolean onQueryTextChange(String s) {
-                profileResults.setVisibility(View.VISIBLE);
-                if (s.isEmpty()){
-                    profiles.clear();
-                    profileSearchAdapter.notifyDataSetChanged();
-                    profileResults.setVisibility(View.INVISIBLE);
-                }
-                else{
-                    // remove comment and call db method here a
-                    profiles.add(new Profile("zzzzzzzzzzz"));
-                    profileSearchAdapter.notifyDataSetChanged();
-                }
-
-                return true;
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                // all for manual testing and setup for transitioning to different fragments
+                Profile profile = profiles.get(i);
+                Toast.makeText(requireContext(), "Clicked: " + profile.getUserID(), Toast.LENGTH_SHORT).show();
+                ((MainActivity) requireActivity()).replaceFragment(new HomepageFragment());
+                // and update state of navbar
             }
         });
+
+        DatabaseManager.getInstance().searchUsers("test", new DatabaseManager.OnUserSearchFetchListener(){
+            @Override
+            public void onUsersFetched(List<HashMap<String, Object>> users) {
+//                HashMap<String, ?> userHashMap = (HashMap<String, ?>) users.get(0).get("test");
+//                Object object = users.get(0).get("test");
+
+                profileSearch.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+                    @Override
+                    public boolean onQueryTextSubmit(String s) {
+                        return false;
+                    }
+
+                    @Override
+                    public boolean onQueryTextChange(String s) {
+                        profileResults.setVisibility(View.VISIBLE);
+                        if (s.isEmpty()){
+                            profiles.clear();
+                            profileSearchAdapter.notifyDataSetChanged();
+                            profileResults.setVisibility(View.INVISIBLE);
+                        }
+                        else{
+                            // remove comment and call db method here
+                            profiles.add(new Profile("zzzzzzzzzzz"));
+                            profileSearchAdapter.notifyDataSetChanged();
+                        }
+
+                        return true;
+                    }
+                });
+            }
+        });
+
+
     }
 }
