@@ -7,7 +7,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.ImageButton;
 import android.widget.ListView;
 
@@ -16,6 +15,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import com.github.bytebandits.bithub.controller.DatabaseManager;
+import com.github.bytebandits.bithub.controller.PostFilterManager;
 import com.github.bytebandits.bithub.model.Profile;
 import com.github.bytebandits.bithub.model.MoodPost;
 import com.github.bytebandits.bithub.R;
@@ -232,24 +232,8 @@ public class ProfileFragment extends Fragment implements FilterDialog.FilterList
 
     @Override
     public void onFilterSelected(String mood) {
-        filterPostsByMood(mood);
-    }
-
-    private void filterPostsByMood(String mood) {
-        ArrayList<MoodPost> filteredPosts = new ArrayList<>();
-        if (mood.equals("all")) {
-            filteredPosts.addAll(dataList); // Show all posts when "all" is selected
-        } else {
-            for (MoodPost post : dataList) {
-                if (post.getEmotionString().equalsIgnoreCase(mood)) {
-                    filteredPosts.add(post);
-                }
-            }
-        }
-
-        // Update the adapter with filtered posts
-        moodPostAdapter.clear();
-        moodPostAdapter.addAll(filteredPosts);
+        filteredDataList.clear();
+        filteredDataList.addAll(PostFilterManager.filterPostsByMood(dataList, mood));
         moodPostAdapter.notifyDataSetChanged();
     }
 }

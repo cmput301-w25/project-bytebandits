@@ -21,6 +21,7 @@ import androidx.fragment.app.Fragment;
 
 import com.github.bytebandits.bithub.MainActivity;
 import com.github.bytebandits.bithub.controller.DatabaseManager;
+import com.github.bytebandits.bithub.controller.PostFilterManager;
 import com.github.bytebandits.bithub.model.MoodPost;
 import com.github.bytebandits.bithub.R;
 import com.github.bytebandits.bithub.model.Profile;
@@ -35,84 +36,93 @@ import java.util.HashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-public class HomepageFragment extends Fragment {
+public class HomepageFragment extends Fragment implements FilterDialog.FilterListener {
     private ArrayList<MoodPost> dataList;
+    private ArrayList<MoodPost> filteredDataList; // Separate list for filtering
     private ListView moodPostList;
     private MoodPostArrayAdapter moodPostAdapter;
-
+    private ImageButton filterButton;
     private final ExecutorService executor = Executors.newSingleThreadExecutor();
     private final Handler mainHandler = new Handler(Looper.getMainLooper());
 
-
     @Nullable
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
+            @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.homepage_fragment, container, false);
 
-        // Initialize dataList to avoid NullPointerException
+        filterButton = view.findViewById(R.id.filter_button_homepage);
+        filterButton.setOnClickListener(v -> openFilterDialog());
+
+        // Initialize lists
         if (dataList == null) {
             dataList = new ArrayList<>();
+            filteredDataList = new ArrayList<>();
             Log.d("HomepageFragment", "dataList initialized as empty list");
         } else {
             Log.d("HomepageFragment", "dataList already initialized with size: " + dataList.size());
         }
 
         executor.execute(() -> {
-                    DatabaseManager.getInstance().getAllPosts(posts -> {
-                        if (posts == null) {
-                            Log.e("HomepageFragment", "Error: posts is null");
-                        }
+            DatabaseManager.getInstance().getAllPosts(posts -> {
+                if (posts == null) {
+                    Log.e("HomepageFragment", "Error: posts is null");
+                }
 
-                        Log.d("HomepageFragment", "Fetched posts count: " + posts.size());
+                Log.d("HomepageFragment", "Fetched posts count: " + posts.size());
 
-                        // Switch to UI thread for UI updates
-                        mainHandler.post(() -> {
-                            dataList.clear();
-                            dataList.addAll(posts);
+                // Switch to UI thread for UI updates
+                mainHandler.post(() -> {
+                    dataList.clear();
+                    dataList.addAll(posts);
 
-                            if (moodPostAdapter != null) {
-                                moodPostAdapter.notifyDataSetChanged();
-                            } else {
-                                Log.e("HomepageFragment", "moodPostAdapter is null");
-                            }
+                    // Reset filteredDataList to show all posts initially
+                    filteredDataList.clear();
+                    filteredDataList.addAll(dataList);
 
-                            // Initialize views and adapters
-                            moodPostList = view.findViewById(R.id.homepageMoodPostList);
-                            if (dataList.size() > 0) {
-                                moodPostAdapter = new MoodPostArrayAdapter(getContext(), dataList);
-                                moodPostList.setAdapter(moodPostAdapter);
+                    if (moodPostAdapter != null) {
+                        moodPostAdapter.notifyDataSetChanged();
+                    } else {
+                        Log.e("HomepageFragment", "moodPostAdapter is null");
+                    }
 
-                                // on item click on list, open detailed view of post
-                                moodPostList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                                    @Override
-                                    public void onItemClick(AdapterView<?> parent, View view,
-                                                            int position, long id) {
-                                        DetailedMoodPostFragment detailedMoodPostFragment =
-                                                DetailedMoodPostFragment.newInstance(dataList.get(position));
-                                        detailedMoodPostFragment.show(getActivity().getSupportFragmentManager(), "Detailed Mood Post View");
-                                    }
-                                });
-                            }
+                    // Initialize views and adapters
+                    moodPostList = view.findViewById(R.id.homepageMoodPostList);
+                    if (!filteredDataList.isEmpty()) {
+                        moodPostAdapter = new MoodPostArrayAdapter(getContext(), filteredDataList);
+                        moodPostList.setAdapter(moodPostAdapter);
+
+                        // on item click on list, open detailed view of post
+                        moodPostList.setOnItemClickListener((parent, v, position, id) -> {
+                            DetailedMoodPostFragment detailedMoodPostFragment = DetailedMoodPostFragment
+                                    .newInstance(filteredDataList.get(position));
+                            detailedMoodPostFragment.show(getActivity().getSupportFragmentManager(),
+                                    "Detailed Mood Post View");
                         });
-                        return null;
-                    });
+                    }
                 });
+                return null;
+            });
+        });
 
-        // Listener so that dataList gets updated whenever the database does
+        // Firestore listener to update lists when database changes
         CollectionReference moodPostRef = DatabaseManager.getInstance().getPostsCollectionRef();
         moodPostRef.addSnapshotListener((value, error) -> {
-            if (error != null){
+            if (error != null) {
                 Log.e("Firestore", error.toString());
             }
-            if (value != null){
+            if (value != null) {
                 Log.d("Firestore", "SnapshotListener triggered, updating dataList");
                 dataList.clear();
                 if (!value.isEmpty()) {
                     for (QueryDocumentSnapshot snapshot : value) {
-                        snapshot.toObject(MoodPost.class);
                         dataList.add(snapshot.toObject(MoodPost.class));
                     }
                 }
+                // Reset filteredDataList to reflect new data
+                filteredDataList.clear();
+                filteredDataList.addAll(dataList);
+
                 if (moodPostAdapter != null) {
                     moodPostAdapter.notifyDataSetChanged();
                 }
@@ -121,14 +131,15 @@ public class HomepageFragment extends Fragment {
 
         profileSearchManager(view);
 
-
         return view;
     }
 
-
     /**
-     * Manages and encapsulates all logic relating to searching profiles within the homepage fragment
-     * @param view the view in question, so the method can reference the various UI elements of the layout
+     * Manages and encapsulates all logic relating to searching profiles within the
+     * homepage fragment
+     * 
+     * @param view the view in question, so the method can reference the various UI
+     *             elements of the layout
      */
     private void profileSearchManager(View view) {
         ArrayList<Profile> profiles = new ArrayList<>();
@@ -147,7 +158,9 @@ public class HomepageFragment extends Fragment {
             ((MainActivity) requireActivity()).replaceFragment(profileFragment);
         });
 
-        // logic to unfocus from search view, although there are cases where if you click certain ui elements, the click wont register and you will be still focused
+        // logic to unfocus from search view, although there are cases where if you
+        // click certain ui elements, the click wont register and you will be still
+        // focused
         LinearLayout homepageLinearLayoutRoot = view.findViewById(R.id.HomepageLinearLayoutRoot);
         homepageLinearLayoutRoot.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -158,18 +171,18 @@ public class HomepageFragment extends Fragment {
 
         // submit logic for search results
         ImageButton profileSearchIcon = view.findViewById(R.id.profileSearchConfirm);
-        profileSearchIcon.setOnClickListener(new View.OnClickListener(){
+        profileSearchIcon.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 String query = profileSearch.getQuery().toString();
-                if (!query.isEmpty()){
+                if (!query.isEmpty()) {
                     profileResults.setVisibility(View.VISIBLE);
                     DatabaseManager.getInstance().searchUsers(query, users -> {
                         profiles.clear();
 
                         for (HashMap<String, Object> user : users) {
                             String profileJson = (String) user.get("profile");
-                            try{
+                            try {
                                 JSONObject profileObj = new JSONObject(profileJson);
                                 String userID = profileObj.getString("userID");
                                 String userImg;
@@ -177,11 +190,10 @@ public class HomepageFragment extends Fragment {
                                     profiles.add(new Profile(userID));
                                     // use default profile pic
                                 }
-//                            else{
-//                                  // do stuff if profile pic exists
-//                            }
-                            }
-                            catch (JSONException e) {
+                                // else{
+                                // // do stuff if profile pic exists
+                                // }
+                            } catch (JSONException e) {
                                 Log.e("ProfileSearchJSONException", e.toString());
                             }
                         }
@@ -208,4 +220,19 @@ public class HomepageFragment extends Fragment {
             }
         });
     }
+
+    @Override
+    public void onFilterSelected(String mood) {
+        filteredDataList.clear(); // Clear current filtered list
+
+        List<MoodPost> filteredPosts = PostFilterManager.filterPostsByMood(dataList, mood);
+        filteredDataList.addAll(filteredPosts);
+
+        moodPostAdapter.notifyDataSetChanged();
     }
+
+    private void openFilterDialog() {
+        FilterDialog filterDialog = new FilterDialog(requireContext(), this);
+        filterDialog.showFilterDialog();
+    }
+}
