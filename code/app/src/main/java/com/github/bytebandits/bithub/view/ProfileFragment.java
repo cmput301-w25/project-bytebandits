@@ -35,8 +35,9 @@ import java.util.concurrent.Executors;
  * - Providing access to the settings dialog via a settings button.
  */
 
-public class ProfileFragment extends Fragment {
+public class ProfileFragment extends Fragment implements FilterDialog.FilterListener {
     private ArrayList<MoodPost> dataList;
+    private ArrayList<MoodPost> filteredDataList;
     private ListView moodPostListHistory;
     private MoodPostArrayAdapter moodPostAdapter;
     private ImageButton settingsButton;
@@ -132,12 +133,12 @@ public class ProfileFragment extends Fragment {
 
         filterButton.setOnClickListener(v -> openFilterDialog());
 
-        // Initialize dataList to avoid NullPointerException
+        // Initialize both dataList and filteredDataList to avoid NullPointerException
         if (dataList == null) {
             dataList = new ArrayList<>();
-            Log.d("ProfileFragment", "dataList initialized as empty list");
-        } else {
-            Log.d("ProfileFragment", "dataList already initialized with size: " + dataList.size());
+        }
+        if (filteredDataList == null) {
+            filteredDataList = new ArrayList<>();
         }
 
         executor.execute(() -> {
@@ -160,6 +161,8 @@ public class ProfileFragment extends Fragment {
                 mainHandler.post(() -> {
                     dataList.clear();
                     dataList.addAll(posts);
+                    filteredDataList.clear();
+                    filteredDataList.addAll(posts);
 
                     if (moodPostAdapter != null) {
                         moodPostAdapter.notifyDataSetChanged();
@@ -169,7 +172,7 @@ public class ProfileFragment extends Fragment {
 
                     // Initialize views and adapters
                     moodPostListHistory = view.findViewById(R.id.mood_post_list_history);
-                    moodPostAdapter = new MoodPostArrayAdapter(getContext(), dataList);
+                    moodPostAdapter = new MoodPostArrayAdapter(getContext(), filteredDataList);
                     moodPostListHistory.setAdapter(moodPostAdapter);
 
                     // open detailed view of the user's clicked post
@@ -188,7 +191,8 @@ public class ProfileFragment extends Fragment {
             });
         });
 
-        // Listener so that dataList gets updated whenever the database does
+        // Listener to update dataList and filteredDataList whenever the database
+        // changes
         CollectionReference moodPostRef = DatabaseManager.getInstance().getPostsCollectionRef();
         moodPostRef.addSnapshotListener((value, error) -> {
             if (error != null) {
@@ -196,11 +200,13 @@ public class ProfileFragment extends Fragment {
             }
             if (value != null) {
                 dataList.clear();
+                filteredDataList.clear();
                 if (!value.isEmpty()) {
                     for (QueryDocumentSnapshot snapshot : value) {
-                        snapshot.toObject(MoodPost.class);
-                        dataList.add(snapshot.toObject(MoodPost.class));
+                        MoodPost post = snapshot.toObject(MoodPost.class);
+                        dataList.add(post);
                     }
+                    filteredDataList.addAll(dataList); // Copy the entire list to filteredDataList
                 }
                 if (moodPostAdapter != null) {
                     moodPostAdapter.notifyDataSetChanged();
@@ -211,9 +217,6 @@ public class ProfileFragment extends Fragment {
         return view;
     }
 
-    /**
-     * Displays the settings dialog when the settings button is clicked.
-     */
     private void openSettings() {
         SettingsDialog settingsDialog = new SettingsDialog(requireContext());
         settingsDialog.showSettingsDialog();
@@ -223,7 +226,30 @@ public class ProfileFragment extends Fragment {
      * Displays the filter dialog when the settings button is clicked.
      */
     private void openFilterDialog() {
-        FilterDialog filterDialog = new FilterDialog(requireContext());
+        FilterDialog filterDialog = new FilterDialog(requireContext(), this);
         filterDialog.showFilterDialog();
+    }
+
+    @Override
+    public void onFilterSelected(String mood) {
+        filterPostsByMood(mood);
+    }
+
+    private void filterPostsByMood(String mood) {
+        ArrayList<MoodPost> filteredPosts = new ArrayList<>();
+        if (mood.equals("all")) {
+            filteredPosts.addAll(dataList); // Show all posts when "all" is selected
+        } else {
+            for (MoodPost post : dataList) {
+                if (post.getEmotionString().equalsIgnoreCase(mood)) {
+                    filteredPosts.add(post);
+                }
+            }
+        }
+
+        // Update the adapter with filtered posts
+        moodPostAdapter.clear();
+        moodPostAdapter.addAll(filteredPosts);
+        moodPostAdapter.notifyDataSetChanged();
     }
 }

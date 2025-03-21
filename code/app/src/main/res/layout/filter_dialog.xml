@@ -14,7 +14,7 @@
         android:layout_marginBottom="20dp"
         android:text="Filter by Mood"
         android:textAllCaps="false"
-        android:textColor="@color/gold"
+        android:textColor="@color/white"
         android:textSize="34dp" />
 
     <RadioGroup
@@ -23,60 +23,76 @@
         android:layout_height="482dp">
 
         <RadioButton
+            android:id="@+id/all_radio_button"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:text="All"
+            android:textColor="@color/gold" />
+
+        <RadioButton
             android:id="@+id/anger_radio_button"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
-            android:text="Anger" />
+            android:text="Anger"
+            android:textColor="@color/gold" />
 
         <RadioButton
             android:id="@+id/confusion_radio_button"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
-            android:text="Confusion" />
+            android:text="Confusion"
+            android:textColor="@color/gold" />
 
         <RadioButton
             android:id="@+id/disgust_radio_button"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
-            android:text="Disgust" />
+            android:text="Disgust"
+            android:textColor="@color/gold" />
 
         <RadioButton
             android:id="@+id/fear_radio_button"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
-            android:text="Fear" />
+            android:text="Fear"
+            android:textColor="@color/gold" />
 
         <RadioButton
             android:id="@+id/happiness_radio_button"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
-            android:text="Happiness" />
+            android:text="Happiness"
+            android:textColor="@color/gold" />
 
         <RadioButton
             android:id="@+id/sadness_radio_button"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
-            android:text="Sadness" />
+            android:text="Sadness"
+            android:textColor="@color/gold" />
 
         <RadioButton
             android:id="@+id/shame_radio_button"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
-            android:text="Shame" />
+            android:text="Shame"
+            android:textColor="@color/gold" />
 
         <RadioButton
             android:id="@+id/suprise_radio_button"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
-            android:text="Suprise" />
+            android:text="Suprise"
+            android:textColor="@color/gold" />
     </RadioGroup>
 
     <Button

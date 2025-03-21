@@ -11,9 +11,11 @@ import com.github.bytebandits.bithub.R;
 
 public class FilterDialog {
     private Context context;
+    private FilterListener filterListener;
 
-    public FilterDialog(Context context) {
+    public FilterDialog(Context context, FilterListener filterListener) {
         this.context = context;
+        this.filterListener = filterListener;
     }
 
     public void showFilterDialog() {
@@ -27,61 +29,38 @@ public class FilterDialog {
                 .create();
 
         RadioGroup radioGroup = dialogView.findViewById(R.id.radioGroup);
-        RadioButton anger = dialogView.findViewById(R.id.anger_radio_button);
-        RadioButton confusion = dialogView.findViewById(R.id.confusion_radio_button);
-        RadioButton disgust = dialogView.findViewById(R.id.disgust_radio_button);
-        RadioButton fear = dialogView.findViewById(R.id.fear_radio_button);
-        RadioButton happiness = dialogView.findViewById(R.id.happiness_radio_button);
-        RadioButton sadness = dialogView.findViewById(R.id.sadness_radio_button);
-        RadioButton shame = dialogView.findViewById(R.id.shame_radio_button);
-        RadioButton suprise = dialogView.findViewById(R.id.suprise_radio_button);
+
 
         radioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(RadioGroup group, int checkedId) {
-                if(anger.isChecked())
-                {
-                    // do something
-                }
-                else if(confusion.isChecked())
-                {
-                    // do something
-
-                }
-                else if(disgust.isChecked())
-                {
-                    // do something
-
-                }
-                else if(fear.isChecked())
-                {
-                    // do something
-
-                }
-                else if(happiness.isChecked())
-                {
-                    // do something
-
-                }
-                else if(sadness.isChecked())
-                {
-                    // do something
-
-                }
-                else if(shame.isChecked())
-                {
-                    // do something
-
-                }
-                else if(suprise.isChecked())
-                {
-                    // do something
-
+                if (checkedId == R.id.all_radio_button) {
+                    filterListener.onFilterSelected("all");
+                } else if (checkedId == R.id.anger_radio_button) {
+                    filterListener.onFilterSelected("anger");
+                } else if (checkedId == R.id.confusion_radio_button) {
+                    filterListener.onFilterSelected("confusion");
+                } else if (checkedId == R.id.disgust_radio_button) {
+                    filterListener.onFilterSelected("disgust");
+                } else if (checkedId == R.id.fear_radio_button) {
+                    filterListener.onFilterSelected("fear");
+                } else if (checkedId == R.id.happiness_radio_button) {
+                    filterListener.onFilterSelected("happiness");
+                } else if (checkedId == R.id.sadness_radio_button) {
+                    filterListener.onFilterSelected("sadness");
+                } else if (checkedId == R.id.shame_radio_button) {
+                    filterListener.onFilterSelected("shame");
+                } else if (checkedId == R.id.suprise_radio_button) {
+                    filterListener.onFilterSelected("suprise");
                 }
             }
         });
 
 
         filterDialog.show();
+    }
+
+    public interface FilterListener {
+        void onFilterSelected(String mood);
     }
 }
