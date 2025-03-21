@@ -46,9 +46,18 @@ public final class DatabaseManager {
         return getInstance(false); // Default: Don't use emulator
     }
 
-    public CollectionReference getUsersCollectionRef() {
-        return usersCollectionRef;
+    // Testing functions for offline persistence
+
+    public void setOffline() {
+        this.firestoreDb.disableNetwork();
     }
+
+    public void setOnline(){
+        this.firestoreDb.enableNetwork();
+    }
+
+    public CollectionReference getUsersCollectionRef() { return usersCollectionRef; }
+    public CollectionReference getPostsCollectionRef() { return postsCollectionRef; }
 
     public CollectionReference getPostsCollectionRef() {
         return postsCollectionRef;
