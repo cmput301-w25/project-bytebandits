@@ -5,7 +5,9 @@ import android.location.Location;
 
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.Objects;
 import java.util.UUID;
 
 /**
@@ -22,6 +24,7 @@ public class MoodPost implements Serializable {
     private SocialSituation situation;
     private String desc;
     private Bitmap image;
+    private ArrayList<Comment> comments;
 
     public MoodPost() {}
 
@@ -47,7 +50,7 @@ public class MoodPost implements Serializable {
      *      When null is passed, it means that no image is attached to the mood post.
      */
     public MoodPost(Emotion emotion, Profile profile, boolean showLocation, SocialSituation situation,
-                    String desc, Bitmap image) {
+                    String desc, Bitmap image ) {
         this.postID = UUID.randomUUID().toString();
         this.emotion = emotion;
         this.profile = profile;
@@ -56,15 +59,16 @@ public class MoodPost implements Serializable {
         this.situation = situation;
         this.desc = desc;
         this.image = image;
+        this.comments = new ArrayList<>();
     }
 
     /**
-     * Returns the mood post's ID as a string for database storage
+     * Returns the mood post's ID as a string
      * @return
      *      Returns a String object representing the mood post's ID
      */
     public String getPostID() {
-        return postID.toString();
+        return postID;
     }
 
     /**
@@ -86,15 +90,6 @@ public class MoodPost implements Serializable {
     }
 
     /**
-     * Returns the mood post's emotion's name as a string for database storage and display
-     * @return
-     *      Returns a String object representing the mood post's emotion's name (ex. "Sadness")
-     */
-    public String getEmotionString() {
-        return getEmotion().getState();
-    }
-
-    /**
      * Returns the profile of the mood post
      * @return
      *      Returns a Profile object representing the profile of the user who posted the mood post
@@ -113,15 +108,6 @@ public class MoodPost implements Serializable {
     }
 
     /**
-     * Returns the mood post's profile's UserID/Username for database storage and display
-     * @return
-     *      Returns a String object representing the mood post's profile's username
-     */
-    public String getUsername() {
-        return getProfile().getUserID();
-    }
-
-    /**
      * Returns the mood post's date and time posted
      * @return
      *      Returns a Date object representing the date and time the mood post was posted.
@@ -137,17 +123,6 @@ public class MoodPost implements Serializable {
      */
     public void setPostedDateTime(Date dateTime) {
         this.dateTime = dateTime;
-    }
-
-    /**
-     * Returns the mood post's date and time posted as a string for database storage
-     * @return
-     *      Returns a String object representing the mood post's date and time posted
-     */
-    public String getPostedDateTimeString() {
-        // Format the string before returning
-        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
-        return formatter.format(getPostedDateTime());
     }
 
     /**
@@ -195,7 +170,7 @@ public class MoodPost implements Serializable {
     }
 
     /**
-     * Returns the mood post's attached location as a string for database storage and display
+     * Returns the mood post's attached location as a string for display
      * @return
      *      Returns a String object representing the mood post's attached location.
      *      Returns null when the mood post has no attached location.
@@ -222,17 +197,6 @@ public class MoodPost implements Serializable {
      */
     public void setSocialSituation(SocialSituation situation) {
         this.situation = situation;
-    }
-
-    /**
-     * Returns the mood post's social situation's name as a string for database storage and display
-     * @return
-     *      Returns a String object representing the mood post's social situation's name (ex. "ALONE")
-     *      Returns null when the mood post has no attached social situation.
-     */
-    public String getSocialSituationString() {
-        if (getSocialSituation() == null) { return null; }
-        return getSocialSituation().name();
     }
 
     /**
@@ -276,15 +240,34 @@ public class MoodPost implements Serializable {
     }
 
     /**
-     * Returns the mood post's attached image as a string for database storage
+     * Returns the mood post's comments
      *
      * @return
-     *      Returns a Base64 String representing the image
-     *      Returns null when the mood post has no attached image.
+     *      Returns a ArrayList of Comment objects representing the comments of the mood post
      */
-    public String getImageString() {
-        // Check if there is an attached image
-        if (getImage() == null) { return null; }
-        return null; // TODO
+    public ArrayList<Comment> getComments() { return comments; }
+
+    /**
+     * Adds a comment to the mood post's comments
+     * @param comment
+     *      Comment object representing the comment we want to add
+     */
+    public void addComment(Comment comment) {
+        comments.add(comment);
+    }
+
+    /**
+     * Deletes a comment on the mood post's comments
+     * @param comment
+     *      Comment object representing the comment we want to delete
+     */
+    public void deleteComment(Comment comment) {
+        // Loop through comments and find matching comment id and delete it
+        for (int i = 0; i < comments.size(); i++) {
+            if (Objects.equals(comments.get(i).getCommentID(), comment.getCommentID())) {
+                comments.remove(i);
+                break;
+            }
+        }
     }
 }
