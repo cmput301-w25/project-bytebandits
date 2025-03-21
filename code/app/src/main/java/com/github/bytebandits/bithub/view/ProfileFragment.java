@@ -29,6 +29,7 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -170,11 +171,20 @@ public class ProfileFragment extends Fragment {
             }
         });
 
+        Log.d("BEFORE_DB_CALL", "BEFORE_DB_CALL BEFORE_DB_CALL BEFORE_DB_CALL BEFORE_DB_CALL BEFORE_DB_CALL");
         DatabaseManager.getInstance().searchUsers("test", new DatabaseManager.OnUserSearchFetchListener(){
             @Override
             public void onUsersFetched(List<HashMap<String, Object>> users) {
 //                HashMap<String, ?> userHashMap = (HashMap<String, ?>) users.get(0).get("test");
 //                Object object = users.get(0).get("test");
+                for (HashMap<String, Object> user: users){
+                    for (String key : user.keySet()){
+
+                        Log.d("UsersFetched", "Key: " + key + ", Value: " + user.get(key).toString());
+
+                    }
+                }
+                Log.d("AFTER_DB_CALL", "AFTER_DB_CALL AFTER_DB_CALL AFTER_DB_CALL AFTER_DB_CALL AFTER_DB_CALL");
 
                 profileSearch.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
                     @Override
