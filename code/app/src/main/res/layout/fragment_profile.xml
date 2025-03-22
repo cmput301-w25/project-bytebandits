@@ -5,22 +5,28 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/background"
+    android:focusableInTouchMode="false"
     tools:context=".view.ProfileFragment">
 
     <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/constraintLayoutProfile"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:focusable="auto"
+        android:focusableInTouchMode="true">
 
         <SearchView
             android:id="@+id/profileSearch"
-            android:layout_width="309dp"
+            android:layout_width="308dp"
             android:layout_height="0dp"
             android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
             android:background="@drawable/profile_search_bg"
+            android:clickable="true"
+            android:iconifiedByDefault="false"
             android:queryHint="Profile Search"
             android:theme="@style/profile_SearchView"
-            app:layout_constraintEnd_toStartOf="@+id/filter_button"
+            app:layout_constraintEnd_toStartOf="@+id/profileSearchConfirm"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">
 
@@ -36,6 +42,18 @@
             app:layout_constraintEnd_toStartOf="@+id/filter_button"
             app:layout_constraintStart_toStartOf="@+id/profileSearch"
             app:layout_constraintTop_toBottomOf="@+id/profileSearch" />
+
+        <ImageButton
+            android:id="@+id/profileSearchConfirm"
+            android:layout_width="38dp"
+            android:layout_height="0dp"
+            android:background="@color/Accent1"
+            android:src="@android:drawable/ic_menu_send"
+            app:layout_constraintEnd_toStartOf="@+id/filter_button"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toEndOf="@+id/profileSearch"
+            app:layout_constraintStart_toStartOf="@+id/filter_button"
+            app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
             android:id="@+id/textView2"
@@ -77,10 +95,10 @@
             android:layout_weight="1"
             android:backgroundTint="@color/background"
             android:src="@drawable/baseline_keyboard_double_arrow_down_24"
-            app:tint="@color/white"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@+id/searchView2"
-            app:layout_constraintTop_toBottomOf="@+id/divider" />
+            app:layout_constraintTop_toBottomOf="@+id/divider"
+            app:tint="@color/white" />
 
         <SearchView
             android:id="@+id/searchView2"
@@ -159,14 +177,14 @@
 
         <ImageButton
             android:id="@+id/filter_button"
-            android:layout_width="wrap_content"
+            android:layout_width="54dp"
             android:layout_height="wrap_content"
             android:layout_marginEnd="2dp"
             android:backgroundTint="@color/background"
             android:src="@drawable/baseline_filter_alt_24"
-            app:tint="@color/white"
             app:layout_constraintEnd_toStartOf="@+id/settings_button"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            app:tint="@color/white" />
 
         <TextView
             android:id="@+id/followers_count"

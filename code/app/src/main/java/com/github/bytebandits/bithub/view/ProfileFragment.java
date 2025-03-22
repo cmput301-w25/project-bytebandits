@@ -5,16 +5,19 @@ import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.SearchView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
 
 import com.github.bytebandits.bithub.MainActivity;
@@ -160,10 +163,45 @@ private void profileSearchManager(View view) {
     ListView profileResults = view.findViewById(R.id.profileResults);
     profileResults.setAdapter(profileSearchAdapter);
 
+
+
+    // logic of profile transition via clicking
     profileResults.setOnItemClickListener((adapterView, view1, i, l) -> {
         Profile profile = profiles.get(i);
         Toast.makeText(requireContext(), "Clicked: " + profile.getUserID(), Toast.LENGTH_SHORT).show();
         ((MainActivity) requireActivity()).replaceFragment(new HomepageFragment());
+    });
+
+    // logic to unfocus from search view, although there are cases where if you click certain ui elements, the click wont register and you will be still focused
+    ConstraintLayout parentConstraintLayout = view.findViewById(R.id.constraintLayoutProfile);
+    parentConstraintLayout.setOnClickListener(new View.OnClickListener() {
+        @Override
+        public void onClick(View view) {
+            profileSearch.clearFocus();
+        }
+    });
+
+    // submit logic for search results
+    ImageButton profileSearchIcon = view.findViewById(R.id.profileSearchConfirm);
+    profileSearchIcon.setOnClickListener(new View.OnClickListener(){
+        @Override
+        public void onClick(View view) {
+            String query = profileSearch.getQuery().toString();
+            if (!query.isEmpty()){
+                profileResults.setVisibility(View.VISIBLE);
+                DatabaseManager.getInstance().searchUsers(query, users -> {
+                    profiles.clear();
+                    for (HashMap<String, Object> user : users) {
+                        for (String key : user.keySet()) {
+                            if (key.equals("username")){
+                                profiles.add(new Profile(user.get(key).toString())); // Assuming key is the user ID
+                            }
+                        }
+                    }
+                    profileSearchAdapter.notifyDataSetChanged();
+                });
+            }
+        }
     });
 
     profileSearch.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
@@ -178,18 +216,6 @@ private void profileSearchManager(View view) {
                 profiles.clear();
                 profileSearchAdapter.notifyDataSetChanged();
                 profileResults.setVisibility(View.INVISIBLE);
-            } else {
-                profileResults.setVisibility(View.VISIBLE);
-                DatabaseManager.getInstance().searchUsers(s, users -> {
-                    profiles.clear();
-                    for (HashMap<String, Object> user : users) {
-                        for (String key : user.keySet()) {
-                            Log.d("UsersFetched", "Key: " + key + ", Value: " + user.get(key).toString());
-                            profiles.add(new Profile(key)); // Assuming key is the user ID
-                        }
-                    }
-                    profileSearchAdapter.notifyDataSetChanged();
-                });
             }
             return true;
         }
