@@ -1,6 +1,9 @@
 package com.github.bytebandits.bithub.view;
 
+import android.Manifest;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,6 +16,7 @@ import android.widget.SpinnerAdapter;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 
 import com.github.bytebandits.bithub.controller.DatabaseManager;
@@ -22,6 +26,10 @@ import com.github.bytebandits.bithub.model.MoodPost;
 import com.github.bytebandits.bithub.R;
 import com.github.bytebandits.bithub.controller.SessionManager;
 import com.github.bytebandits.bithub.model.SocialSituation;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.model.LatLng;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -30,6 +38,10 @@ import java.util.List;
 import java.util.Optional;
 
 public class PostMoodFragment extends Fragment {
+    private FusedLocationProviderClient fusedLocationClient;
+    private static final int REQUEST_LOCATION_PERMISSION = 1001;
+    private double currentLatitude = 0.0;
+    private double currentLongitude = 0.0;
     private Emotion selectedEmotion;
     private SocialSituation selectedSocialSituation;
     private String selectedDescription;
@@ -54,7 +66,8 @@ public class PostMoodFragment extends Fragment {
         EditText editDescription = view.findViewById(R.id.postMoodDescription);
         Button cancelButton = view.findViewById(R.id.postMoodCancelButton);
         Button confirmButton = view.findViewById(R.id.postMoodConfirmButton);
-
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(getActivity());
+        findCurrentLocation();
         // Get the mood post if we need to edit a mood post
         String tag = getTag();
         Bundle bundle = getArguments();
@@ -145,7 +158,9 @@ public class PostMoodFragment extends Fragment {
                 // Add mood post to database
                 if (postToEdit == null) {
                     SessionManager sessionManager = SessionManager.getInstance(requireContext());
-                    MoodPost moodPost = new MoodPost(selectedEmotion, sessionManager.getProfile(), false, selectedSocialSituation, selectedDescription, null);
+                    MoodPost moodPost = new MoodPost(selectedEmotion, sessionManager.getProfile(), true, selectedSocialSituation, selectedDescription, null);
+                    moodPost.setLatitude(currentLatitude);
+                    moodPost.setLongitude(currentLongitude);
                     databaseManager.addPost(moodPost, sessionManager.getUsername(), Optional.empty());
                 }
                 else {
@@ -166,6 +181,30 @@ public class PostMoodFragment extends Fragment {
         });
 
         return view;
+    }
+
+    private void findCurrentLocation() {
+        boolean b = ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_COARSE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED;
+        if (ActivityCompat.checkSelfPermission(requireContext(), android.Manifest.permission.ACCESS_FINE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED &&
+        ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_COARSE_LOCATION)
+                        != PackageManager.PERMISSION_GRANTED) {
+
+            // Request permissions if not granted
+            requestPermissions(new String[]{
+                    android.Manifest.permission.ACCESS_FINE_LOCATION,
+                    android.Manifest.permission.ACCESS_COARSE_LOCATION
+            }, REQUEST_LOCATION_PERMISSION);
+            return;
+        }
+        // Attempt to get last known location
+        fusedLocationClient.getLastLocation().addOnSuccessListener(requireActivity(), location -> {
+            if (location != null) {
+                currentLatitude = location.getLatitude();
+                currentLongitude = location.getLongitude();
+            }
+        });
     }
 
     /**

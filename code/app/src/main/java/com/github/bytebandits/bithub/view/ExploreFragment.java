@@ -35,6 +35,7 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -92,7 +93,27 @@ public class ExploreFragment extends Fragment implements GoogleMap.OnMarkerClick
 
         return view;
     }
+    /**
+     * Finds the exact MoodPost matching the marker's location
+     * @param marker The marker that was clicked
+     * @param posts List of posts to search through
+     * @return The exact MoodPost matching the marker's location
+     */
+    private MoodPost findExactPost(Marker marker, List<MoodPost> posts) {
+        if (posts == null || posts.isEmpty()) {
+            return null;
+        }
 
+        for (MoodPost post : posts) {
+            // Check if the marker's location exactly matches the post's location
+            if (marker.getPosition().latitude == post.getLatitude() &&
+                    marker.getPosition().longitude == post.getLongitude()) {
+                return post;
+            }
+        }
+
+        return null;
+    }
     @Override
     public void onMapReady(GoogleMap map) {
         googleMap = map;
@@ -116,6 +137,11 @@ public class ExploreFragment extends Fragment implements GoogleMap.OnMarkerClick
                 // Add a marker on the current location
                 currentLocationMarker= googleMap.addMarker(new MarkerOptions().position(currentLatLng).title("You are here"));
                 currentLocationMarker.setTag(0);
+
+                for (MoodPost moodPost : dataList) {
+                    LatLng moodPostLatLng = new LatLng(moodPost.getLatitude(), moodPost.getLongitude());
+                    googleMap.addMarker(new MarkerOptions().position(moodPostLatLng).title(moodPost.getProfile().getUserID()));
+                }
                 // Move and zoom the camera to the user's location
                 googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(currentLatLng, 15));
             }
@@ -139,15 +165,16 @@ public class ExploreFragment extends Fragment implements GoogleMap.OnMarkerClick
                     dataList.clear();
                     dataList.addAll(posts);
 
+                    MoodPost exactPost = findExactPost(marker, posts);
+                    DetailedMoodPostFragment detailedMoodPostFragment =
+                            DetailedMoodPostFragment.newInstance(exactPost);
+                    detailedMoodPostFragment.show(getActivity().getSupportFragmentManager(), "Detailed Mood Post View");
+
                     if (moodPostAdapter != null) {
                         moodPostAdapter.notifyDataSetChanged();
                     } else {
                         Log.e("ExploreFragment", "moodPostAdapter is null");
                     }
-
-                    DetailedMoodPostFragment detailedMoodPostFragment =
-                            DetailedMoodPostFragment.newInstance(dataList.get(0));
-                    detailedMoodPostFragment.show(getActivity().getSupportFragmentManager(), "Detailed Mood Post View");
                 });
                 return null;
             });
