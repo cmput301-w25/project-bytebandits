@@ -15,6 +15,14 @@
         android:focusable="auto"
         android:focusableInTouchMode="true">
 
+        <include
+            layout="@layout/profile_search_bar"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            app:layout_constraintEnd_toStartOf="@id/filter_button"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
         <TextView
             android:id="@+id/textView2"
             android:layout_width="wrap_content"
