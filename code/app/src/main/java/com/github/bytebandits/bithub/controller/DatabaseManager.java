@@ -17,7 +17,7 @@ import java.util.concurrent.ExecutionException;
 public final class DatabaseManager {
     private final FirebaseFirestore firestoreDb;
     private final CollectionReference usersCollectionRef;
-    private final CollectionReference postsCollectionRef;
+    private static CollectionReference postsCollectionRef = null;
 
     private static DatabaseManager instance;
 
@@ -44,7 +44,7 @@ public final class DatabaseManager {
     }
 
     public CollectionReference getUsersCollectionRef() { return usersCollectionRef; }
-    public CollectionReference getPostsCollectionRef() { return postsCollectionRef; }
+    public static CollectionReference getPostsCollectionRef() { return postsCollectionRef; }
 
 
     /**

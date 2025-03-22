@@ -20,7 +20,8 @@ public class MoodPost implements Serializable {
     private Emotion emotion;
     private Profile profile;
     private Date dateTime;
-    private Location location;
+    private double latitude;
+    private double longitude;
     private SocialSituation situation;
     private String desc;
     private Bitmap image;
@@ -55,7 +56,6 @@ public class MoodPost implements Serializable {
         this.emotion = emotion;
         this.profile = profile;
         this.dateTime = new Date();
-        this.location = null; // change later to save location based on showLocation
         this.situation = situation;
         this.desc = desc;
         this.image = image;
@@ -145,28 +145,20 @@ public class MoodPost implements Serializable {
         return timeFormatter.format(getPostedDateTime());
     }
 
-    /**
-     * Returns the mood post's attached location
-     * @return
-     *      Returns a Location object representing the mood post's attached location.
-     *      Returns null when the mood post has no attached location.
-     */
-    public Location getLocation() {
-        return location;
+    public void setLatitude(double latitude) {
+        this.latitude = latitude;
     }
 
-    /**
-     * Sets the mood post's attached location
-     */
-    public void showLocation() {
-        this.location = null;  // change later to save location
+    public void setLongitude(double longitude) {
+        this.longitude = longitude;
     }
 
-    /**
-     * Disables the mood post's attached location
-     */
-    public void hideLocation() {
-        this.location = null;  // change later
+    public double getLatitude() {
+        return this.latitude;
+    }
+
+    public double getLongitude() {
+        return this.longitude;
     }
 
     /**
@@ -176,8 +168,7 @@ public class MoodPost implements Serializable {
      *      Returns null when the mood post has no attached location.
      */
     public String getLocationString() {
-        if (getLocation() == null) { return null; }
-        return getLocation().getLatitude() + "," + getLocation().getLongitude();
+        return getLatitude() + "," + getLongitude();
     }
 
     /**
