@@ -29,6 +29,9 @@ import com.github.bytebandits.bithub.model.Profile;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -191,11 +194,23 @@ private void profileSearchManager(View view) {
                 profileResults.setVisibility(View.VISIBLE);
                 DatabaseManager.getInstance().searchUsers(query, users -> {
                     profiles.clear();
+
                     for (HashMap<String, Object> user : users) {
-                        for (String key : user.keySet()) {
-                            if (key.equals("username")){
-                                profiles.add(new Profile(user.get(key).toString())); // Assuming key is the user ID
+                        String profileJson = (String) user.get("profile");
+                        try{
+                            JSONObject profileObj = new JSONObject(profileJson);
+                            String userID = profileObj.getString("userID");
+                            String userImg;
+                            if (profileObj.isNull("img")) {
+                                profiles.add(new Profile(userID));
+                                // use default profile pic
                             }
+//                            else{
+//                                  // do stuff if profile pic exists
+//                            }
+                        }
+                        catch (JSONException e) {
+                            Log.e("ProfileSearchJSONException", e.toString());
                         }
                     }
                     profileSearchAdapter.notifyDataSetChanged();
