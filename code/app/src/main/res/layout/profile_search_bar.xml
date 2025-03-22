@@ -16,6 +16,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_weight="3"
+            android:background="@drawable/profile_search_bg"
             android:theme="@style/profile_SearchView" />
 
         <ImageButton
@@ -23,6 +24,7 @@
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_weight="1"
+            android:backgroundTint="@color/Accent1"
             app:srcCompat="@android:drawable/ic_menu_send" />
     </LinearLayout>
 
@@ -31,6 +33,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_weight="3"
+        android:background="@color/Accent1"
         android:visibility="invisible" />
 
 </LinearLayout>
