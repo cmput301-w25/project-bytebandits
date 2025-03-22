@@ -55,6 +55,43 @@ public class ProfileFragment extends Fragment {
     private final ExecutorService executor = Executors.newSingleThreadExecutor();
     private final Handler mainHandler = new Handler(Looper.getMainLooper());
 
+    /**
+     * Getter method to get the state on whether a profile fragment represents another person's profile
+     * @return boolean value on whether the above is true or false
+     */
+    public boolean getIsOtherProfile() {
+        return isOtherProfile;
+    }
+
+    /**
+     * Setter method to set the state on whether a profile fragment represents another person's profile
+     * @param newIsOtherProfile  boolean value on whether the above is true or false
+     */
+    public void setIsOtherProfile(boolean newIsOtherProfile) {
+        isOtherProfile = newIsOtherProfile;
+    }
+
+    public boolean isOtherProfile = false;
+
+    /**
+     * Getter method to get the profile object if the fragment represents another person (not the current user)
+     * @return profile object
+     */
+    public Profile getOtherProfile() {
+        return otherProfile;
+    }
+
+    /**
+     * Setter method to set the profile object of the fragment
+     * @param otherProfile profile object that represents another profile (not the current user)
+     */
+    public void setOtherProfile(Profile otherProfile) {
+        this.otherProfile = otherProfile;
+    }
+
+    public Profile otherProfile = null;
+
+
 
     /**
      * Called to have the fragment instantiate its user interface view.
@@ -78,7 +115,14 @@ public class ProfileFragment extends Fragment {
         }
 
         executor.execute(() -> {
-            String username = SessionManager.getInstance(requireContext()).getUsername();
+            String username;
+            if (isOtherProfile){
+                username = getOtherProfile().getUserID();
+            }
+            else{
+                username = SessionManager.getInstance(requireContext()).getUsername();
+            }
+
             DatabaseManager.getInstance().getUserPosts(username, posts -> {
                 if (posts == null) {
                     Log.e("ProfileFragment", "Error: posts is null");
@@ -166,13 +210,14 @@ private void profileSearchManager(View view) {
     ListView profileResults = view.findViewById(R.id.profileResults);
     profileResults.setAdapter(profileSearchAdapter);
 
-
-
     // logic of profile transition via clicking
     profileResults.setOnItemClickListener((adapterView, view1, i, l) -> {
         Profile profile = profiles.get(i);
         Toast.makeText(requireContext(), "Clicked: " + profile.getUserID(), Toast.LENGTH_SHORT).show();
-        ((MainActivity) requireActivity()).replaceFragment(new HomepageFragment());
+        ProfileFragment profileFragment = new ProfileFragment();
+        profileFragment.setIsOtherProfile(true);
+        profileFragment.setOtherProfile(profile);
+        ((MainActivity) requireActivity()).replaceFragment(profileFragment);
     });
 
     // logic to unfocus from search view, although there are cases where if you click certain ui elements, the click wont register and you will be still focused
@@ -236,5 +281,4 @@ private void profileSearchManager(View view) {
         }
     });
 }
-
 }
