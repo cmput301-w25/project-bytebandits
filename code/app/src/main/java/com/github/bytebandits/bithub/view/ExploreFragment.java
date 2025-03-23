@@ -131,9 +131,6 @@ public class ExploreFragment extends Fragment implements GoogleMap.OnMarkerClick
             if (location != null && googleMap != null) {
                 // Convert current location to a LatLng
                 LatLng currentLatLng = new LatLng(location.getLatitude(), location.getLongitude());
-                // Add a marker on the current location
-                currentLocationMarker= googleMap.addMarker(new MarkerOptions().position(currentLatLng).title("You are here"));
-                currentLocationMarker.setTag(0);
 
                 for (MoodPost moodPost : dataList) {
                     LatLng moodPostLatLng = new LatLng(moodPost.getLatitude(), moodPost.getLongitude());
