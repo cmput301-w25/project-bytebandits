@@ -62,4 +62,27 @@ public enum Emotion {
     public int getLogoID() {
         return logoID;
     }
+
+    public int getColor() {
+        switch (this) {
+            case ANGER:
+                return R.color.bright_red;
+            case CONFUSION:
+                return R.color.orange;
+            case DISGUST:
+                return R.color.dark_green;
+            case FEAR:
+                return R.color.purple;
+            case HAPPINESS:
+                return R.color.green;
+            case SADNESS:
+                return R.color.blue;
+            case SHAME:
+                return R.color.deep_red;
+            case SURPRISE:
+                return R.color.yellow;
+            default:
+                return R.color.white;
+        }
+    }
 }
