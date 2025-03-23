@@ -25,6 +25,7 @@ import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -233,7 +234,24 @@ public class ProfileFragment extends Fragment implements FilterDialog.FilterList
     @Override
     public void onFilterSelected(String mood) {
         filteredDataList.clear();
-        filteredDataList.addAll(PostFilterManager.filterPostsByMood(dataList, mood));
+        if (mood.equals("last_week")) {
+            filteredDataList.addAll(filterPostsFromLastWeek(dataList));
+        } else {
+            filteredDataList.addAll(PostFilterManager.filterPostsByMood(dataList, mood));
+        }
         moodPostAdapter.notifyDataSetChanged();
+    }
+    private List<MoodPost> filterPostsFromLastWeek(List<MoodPost> posts) {
+        List<MoodPost> filteredPosts = new ArrayList<>();
+        long currentTime = System.currentTimeMillis();
+        long oneWeekInMillis = 7 * 24 * 60 * 60 * 1000; // 7 days in milliseconds
+
+        for (MoodPost post : posts) {
+            long postTime = post.getPostedDateTime().getTime();
+            if ((currentTime - postTime) <= oneWeekInMillis) {
+                filteredPosts.add(post);
+            }
+        }
+        return filteredPosts;
     }
 }

@@ -52,10 +52,11 @@ public class FilterDialog {
                     filterListener.onFilterSelected("shame");
                 } else if (checkedId == R.id.suprise_radio_button) {
                     filterListener.onFilterSelected("suprise");
+                } else if (checkedId == R.id.last_week_radio_button) {
+                    filterListener.onFilterSelected("last_week");
                 }
             }
         });
-
 
         filterDialog.show();
     }
