@@ -225,8 +225,12 @@ public class HomepageFragment extends Fragment implements FilterDialog.FilterLis
     public void onFilterSelected(String mood) {
         filteredDataList.clear(); // Clear current filtered list
 
-        List<MoodPost> filteredPosts = PostFilterManager.filterPostsByMood(dataList, mood);
-        filteredDataList.addAll(filteredPosts);
+        if (mood.equals("last_week")) {
+            filteredDataList.addAll(filterPostsFromLastWeek(dataList));
+        } else {
+            List<MoodPost> filteredPosts = PostFilterManager.filterPostsByMood(dataList, mood);
+            filteredDataList.addAll(filteredPosts);
+        }
 
         moodPostAdapter.notifyDataSetChanged();
     }
@@ -234,5 +238,19 @@ public class HomepageFragment extends Fragment implements FilterDialog.FilterLis
     private void openFilterDialog() {
         FilterDialog filterDialog = new FilterDialog(requireContext(), this);
         filterDialog.showFilterDialog();
+    }
+
+    private List<MoodPost> filterPostsFromLastWeek(List<MoodPost> posts) {
+        List<MoodPost> filteredPosts = new ArrayList<>();
+        long currentTime = System.currentTimeMillis();
+        long oneWeekInMillis = 7 * 24 * 60 * 60 * 1000; // 7 days in milliseconds
+
+        for (MoodPost post : posts) {
+            long postTime = post.getPostedDateTime().getTime();
+            if ((currentTime - postTime) <= oneWeekInMillis) {
+                filteredPosts.add(post);
+            }
+        }
+        return filteredPosts;
     }
 }
