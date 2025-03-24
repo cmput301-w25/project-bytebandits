@@ -1,8 +1,5 @@
 package com.github.bytebandits.bithub.model;
 
-import com.google.firebase.firestore.Blob;
-import android.location.Location;
-
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -20,8 +17,9 @@ public class MoodPost implements Serializable {
     private Emotion emotion;
     private Profile profile;
     private Date dateTime;
-    private double latitude;
-    private double longitude;
+    private Boolean location;
+    private Double latitude;
+    private Double longitude;
     private SocialSituation situation;
     private String desc;
     private String image;
@@ -59,6 +57,7 @@ public class MoodPost implements Serializable {
         this.emotion = emotion;
         this.profile = profile;
         this.dateTime = new Date();
+        this.location = showLocation;
         this.situation = situation;
         this.desc = desc;
         this.image = image;
@@ -149,20 +148,64 @@ public class MoodPost implements Serializable {
         return timeFormatter.format(getPostedDateTime());
     }
 
-    public void setLatitude(double latitude) {
+    /**
+     * Returns the mood post's attached latitude
+     * @return
+     *      Returns a Double object representing the mood post's attached latitude.
+     *      Returns null when the mood post has no attached location.
+     */
+    public Double getLatitude() {
+        if (location) { return latitude; }
+        else { return null; }
+    }
+
+    /**
+     * Returns the mood post's attached longitude
+     * @return
+     *      Returns a Double object representing the mood post's attached latitude.
+     *      Returns null when the mood post has no attached location.
+     */
+    public Double getLongitude() {
+        if (!location) { return longitude; }
+        else { return null; }
+    }
+
+    /**
+     * Sets the mood post's attached Latitude
+     */
+    public void setLatitude(Double latitude) {
         this.latitude = latitude;
     }
 
-    public void setLongitude(double longitude) {
+    /**
+     * Sets the mood post's attached Longitude
+     */
+    public void setLongitude(Double longitude) {
         this.longitude = longitude;
     }
 
-    public double getLatitude() {
-        return this.latitude;
+    /**
+     * Returns the mood post's show location status
+     * @return
+     *      Returns a Boolean object representing the mood post's show location status.
+     */
+    public boolean getLocation() {
+        return location;
     }
 
-    public double getLongitude() {
-        return this.longitude;
+
+    /**
+     * Enables the mood post's attached location
+     */
+    public void showLocation() {
+        this.location = true;
+    }
+
+    /**
+     * Disables the mood post's attached location
+     */
+    public void hideLocation() {
+        this.location = false;
     }
 
     /**
@@ -172,7 +215,8 @@ public class MoodPost implements Serializable {
      *      Returns null when the mood post has no attached location.
      */
     public String getLocationString() {
-        return getLatitude() + "," + getLongitude();
+        if (getLatitude() == null || getLongitude() == null) { return null; }
+        else { return getLatitude() + "," + getLongitude(); }
     }
 
     /**

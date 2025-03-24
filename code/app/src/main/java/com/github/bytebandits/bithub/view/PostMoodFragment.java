@@ -7,7 +7,6 @@ import android.util.Log;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
@@ -39,6 +38,7 @@ import com.github.bytebandits.bithub.MainActivity;
 import com.github.bytebandits.bithub.model.MoodPost;
 import com.github.bytebandits.bithub.R;
 import com.github.bytebandits.bithub.controller.SessionManager;
+import com.github.bytebandits.bithub.model.Profile;
 import com.github.bytebandits.bithub.model.SocialSituation;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -96,6 +96,7 @@ public class PostMoodFragment extends Fragment {
         Button deleteButton = view.findViewById(R.id.postMoodDeleteImageButton);
         deleteButton.setVisibility(View.GONE);
         ImageView editImage = view.findViewById(R.id.postMoodImage);
+        SessionManager sessionManager = SessionManager.getInstance(requireContext());
 
         // Get the mood post if we need to edit a mood post
         String tag = getTag();
@@ -206,11 +207,16 @@ public class PostMoodFragment extends Fragment {
             imagePickerLauncher.launch(intent);
         });
 
+        // Only show location checkbox if we have location services enabled
+        if (!sessionManager.getProfile().getLocationServices()) {
+            editLocation.setVisibility(View.GONE);
+        }
+
         // If editing mood post, set the input views to mood post properties
         if (postToEdit != null) {
             selectSpinnerItemByValue(editEmotion, postToEdit.getEmotion());
             selectSpinnerItemByValue(editSocialSituation, postToEdit.getSocialSituation());
-            // TODO: set location check box
+            editLocation.setChecked(postToEdit.getLocation());
             editPublic.setChecked(postToEdit.isPublic());
             if (postToEdit.getDescription() == null) { editDescription.setText(""); }
             else { editDescription.setText(postToEdit.getDescription()); }
@@ -249,10 +255,14 @@ public class PostMoodFragment extends Fragment {
                 if (selectedImageByteArray != null) { selectedImageBase64String = Base64.encodeToString(selectedImageByteArray, Base64.DEFAULT); }
                 else { selectedImageBase64String = null; }
                 if (postToEdit == null) {
-                    SessionManager sessionManager = SessionManager.getInstance(requireContext());
                     MoodPost moodPost = new MoodPost(selectedEmotion, sessionManager.getProfile(),
                             selectedLocation, selectedSocialSituation, selectedDescription,
                             selectedImageBase64String, selectedPublic);
+                    if (selectedLocation) {
+                        // TODO: uncomment these two lines if they are right
+                        //moodPost.setLatitude(currentLatitude);
+                        //moodPost.setLongitude(currentLongitude);
+                    }
                     databaseManager.addPost(moodPost, sessionManager.getUsername(), Optional.empty());
                 }
                 else {
@@ -261,8 +271,14 @@ public class PostMoodFragment extends Fragment {
                     updateFields.put("emotion", selectedEmotion);
                     updateFields.put("description", selectedDescription);
                     updateFields.put("image", selectedImageBase64String);
-                    // TODO: update location
+                    updateFields.put("location", selectedLocation);
                     updateFields.put("public", selectedPublic);
+                    // If user wants to set the location, and no previous location is assigned to the mood post, then assign new location
+                    if (selectedLocation && (postToEdit.getLongitude() == null || postToEdit.getLatitude() == null)) {
+                        // TODO: uncomment these two lines if they are right
+                        //updateFields.put("longitude", currentLongitude);
+                        //updateFields.put("latitude", currentLatitude);
+                    }
                     databaseManager.updatePost(postToEdit.getPostID(), updateFields, Optional.empty());
                 }
                 // Go back to homepage fragment

@@ -73,6 +73,15 @@ public class Profile implements Serializable {
     }
 
     /**
+     * Returns the location service status.
+     *
+     * @return a boolean representing the location service status
+     */
+    public boolean getLocationServices() {
+        return locationServices;
+    }
+
+    /**
      * Returns the user's profile picture.
      *
      * @return The user's profile picture
