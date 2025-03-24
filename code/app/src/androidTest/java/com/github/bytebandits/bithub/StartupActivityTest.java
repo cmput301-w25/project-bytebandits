@@ -1,11 +1,13 @@
 package com.github.bytebandits.bithub;
 
+import androidx.test.core.app.ApplicationProvider;
 import androidx.test.ext.junit.rules.ActivityScenarioRule;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.filters.LargeTest;
 import androidx.test.platform.app.InstrumentationRegistry;
 
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -33,6 +35,8 @@ import android.app.Activity;
 import android.app.Instrumentation;
 import android.content.Context;
 
+import com.github.bytebandits.bithub.controller.DatabaseManager;
+import com.github.bytebandits.bithub.controller.SessionManager;
 import com.github.bytebandits.bithub.view.LoginFragment;
 import com.github.bytebandits.bithub.view.SignupFragment;
 import com.github.bytebandits.bithub.view.StartupActivity;
@@ -41,6 +45,12 @@ import com.github.bytebandits.bithub.view.StartupActivity;
 @RunWith(AndroidJUnit4.class)
 @LargeTest
 public class StartupActivityTest {
+    @BeforeClass
+    public static void setup(){
+        DatabaseManager.getInstance(true);
+        SessionManager sessionManager = SessionManager.getInstance(ApplicationProvider.getApplicationContext());
+        sessionManager.logoutUser();
+    }
 
     @Rule
     public ActivityScenarioRule<StartupActivity> scenario = new ActivityScenarioRule<>(StartupActivity.class);
@@ -50,7 +60,7 @@ public class StartupActivityTest {
      */
     @Before
     public void clearLoggedInState(){
-
+        SessionManager sessionManager = SessionManager.getInstance(ApplicationProvider.getApplicationContext());
     }
 
     /**
@@ -256,5 +266,6 @@ public class StartupActivityTest {
         Activity mainActivity = monitor.waitForActivityWithTimeout(5000);
         assertNotNull("MainActivity should have been launched", mainActivity);
         assertTrue(mainActivity instanceof MainActivity);
+        SessionManager.getInstance(ApplicationProvider.getApplicationContext()).logoutUser();
     }
 }

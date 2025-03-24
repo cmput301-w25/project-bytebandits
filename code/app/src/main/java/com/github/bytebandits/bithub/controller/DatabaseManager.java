@@ -46,15 +46,6 @@ public final class DatabaseManager {
         return getInstance(false);  // Default: Don't use emulator
     }
 
-
-    public void useEmulation(String address, int portNumber) {
-        this.firestoreDb.useEmulator(address, portNumber);
-    }
-
-    public void useEmulation() {
-        useEmulation("10.0.2.2", 8080);
-    }
-
     public CollectionReference getUsersCollectionRef() { return usersCollectionRef; }
     public CollectionReference getPostsCollectionRef() { return postsCollectionRef; }
 

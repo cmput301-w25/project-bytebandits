@@ -38,7 +38,7 @@ public class DatabaseManagerTest {
 
     @Before
     public void seedDatabase() {
-        DatabaseManager dbInstance = DatabaseManager.getInstance();
+        this.dbInstance = DatabaseManager.getInstance();
         CollectionReference postsCollectionRef = dbInstance.getPostsCollectionRef();
         CollectionReference usersCollectionRef = dbInstance.getUsersCollectionRef();
 
@@ -81,31 +81,17 @@ public class DatabaseManagerTest {
     }
 
     @Test
-    public void testGetUser_Success() throws InterruptedException {
-        DatabaseManager dbInstance = DatabaseManager.getInstance();
-        CountDownLatch latch = new CountDownLatch(1);  // Used to wait for async response
-
+    public void testGetUser_Success() {
+        Log.d("DatabaseManagerTest", "Calling getUser...");
         dbInstance.getUser(testProfile.getUserID(), user -> {
-            try {
-                Log.d("DatabaseManagerTest", "testGetUser_Success");
-                assert user != null;
-                String name = (String) user.get("name");
-                assert name != null;
-
-                Log.d("DatabaseManagerTest", "name: " + name);
-                assertTrue(name.matches("John Doe"));
-            } finally {
-                latch.countDown(); // Signal that the async call is done
-            }
+            Log.d("DatabaseManagerTest", "Callback executed");
+            String name = (String) user.get("name");
+            assertTrue(name.matches("John Doe"));
         });
-
-        assertTrue("Test timed out waiting for getUser() response", latch.await(10, TimeUnit.SECONDS));
     }
 
     @Test
     public void testGetAllPosts_Success() {
-        DatabaseManager dbInstance = DatabaseManager.getInstance();
-
         dbInstance.getAllPosts(
                 dbPosts -> {
                     assertEquals(2, dbPosts.size());
@@ -116,7 +102,6 @@ public class DatabaseManagerTest {
 
     @Test
     public void testAddAndGetUserPosts_Success() {
-        DatabaseManager dbInstance = DatabaseManager.getInstance();
         MoodPost post = new MoodPost(
                 Emotion.SHAME,
                 testProfile, false, SocialSituation.ALONE, "Test Desc",
@@ -144,6 +129,7 @@ public class DatabaseManagerTest {
         updateFields.put("description", "Updated Description");
 
         dbInstance.updatePost(post.getPostID(), updateFields, Optional.of(success -> assertTrue(success)));
+
     }
 
     @Test

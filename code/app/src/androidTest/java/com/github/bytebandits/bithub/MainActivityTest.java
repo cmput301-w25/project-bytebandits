@@ -10,6 +10,7 @@ import static androidx.test.espresso.matcher.ViewMatchers.withText;
 
 import android.util.Log;
 
+import androidx.test.core.app.ApplicationProvider;
 import androidx.test.espresso.NoMatchingViewException;
 import androidx.test.espresso.action.ViewActions;
 import androidx.test.ext.junit.rules.ActivityScenarioRule;
@@ -17,11 +18,13 @@ import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.filters.LargeTest;
 
 import com.github.bytebandits.bithub.controller.DatabaseManager;
+import com.github.bytebandits.bithub.controller.SessionManager;
 import com.github.bytebandits.bithub.model.Emotion;
 import com.github.bytebandits.bithub.model.MoodPost;
 import com.github.bytebandits.bithub.model.Profile;
 import com.github.bytebandits.bithub.model.SocialSituation;
 import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentReference;
 
 import org.junit.After;
 import org.junit.Before;
@@ -34,17 +37,33 @@ import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.HashMap;
 import java.util.Objects;
 
 @RunWith(AndroidJUnit4.class)
 @LargeTest
 public class MainActivityTest {
+
     @BeforeClass
     public static void setup() {
-        // Specific address for emulated device to access our localHost
-        String androidLocalhost = "10.0.2.2";
-        int portNumber = 8080;
-        DatabaseManager.getInstance().useEmulation(androidLocalhost, portNumber);
+        DatabaseManager dbInstance = DatabaseManager.getInstance(true);
+        // add session to bypass login
+        SessionManager sessionManager = SessionManager.getInstance(ApplicationProvider.getApplicationContext());
+
+        HashMap<String, Object> user1 = new HashMap<>();
+        user1.put("userId", "testUser1");
+        user1.put("name", "John Doe");
+        user1.put("password", "testing");
+
+
+        String userId = (String) user1.get("userId");
+        CollectionReference usersCollectionRef = dbInstance.getUsersCollectionRef();
+        DocumentReference user1DocRef = usersCollectionRef.document((String) Objects.requireNonNull(user1.get("userId")));
+        user1DocRef.set(user1);
+
+        Profile profile = new Profile(userId);
+        sessionManager.createLoginSession(userId);
+        sessionManager.saveProfile(profile);
     }
 
     @Rule
