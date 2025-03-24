@@ -168,7 +168,7 @@ public class StartupActivityTest {
     }
 
     /**
-     * Tests if signup page input validation works, assuming user inputs correct info
+     * Tests if signup page input validation works, assuming user inputs correct info (info is not in the db)
      */
     @Test
     public void signupFragmentTestValidInput(){
@@ -207,8 +207,17 @@ public class StartupActivityTest {
     public void signupFragmentTestExistingUserError(){
 
         onView(withId(R.id.registerBtn)).perform(click());
-        Log.d("SignupFragment", "Prior to signupFragmentTestExistingUserError");
-        onView(withId(R.id.UserInputText)).perform(typeText("testUser1"));
+        onView(withId(R.id.UserInputText)).perform(typeText("usernameTest"));
+        onView(withId(R.id.EmailInputText)).perform(typeText("email@test.com"));
+        onView(withId(R.id.PswrdInputText)).perform(typeText("abc123"));
+        onView(withId(R.id.PswrdConInputText)).perform(typeText("abc123"));
+        onView(withId(R.id.registerBtn)).perform(click());
+
+        onView(withId(R.id.backActionButton)).perform(click());
+        onView(withId(R.id.backActionButton)).perform(click());
+
+        onView(withId(R.id.registerBtn)).perform(click());
+        onView(withId(R.id.UserInputText)).perform(typeText("usernameTest"));
         onView(withId(R.id.EmailInputText)).perform(typeText("email@test.com"));
         onView(withId(R.id.PswrdInputText)).perform(typeText("abc123"));
         onView(withId(R.id.PswrdConInputText)).perform(typeText("abc123"));
@@ -248,10 +257,10 @@ public class StartupActivityTest {
     }
 
     /**
-     * Tests if correct login page input validation by switching to main activity from login page
+     * Tests if a successful sign up -> login process  by testing to see if main activity is reached
      */
     @Test
-    public void loginFragmentTestInputValidation(){
+    public void loginFragmentTestValidInput(){
         // Parts a & b where retrieved from Claude LLM, had to ask an LLM due to not a lot of results coming up with the right syntax to reference an activity
         // and observe how it is transitioning. Retrived by: Hanss Rivera, On: March 8 2025.
 
@@ -260,9 +269,15 @@ public class StartupActivityTest {
                 .addMonitor(MainActivity.class.getName(), null, false);
 
 
-        onView(withId(R.id.loginBtn)).perform(click());
-        // remove this comment and the second one when db connection is implemented, for now assume query always succeeds
-        // meaning that the username OR email lookup is assumed to exist AND password lookup matches the provided password
+        // register a user
+        onView(withId(R.id.registerBtn)).perform(click());
+        onView(withId(R.id.UserInputText)).perform(typeText("usernameTest"));
+        onView(withId(R.id.EmailInputText)).perform(typeText("email@test.com"));
+        onView(withId(R.id.PswrdInputText)).perform(typeText("abc123"));
+        onView(withId(R.id.PswrdConInputText)).perform(typeText("abc123"));
+        onView(withId(R.id.registerBtn)).perform(click());
+
+        // login
         onView(withId(R.id.UserEmailInputText)).perform(typeText("usernameTest"));
         onView(withId(R.id.PswrdInputText)).perform(typeText("abc123"));
         onView(withId(R.id.loginBtn)).perform(click());
@@ -272,7 +287,6 @@ public class StartupActivityTest {
         Activity mainActivity = monitor.waitForActivityWithTimeout(5000);
         assertNotNull("MainActivity should have been launched", mainActivity);
         assertTrue(mainActivity instanceof MainActivity);
-        SessionManager.getInstance(ApplicationProvider.getApplicationContext()).logoutUser();
     }
 
     /**

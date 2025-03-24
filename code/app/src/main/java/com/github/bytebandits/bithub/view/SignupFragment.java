@@ -50,7 +50,7 @@ public class SignupFragment extends Fragment {
         View view = inflater.inflate(R.layout.signup, container, false);
         signup = view.findViewById(R.id.registerBtn);
         accountExists = view.findViewById(R.id.accountExists);
-        back = view.findViewById(R.id.backActionButton2);
+        back = view.findViewById(R.id.backActionButton);
         userText = view.findViewById(R.id.UserInputText);
         emailText = view.findViewById(R.id.EmailInputText);
         pswrdText = view.findViewById(R.id.PswrdInputText);
