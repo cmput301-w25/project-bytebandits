@@ -4,6 +4,14 @@ import android.Manifest;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.util.Log;
+import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.net.Uri;
+import android.os.Bundle;
+import android.provider.MediaStore;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,9 +20,13 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.SpinnerAdapter;
+import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
@@ -31,7 +43,12 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.firebase.firestore.Blob;
 
+import java.io.ByteArrayOutputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -48,6 +65,8 @@ public class PostMoodFragment extends Fragment {
     private String selectedDescription;
     private boolean selectedLocation;
     private boolean selectedPublic;
+    private Uri selectedImageUri;
+    private byte[] selectedImageByteArray = null;
 
     public static PostMoodFragment newInstance(MoodPost moodPost) {
         // Use Bundle to get info between fragments
@@ -73,6 +92,8 @@ public class PostMoodFragment extends Fragment {
         findCurrentLocation();
         CheckBox editPublic = view.findViewById(R.id.postMoodPublic);
         CheckBox editLocation = view.findViewById(R.id.postMoodLocation);
+        Button uploadButton = view.findViewById(R.id.postMoodUploadImageButton);
+        ImageView editImage = view.findViewById(R.id.postMoodImage);
 
         // Get the mood post if we need to edit a mood post
         String tag = getTag();
@@ -141,12 +162,60 @@ public class PostMoodFragment extends Fragment {
             }
         });
 
+        // Handle user uploading an image
+        // Initialize the activity launcher
+        ActivityResultLauncher<Intent> imagePickerLauncher;
+        imagePickerLauncher = registerForActivityResult(
+                new ActivityResultContracts.StartActivityForResult(),
+                result -> {
+                    if (result.getResultCode() == Activity.RESULT_OK && result.getData() != null) {
+                        selectedImageUri = result.getData().getData(); // The first getData() returns and intent, and the second, the URI
+                        // Convert image Uri to Byte array for storage and check the file size of image
+                        try {
+                            selectedImageByteArray = uriToByteArray(selectedImageUri);
+                            // Display the image in the imageview if no exception is thrown
+                            editImage.setImageURI(selectedImageUri);
+                        } catch (IllegalArgumentException e) {
+                            // Show an error message
+                            new AlertDialog.Builder(getContext())
+                                    .setTitle("Error")
+                                    .setMessage("Image is too large (Must be less than 65536 bytes). Please select a smaller file.")
+                                    .setNegativeButton("Ok", (dialog, which) -> {
+                                        dialog.cancel();
+                                    })
+                                    .show();
+                        } catch (IOException e) {
+                            // Show an error message
+                            new AlertDialog.Builder(getContext())
+                                    .setTitle("Error")
+                                    .setMessage("Image cannot be read")
+                                    .setNegativeButton("Ok", (dialog, which) -> {
+                                        dialog.cancel();
+                                    })
+                                    .show();
+                        }
+                    }
+                }
+        );
+        // Launch the activity on upload button click
+        uploadButton.setOnClickListener(v -> {
+            Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+            imagePickerLauncher.launch(intent);
+        });
+
         // If editing mood post, set the input views to mood post properties
         if (postToEdit != null) {
             selectSpinnerItemByValue(editEmotion, postToEdit.getEmotion());
             selectSpinnerItemByValue(editSocialSituation, postToEdit.getSocialSituation());
+            // TODO: set location check box
+            editPublic.setChecked(postToEdit.isPublic());
             if (postToEdit.getDescription() == null) { editDescription.setText(""); }
             else { editDescription.setText(postToEdit.getDescription()); }
+            if (postToEdit.getImage() != null) {
+                selectedImageByteArray = postToEdit.getImage().toBytes(); // So if the user doesn't upload a new image, it won't update the image to null
+                editImage.setImageBitmap(BitmapFactory.decodeByteArray(postToEdit.getImage().toBytes(),
+                        0, postToEdit.getImage().toBytes().length));
+            }
         }
 
         confirmButton.setOnClickListener(v -> {
@@ -166,7 +235,8 @@ public class PostMoodFragment extends Fragment {
                 if (postToEdit == null) {
                     SessionManager sessionManager = SessionManager.getInstance(requireContext());
                     MoodPost moodPost = new MoodPost(selectedEmotion, sessionManager.getProfile(),
-                            selectedLocation, selectedSocialSituation, selectedDescription, null, selectedPublic);
+                            selectedLocation, selectedSocialSituation, selectedDescription,
+                            Blob.fromBytes(selectedImageByteArray), selectedPublic);
                     databaseManager.addPost(moodPost, sessionManager.getUsername(), Optional.empty());
                 }
                 else {
@@ -174,6 +244,9 @@ public class PostMoodFragment extends Fragment {
                     updateFields.put("socialSituation", selectedSocialSituation);
                     updateFields.put("emotion", selectedEmotion);
                     updateFields.put("description", selectedDescription);
+                    if (selectedImageByteArray != null) {
+                        updateFields.put("image", Blob.fromBytes(selectedImageByteArray));
+                    }
                     // TODO: update location
                     updateFields.put("public", selectedPublic);
                     databaseManager.updatePost(postToEdit.getPostID(), updateFields, Optional.empty());
@@ -235,5 +308,38 @@ public class PostMoodFragment extends Fragment {
                 return;
             }
         }
+    }
+
+/**
+ * Converts the data from a file represented by a URI into a byte array.
+ * This method reads the file in chunks using a buffer to efficiently handle large files
+ * without loading the entire file into memory at once.
+ *
+ * @param uri     The URI of the file to be converted into a byte array.
+ * @return A byte array containing the data from the file.
+ * @throws IOException If an I/O error occurs while reading the file, such as if the URI
+ *                     cannot be opened or the file cannot be read.
+ * @throws IllegalArgumentException If the file size is greater than or equal to 65536 bytes.
+ */
+    private byte[] uriToByteArray(Uri uri) throws IOException, IllegalArgumentException{
+        // Get input output streams
+        InputStream inputStream = getContext().getContentResolver().openInputStream(uri);
+        ByteArrayOutputStream byteBuffer = new ByteArrayOutputStream();
+        // Read the image 1024 bytes at a time and throw error if image is too large
+        int bufferSize = 1024;
+        byte[] buffer = new byte[bufferSize];
+        int len;
+        int totalBytesRead = 0;
+        final int MAX_FILE_SIZE = 65536;
+        while ((len = inputStream.read(buffer)) != -1) {
+            totalBytesRead += len;
+            if (totalBytesRead >= MAX_FILE_SIZE) {
+                inputStream.close();
+                byteBuffer.close();
+                throw new IllegalArgumentException();
+            }
+            byteBuffer.write(buffer, 0, len);
+        }
+        return byteBuffer.toByteArray();
     }
 }
