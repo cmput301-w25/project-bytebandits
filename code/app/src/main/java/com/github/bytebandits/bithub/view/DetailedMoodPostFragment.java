@@ -52,6 +52,7 @@ public class DetailedMoodPostFragment extends DialogFragment{
         Button editButton = view.findViewById(R.id.editButton);
         Button backButton = view.findViewById(R.id.backButton);
         Button commentsButton = view.findViewById(R.id.commentsButton);
+        Button viewProfileButton = view.findViewById(R.id.viewProfileButton);
         MoodPost moodPost = (MoodPost) getArguments().getSerializable("moodPost");
         Profile profile = SessionManager.getInstance(getContext()).getProfile();
 
@@ -84,6 +85,7 @@ public class DetailedMoodPostFragment extends DialogFragment{
 
         // Show and set edit and delete buttons if this post is ours
         if (Objects.equals(moodPost.getProfile().getUserID(), profile.getUserID())) {
+            viewProfileButton.setVisibility(View.GONE);
             deleteButton.setOnClickListener(v -> {
                 DatabaseManager.getInstance().deletePost(moodPost.getPostID(), moodPost.getProfile().getUserID(), Optional.empty());
                 dialog.dismiss();
@@ -95,6 +97,11 @@ public class DetailedMoodPostFragment extends DialogFragment{
             });
         }
         else {
+            viewProfileButton.setOnClickListener(v -> {
+                // TODO Uncomment bottom line later if right
+                // ((MainActivity) requireActivity()).profilePageFragment(moodPost.getProfile());
+                dialog.dismiss();
+            });
             deleteButton.setVisibility(View.GONE);
             editButton.setVisibility(View.GONE);
         }
