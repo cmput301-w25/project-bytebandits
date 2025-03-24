@@ -98,8 +98,7 @@ public class DetailedMoodPostFragment extends DialogFragment{
         }
         else {
             viewProfileButton.setOnClickListener(v -> {
-                // TODO Uncomment bottom line later if right
-                // ((MainActivity) requireActivity()).profilePageFragment(moodPost.getProfile());
+                ((MainActivity) requireActivity()).replaceFragment(ProfileFragment.newInstance(moodPost.getProfile()));
                 dialog.dismiss();
             });
             deleteButton.setVisibility(View.GONE);
