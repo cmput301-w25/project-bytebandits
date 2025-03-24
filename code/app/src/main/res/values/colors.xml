@@ -3,6 +3,14 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
     <color name="gold">#998B68</color>
+    <color name="blue">#0096FF</color>
+    <color name="bright_red">#FF0000</color>
+    <color name="dark_green">#008A00</color>
+    <color name="green">#00FF00</color>
+    <color name="yellow">#FFFF00</color>
+    <color name="purple">#FF00FF</color>
+    <color name="orange">#FFA500</color>
+    <color name="deep_red">#B60000</color>
     <color name="background">#0F0B11</color>
     <color name="Background">#0F0B11</color>
     <color name="Primary1">#18101A</color>
