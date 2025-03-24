@@ -1,6 +1,12 @@
 package com.github.bytebandits.bithub.view;
 
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.Typeface;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -12,6 +18,7 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import com.github.bytebandits.bithub.controller.DatabaseManager;
 import com.github.bytebandits.bithub.R;
@@ -22,16 +29,14 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MapColorScheme;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.firebase.firestore.CollectionReference;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import android.Manifest;
-import android.widget.AdapterView;
-import android.widget.ListView;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
@@ -124,7 +129,51 @@ public class ExploreFragment extends Fragment implements GoogleMap.OnMarkerClick
 
                 for (MoodPost moodPost : dataList) {
                     LatLng moodPostLatLng = new LatLng(moodPost.getLatitude(), moodPost.getLongitude());
-                    googleMap.addMarker(new MarkerOptions().position(moodPostLatLng).title(moodPost.getProfile().getUserID()));
+                    Drawable drawable = ContextCompat.getDrawable(requireContext(), moodPost.getEmotion().getLogoID());
+                    int desiredWidth = 240; // Adjust this value as needed
+                    int desiredHeight = 240; // Adjust this value as needed
+
+                    // Create a bitmap with the desired dimensions
+                    Bitmap bitmap = Bitmap.createBitmap(desiredWidth, desiredHeight, Bitmap.Config.ARGB_8888);
+                    Canvas canvas = new Canvas(bitmap);
+
+                    // Draw the off-white rounded rectangle with shadow
+                    Paint rectPaint = new Paint();
+                    rectPaint.setColor(Color.parseColor("#D3D3D3")); // Light gray color
+                    rectPaint.setAntiAlias(true);
+                    rectPaint.setShadowLayer(10f, 0f, 5f, Color.BLACK); // Shadow effect
+                    float cornerRadius = 40f; // Adjust corner radius as needed
+                    float padding = 20f; // Padding around the icon
+                    canvas.drawRoundRect(padding, padding, desiredWidth - padding, desiredHeight - padding, cornerRadius, cornerRadius, rectPaint);
+
+                    float drawablePadding = 30f; // Padding specifically for the drawable
+                    drawable.setBounds((int) (padding + drawablePadding), (int) (padding + drawablePadding), (int) (desiredWidth - padding - drawablePadding), (int) (desiredHeight - padding - drawablePadding - 40f)); // Leave space for text background
+                    drawable.draw(canvas); // Draw the drawable on top of the rectangle
+
+                    // Add a rounded black background for the text
+                    Paint textBackgroundPaint = new Paint();
+                    textBackgroundPaint.setColor(Color.WHITE); // White background for text
+                    textBackgroundPaint.setAntiAlias(true);
+                    float textBackgroundHeight = 50f; // Height of the text background
+                    float textBackgroundTop = desiredHeight - textBackgroundHeight - padding;
+                    canvas.drawRoundRect(padding + 10f, textBackgroundTop, desiredWidth - padding - 10f, textBackgroundTop + textBackgroundHeight, cornerRadius / 2, cornerRadius / 2, textBackgroundPaint);
+
+                    // Add text to the bitmap
+                    Paint textPaint = new Paint();
+                    textPaint.setColor(Color.BLACK); // Set text color to black
+                    textPaint.setTextSize(50f); // Set text size
+                    textPaint.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.BOLD_ITALIC)); // Bold and italic
+                    textPaint.setAntiAlias(true);
+                    textPaint.setTextAlign(Paint.Align.CENTER);
+
+                    // Calculate the position for the text with padding
+                    float xPos = canvas.getWidth() / 2f;
+                    float yPos = textBackgroundTop + textBackgroundHeight / 2f - ((textPaint.descent() + textPaint.ascent()) / 2f);
+
+                    // Draw the text on the canvas after the drawable
+                    String userId = "@" + moodPost.getProfile().getUserID();
+                    canvas.drawText(userId, xPos, yPos, textPaint);
+                    googleMap.addMarker(new MarkerOptions().position(moodPostLatLng).title(moodPost.getProfile().getUserID()).icon(BitmapDescriptorFactory.fromBitmap(bitmap)));
                 }
                 // Move and zoom the camera to the user's location
                 googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(currentLatLng, 15));
