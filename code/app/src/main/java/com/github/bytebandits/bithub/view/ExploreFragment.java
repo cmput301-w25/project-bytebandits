@@ -30,6 +30,7 @@ import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import android.Manifest;
+import android.widget.AdapterView;
 import android.widget.ListView;
 import java.util.ArrayList;
 import java.util.List;
@@ -37,14 +38,9 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class ExploreFragment extends Fragment implements GoogleMap.OnMarkerClickListener, OnMapReadyCallback {
-    private final ArrayList<MoodPost> moodPosts = new ArrayList<>();
-    private MoodPost latestMoodPost;
     private GoogleMap googleMap;
     private FusedLocationProviderClient fusedLocationClient;
-    private Marker currentLocationMarker                          ;
     private ArrayList<MoodPost> dataList;
-    private ListView moodPostList;
-    private MoodPostArrayAdapter moodPostAdapter;
     private final ExecutorService executor = Executors.newSingleThreadExecutor();
     private final Handler mainHandler = new Handler(Looper.getMainLooper());
     private static final int REQUEST_LOCATION_PERMISSION = 1001;
@@ -61,24 +57,18 @@ public class ExploreFragment extends Fragment implements GoogleMap.OnMarkerClick
             Log.d("ExploreFragment", "dataList already initialized with size: " + dataList.size());
         }
         // Listener so that dataList gets updated whenever the database does
-        CollectionReference moodPostRef = DatabaseManager.getPostsCollectionRef();
-        moodPostRef.addSnapshotListener((value, error) -> {
-            if (error != null){
-                Log.e("Firestore", error.toString());
-            }
-            if (value != null){
-                Log.d("Firestore", "SnapshotListener triggered, updating dataList");
-                dataList.clear();
-                if (!value.isEmpty()) {
-                    for (QueryDocumentSnapshot snapshot : value) {
-                        snapshot.toObject(MoodPost.class);
-                        dataList.add(snapshot.toObject(MoodPost.class));
-                    }
-                }
-                if (moodPostAdapter != null) {
-                    moodPostAdapter.notifyDataSetChanged();
-                }
-            }
+        executor.execute(() -> {
+                    DatabaseManager.getInstance().getAllPosts(posts -> {
+                        if (posts != null) {
+                            Log.e("ExploreFragment", "Error: posts is null");
+                        }
+                        mainHandler.post(() -> {
+                            dataList.clear();
+                            dataList.addAll(posts);
+
+                        });
+                        return null;
+                    });
         });
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(getActivity());
 
@@ -164,11 +154,6 @@ public class ExploreFragment extends Fragment implements GoogleMap.OnMarkerClick
                             DetailedMoodPostFragment.newInstance(exactPost);
                     detailedMoodPostFragment.show(getActivity().getSupportFragmentManager(), "Detailed Mood Post View");
 
-                    if (moodPostAdapter != null) {
-                        moodPostAdapter.notifyDataSetChanged();
-                    } else {
-                        Log.e("ExploreFragment", "moodPostAdapter is null");
-                    }
                 });
                 return null;
             });
