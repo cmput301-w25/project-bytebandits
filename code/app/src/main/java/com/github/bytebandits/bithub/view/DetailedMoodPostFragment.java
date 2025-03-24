@@ -2,8 +2,9 @@ package com.github.bytebandits.bithub.view;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
-import android.util.Log;
+import android.util.Base64;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
@@ -45,6 +46,7 @@ public class DetailedMoodPostFragment extends DialogFragment{
         TextView viewTime = view.findViewById(R.id.detailedViewTime);
         TextView viewEmotion = view.findViewById(R.id.detailedViewEmotion);
         TextView viewDescription = view.findViewById(R.id.detailedViewDescription);
+        ImageView viewMoodIcon = view.findViewById(R.id.detailedViewMoodIcon);
         ImageView viewImage = view.findViewById(R.id.detailedViewImage);
         Button deleteButton = view.findViewById(R.id.deleteButton);
         Button editButton = view.findViewById(R.id.editButton);
@@ -61,7 +63,11 @@ public class DetailedMoodPostFragment extends DialogFragment{
         viewTime.setText(moodPost.getFormattedPostedTime());
         viewEmotion.setText(moodPost.getEmotion().getState());
         viewDescription.setText(moodPost.getDescription());
-        viewImage.setImageResource(moodPost.getEmotion().getLogoID());
+        viewMoodIcon.setImageResource(moodPost.getEmotion().getLogoID());
+        if (moodPost.getImage() != null) {
+            byte[] imageArray = Base64.decode(moodPost.getImage(), Base64.DEFAULT);
+            viewImage.setImageBitmap(BitmapFactory.decodeByteArray(imageArray, 0, imageArray.length));
+        }
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
         builder.setView(view);
