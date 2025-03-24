@@ -10,6 +10,7 @@ import com.github.bytebandits.bithub.model.Profile;
 import com.github.bytebandits.bithub.model.SocialSituation;
 import com.google.firebase.firestore.*;
 
+
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -21,17 +22,18 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.*;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 import static org.junit.Assert.*;
 
-public class DatabaseManagerTests {
+public class DatabaseManagerTest {
     private DatabaseManager dbInstance;
     private Profile testProfile;
 
     @BeforeClass
     public static void setup() {
-        DatabaseManager dbInstance = DatabaseManager.getInstance();
-        dbInstance.useEmulation();
+        DatabaseManager.getInstance(true);
     }
 
     @Before
@@ -56,7 +58,7 @@ public class DatabaseManagerTests {
         DocumentReference user2DocRef = usersCollectionRef.document((String) Objects.requireNonNull(user2.get("userId")));
 
         user1DocRef.set(user1);
-        user1DocRef.set(user2);
+        user2DocRef.set(user2);
 
         // Add Posts
         this.testProfile = new Profile((String) Objects.requireNonNull(user1.get("userId")));
@@ -79,17 +81,25 @@ public class DatabaseManagerTests {
     }
 
     @Test
-    public void testGetUser_Success() {
+    public void testGetUser_Success() throws InterruptedException {
         DatabaseManager dbInstance = DatabaseManager.getInstance();
+        CountDownLatch latch = new CountDownLatch(1);  // Used to wait for async response
 
         dbInstance.getUser(testProfile.getUserID(), user -> {
-            Log.d("DatabaseManagerTests", "getUserTest");
-            if (user != null) {
+            try {
+                Log.d("DatabaseManagerTest", "testGetUser_Success");
+                assert user != null;
                 String name = (String) user.get("name");
                 assert name != null;
+
+                Log.d("DatabaseManagerTest", "name: " + name);
                 assertTrue(name.matches("John Doe"));
+            } finally {
+                latch.countDown(); // Signal that the async call is done
             }
         });
+
+        assertTrue("Test timed out waiting for getUser() response", latch.await(10, TimeUnit.SECONDS));
     }
 
     @Test
@@ -155,8 +165,9 @@ public class DatabaseManagerTests {
 
     @Test
     public void testSearchUsers_Success() throws ExecutionException, InterruptedException {
-        List<DocumentSnapshot> users = dbInstance.searchUsers("testUser");
-        assertFalse(users.isEmpty());
+        dbInstance.searchUsers("testUser", users -> {
+            assertFalse(users.isEmpty());
+        });
     }
 
     @Test

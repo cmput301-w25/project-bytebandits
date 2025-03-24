@@ -14,6 +14,8 @@ import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
+import javax.inject.Singleton;
+
 public final class DatabaseManager {
     private final FirebaseFirestore firestoreDb;
     private final CollectionReference usersCollectionRef;
@@ -22,18 +24,28 @@ public final class DatabaseManager {
     private static DatabaseManager instance;
 
     // Singleton Instance
-    private DatabaseManager() {
+    private DatabaseManager(boolean useEmulator) {
         this.firestoreDb = FirebaseFirestore.getInstance();
+        if (useEmulator) {
+            this.firestoreDb.useEmulator("10.0.2.2", 8080);
+        }
+
         this.usersCollectionRef = firestoreDb.collection("users");
         this.postsCollectionRef = firestoreDb.collection("posts");
     }
 
-    public static synchronized DatabaseManager getInstance() {
+    @Singleton
+    public static synchronized DatabaseManager getInstance(boolean useEmulator) {
         if (instance == null) {
-            instance = new DatabaseManager();
+            instance = new DatabaseManager(useEmulator);
         }
         return instance;
     }
+
+    public static DatabaseManager getInstance() {
+        return getInstance(false);  // Default: Don't use emulator
+    }
+
 
     public void useEmulation(String address, int portNumber) {
         this.firestoreDb.useEmulator(address, portNumber);

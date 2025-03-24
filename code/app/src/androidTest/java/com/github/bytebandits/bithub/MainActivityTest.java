@@ -44,7 +44,7 @@ public class MainActivityTest {
         // Specific address for emulated device to access our localHost
         String androidLocalhost = "10.0.2.2";
         int portNumber = 8080;
-        DatabaseManager.getDb().getInstance().useEmulator(androidLocalhost, portNumber);
+        DatabaseManager.getInstance().useEmulation(androidLocalhost, portNumber);
     }
 
     @Rule
@@ -80,7 +80,7 @@ public class MainActivityTest {
         // Click on the Profile icon in the navigation bar
         onView(withId(R.id.profile)).perform(click());
         // Check if a unique view within the profile fragment is displayed
-        onView(withId(R.id.history_textview)).check(matches(isDisplayed()));
+        onView(withId(R.id.mood_post_list_history)).check(matches(isDisplayed()));
 
         // Click on the Create icon in the navigation bar
         onView(withId(R.id.create)).perform(click());
@@ -90,7 +90,7 @@ public class MainActivityTest {
 
     @Before
     public void seedDatabase() {
-        CollectionReference moodPostRef = DatabaseManager.getPostsCollectionRef();
+        CollectionReference moodPostRef = DatabaseManager.getInstance().getPostsCollectionRef();
         MoodPost[] moodPosts = {
                 new MoodPost(Emotion.HAPPINESS, new Profile("Tony Yang"), false, null, null, null),
                 new MoodPost(Emotion.SADNESS, new Profile("John Smith"), false, SocialSituation.ALONE, "Test Desc",
