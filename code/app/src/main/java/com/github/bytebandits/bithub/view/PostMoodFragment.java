@@ -10,6 +10,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.SpinnerAdapter;
@@ -45,6 +46,8 @@ public class PostMoodFragment extends Fragment {
     private Emotion selectedEmotion;
     private SocialSituation selectedSocialSituation;
     private String selectedDescription;
+    private boolean selectedLocation;
+    private boolean selectedPublic;
 
     public static PostMoodFragment newInstance(MoodPost moodPost) {
         // Use Bundle to get info between fragments
@@ -68,6 +71,9 @@ public class PostMoodFragment extends Fragment {
         Button confirmButton = view.findViewById(R.id.postMoodConfirmButton);
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(getActivity());
         findCurrentLocation();
+        CheckBox editPublic = view.findViewById(R.id.postMoodPublic);
+        CheckBox editLocation = view.findViewById(R.id.postMoodLocation);
+
         // Get the mood post if we need to edit a mood post
         String tag = getTag();
         Bundle bundle = getArguments();
@@ -145,22 +151,22 @@ public class PostMoodFragment extends Fragment {
 
         confirmButton.setOnClickListener(v -> {
             // Get inputs
+            selectedLocation = editLocation.isChecked();
+            selectedPublic = editPublic.isChecked();
             if (editDescription.getText().toString().isEmpty()) { selectedDescription = null; }
             else { selectedDescription = editDescription.getText().toString(); }
 
             // Check for valid description input (max 20 char. or 3 words), if valid, add mood post
-            if (selectedDescription != null &&
-                    ((moreThanThreeWords(selectedDescription)) || selectedDescription.length() > 20)) {
-                editDescription.setError("Description can be max 20 characters or 3 words");
+            if (selectedDescription != null && selectedDescription.length() > 200) {
+                editDescription.setError("Description can be max 200 characters");
             }
             else {
                 DatabaseManager databaseManager = DatabaseManager.getInstance();
                 // Add mood post to database
                 if (postToEdit == null) {
                     SessionManager sessionManager = SessionManager.getInstance(requireContext());
-                    MoodPost moodPost = new MoodPost(selectedEmotion, sessionManager.getProfile(), true, selectedSocialSituation, selectedDescription, null);
-                    moodPost.setLatitude(currentLatitude);
-                    moodPost.setLongitude(currentLongitude);
+                    MoodPost moodPost = new MoodPost(selectedEmotion, sessionManager.getProfile(),
+                            selectedLocation, selectedSocialSituation, selectedDescription, null, selectedPublic);
                     databaseManager.addPost(moodPost, sessionManager.getUsername(), Optional.empty());
                 }
                 else {
@@ -168,6 +174,8 @@ public class PostMoodFragment extends Fragment {
                     updateFields.put("socialSituation", selectedSocialSituation);
                     updateFields.put("emotion", selectedEmotion);
                     updateFields.put("description", selectedDescription);
+                    // TODO: update location
+                    updateFields.put("public", selectedPublic);
                     databaseManager.updatePost(postToEdit.getPostID(), updateFields, Optional.empty());
                 }
                 // Go back to homepage fragment
@@ -205,23 +213,6 @@ public class PostMoodFragment extends Fragment {
                 currentLongitude = location.getLongitude();
             }
         });
-    }
-
-    /**
-     * Checks if a given string contains more than three words.
-     * This method is primarily used to validate description inputs
-     * to ensure they do not exceed a specified word limit.
-     *
-     * @param string The input string to be checked. Can be {@code null}.
-     * @return {@code true} if the string contains more than three words,
-     *         {@code false} if the string is {@code null} or contains
-     *         three or fewer words.
-     *
-    */
-    private boolean moreThanThreeWords(String string) {
-        if (string == null) { return false; }
-        String[] words = string.split("\\s+"); // Groups all whitespace together and splits by the whitespace
-        return (words.length > 3);
     }
 
     /**

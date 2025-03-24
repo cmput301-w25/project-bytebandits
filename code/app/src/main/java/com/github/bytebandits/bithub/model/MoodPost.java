@@ -26,6 +26,7 @@ public class MoodPost implements Serializable {
     private String desc;
     private Bitmap image;
     private ArrayList<Comment> comments;
+    private boolean isPublic;
 
     public MoodPost() {}
 
@@ -49,9 +50,11 @@ public class MoodPost implements Serializable {
      * @param image
      *      A bitmap representing the image attached to the mood post
      *      When null is passed, it means that no image is attached to the mood post.
+     * @param isPublic
+     *      boolean representing whether or not this mood is public or private.
      */
     public MoodPost(Emotion emotion, Profile profile, boolean showLocation, SocialSituation situation,
-                    String desc, Bitmap image ) {
+                    String desc, Bitmap image, boolean isPublic) {
         this.postID = UUID.randomUUID().toString();
         this.emotion = emotion;
         this.profile = profile;
@@ -60,6 +63,7 @@ public class MoodPost implements Serializable {
         this.desc = desc;
         this.image = image;
         this.comments = new ArrayList<>();
+        this.isPublic = isPublic;
     }
 
     /**
@@ -260,5 +264,23 @@ public class MoodPost implements Serializable {
                 break;
             }
         }
+    }
+
+    /**
+     * Returns if the mood post public or not
+     * @return
+     *      A boolean representing if the mood post is public or private
+     */
+    public boolean isPublic() {
+        return isPublic;
+    }
+
+    /**
+     * Sets the mood post to be public or private
+     * @param aPublic
+     *      A boolean representing if we want the mood post to be public or private. True for public, false for private
+     */
+    public void setPublic(boolean aPublic) {
+        isPublic = aPublic;
     }
 }
