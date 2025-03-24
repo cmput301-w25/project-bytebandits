@@ -1,5 +1,7 @@
 package com.github.bytebandits.bithub.model;
 
+import android.util.Log;
+
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;

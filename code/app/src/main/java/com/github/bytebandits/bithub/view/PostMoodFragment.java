@@ -258,12 +258,14 @@ public class PostMoodFragment extends Fragment {
                     MoodPost moodPost = new MoodPost(selectedEmotion, sessionManager.getProfile(),
                             selectedLocation, selectedSocialSituation, selectedDescription,
                             selectedImageBase64String, selectedPublic);
-                    if (selectedLocation) {
-                        // TODO: uncomment these two lines if they are right
-                        //moodPost.setLatitude(currentLatitude);
-                        //moodPost.setLongitude(currentLongitude);
-                    }
                     databaseManager.addPost(moodPost, sessionManager.getUsername(), Optional.empty());
+                    // for some reason setting the longitude and latitude then adding post doesn't work so im updating the values after adding the post
+                    if (selectedLocation) {
+                        HashMap<String, Object> updateFields = new HashMap<>();
+                        updateFields.put("longitude", currentLongitude);
+                        updateFields.put("latitude", currentLatitude);
+                        databaseManager.updatePost(moodPost.getPostID(), updateFields, Optional.empty());
+                    }
                 }
                 else {
                     HashMap<String, Object> updateFields = new HashMap<>();
@@ -275,9 +277,8 @@ public class PostMoodFragment extends Fragment {
                     updateFields.put("public", selectedPublic);
                     // If user wants to set the location, and no previous location is assigned to the mood post, then assign new location
                     if (selectedLocation && (postToEdit.getLongitude() == null || postToEdit.getLatitude() == null)) {
-                        // TODO: uncomment these two lines if they are right
-                        //updateFields.put("longitude", currentLongitude);
-                        //updateFields.put("latitude", currentLatitude);
+                        updateFields.put("longitude", currentLongitude);
+                        updateFields.put("latitude", currentLatitude);
                     }
                     databaseManager.updatePost(postToEdit.getPostID(), updateFields, Optional.empty());
                 }
