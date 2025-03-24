@@ -30,13 +30,21 @@
         android:id="@+id/postMoodUploadImageButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="25dp"
-        android:layout_marginBottom="25dp"
+        android:layout_marginTop="100dp"
         android:text="Upload"
-        app:layout_constraintBottom_toTopOf="@+id/postMoodConfirmButton"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/postMoodImage"
         app:layout_constraintTop_toBottomOf="@+id/postMoodDescription" />
+
+    <Button
+        android:id="@+id/postMoodDeleteImageButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="100dp"
+        android:text="Delete"
+        app:layout_constraintBottom_toTopOf="@+id/postMoodConfirmButton"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/postMoodImage" />
 
     <ImageView
         android:id="@+id/postMoodImage"
@@ -44,6 +52,7 @@
         android:layout_height="250dp"
         android:layout_marginStart="25dp"
         android:layout_marginBottom="25dp"
+        android:background="@color/Accent1"
         app:layout_constraintBottom_toTopOf="@+id/postMoodConfirmButton"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"

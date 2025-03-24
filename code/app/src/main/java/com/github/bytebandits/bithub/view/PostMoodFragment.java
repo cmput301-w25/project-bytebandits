@@ -12,6 +12,8 @@ import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.util.Base64;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,7 +25,6 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.SpinnerAdapter;
-import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
@@ -46,7 +47,6 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.firebase.firestore.Blob;
 
 import java.io.ByteArrayOutputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -93,6 +93,8 @@ public class PostMoodFragment extends Fragment {
         CheckBox editPublic = view.findViewById(R.id.postMoodPublic);
         CheckBox editLocation = view.findViewById(R.id.postMoodLocation);
         Button uploadButton = view.findViewById(R.id.postMoodUploadImageButton);
+        Button deleteButton = view.findViewById(R.id.postMoodDeleteImageButton);
+        deleteButton.setVisibility(View.GONE);
         ImageView editImage = view.findViewById(R.id.postMoodImage);
 
         // Get the mood post if we need to edit a mood post
@@ -175,6 +177,7 @@ public class PostMoodFragment extends Fragment {
                             selectedImageByteArray = uriToByteArray(selectedImageUri);
                             // Display the image in the imageview if no exception is thrown
                             editImage.setImageURI(selectedImageUri);
+                            deleteButton.setVisibility(View.VISIBLE);
                         } catch (IllegalArgumentException e) {
                             // Show an error message
                             new AlertDialog.Builder(getContext())
@@ -212,11 +215,21 @@ public class PostMoodFragment extends Fragment {
             if (postToEdit.getDescription() == null) { editDescription.setText(""); }
             else { editDescription.setText(postToEdit.getDescription()); }
             if (postToEdit.getImage() != null) {
-                selectedImageByteArray = postToEdit.getImage().toBytes(); // So if the user doesn't upload a new image, it won't update the image to null
-                editImage.setImageBitmap(BitmapFactory.decodeByteArray(postToEdit.getImage().toBytes(),
-                        0, postToEdit.getImage().toBytes().length));
+                byte[] postImageByteArray = Base64.decode(postToEdit.getImage(), Base64.DEFAULT);
+                selectedImageByteArray = postImageByteArray; // So if the user doesn't upload a new image, it won't update the image to null
+                    editImage.setImageBitmap(BitmapFactory.decodeByteArray(postImageByteArray,
+                        0, postImageByteArray.length));
+                deleteButton.setVisibility(View.VISIBLE);
             }
         }
+
+        // Delete image button logic
+        deleteButton.setOnClickListener(v ->{
+            editImage.setImageBitmap(null);
+            selectedImageByteArray = null;
+            selectedImageUri = null;
+            deleteButton.setVisibility(View.GONE);
+        });
 
         confirmButton.setOnClickListener(v -> {
             // Get inputs
@@ -232,11 +245,14 @@ public class PostMoodFragment extends Fragment {
             else {
                 DatabaseManager databaseManager = DatabaseManager.getInstance();
                 // Add mood post to database
+                String selectedImageBase64String;
+                if (selectedImageByteArray != null) { selectedImageBase64String = Base64.encodeToString(selectedImageByteArray, Base64.DEFAULT); }
+                else { selectedImageBase64String = null; }
                 if (postToEdit == null) {
                     SessionManager sessionManager = SessionManager.getInstance(requireContext());
                     MoodPost moodPost = new MoodPost(selectedEmotion, sessionManager.getProfile(),
                             selectedLocation, selectedSocialSituation, selectedDescription,
-                            Blob.fromBytes(selectedImageByteArray), selectedPublic);
+                            selectedImageBase64String, selectedPublic);
                     databaseManager.addPost(moodPost, sessionManager.getUsername(), Optional.empty());
                 }
                 else {
@@ -244,9 +260,7 @@ public class PostMoodFragment extends Fragment {
                     updateFields.put("socialSituation", selectedSocialSituation);
                     updateFields.put("emotion", selectedEmotion);
                     updateFields.put("description", selectedDescription);
-                    if (selectedImageByteArray != null) {
-                        updateFields.put("image", Blob.fromBytes(selectedImageByteArray));
-                    }
+                    updateFields.put("image", selectedImageBase64String);
                     // TODO: update location
                     updateFields.put("public", selectedPublic);
                     databaseManager.updatePost(postToEdit.getPostID(), updateFields, Optional.empty());

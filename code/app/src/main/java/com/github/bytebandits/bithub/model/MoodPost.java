@@ -24,7 +24,7 @@ public class MoodPost implements Serializable {
     private double longitude;
     private SocialSituation situation;
     private String desc;
-    private Blob image;
+    private String image;
     private ArrayList<Comment> comments;
     private boolean isPublic;
 
@@ -48,13 +48,13 @@ public class MoodPost implements Serializable {
      *      Can be a max of 20 characters or 3 words.
      *      When null is passed, it means that no description is attached to the mood post.
      * @param image
-     *      A Blob representing the image attached to the mood post
+     *      A Base64 string representing the image attached to the mood post.
      *      When null is passed, it means that no image is attached to the mood post.
      * @param isPublic
      *      boolean representing whether or not this mood is public or private.
      */
     public MoodPost(Emotion emotion, Profile profile, boolean showLocation, SocialSituation situation,
-                    String desc, Blob image, boolean isPublic) {
+                    String desc, String image, boolean isPublic) {
         this.postID = UUID.randomUUID().toString();
         this.emotion = emotion;
         this.profile = profile;
@@ -215,22 +215,22 @@ public class MoodPost implements Serializable {
     }
 
     /**
-     * Returns the mood post's attached image as a byte array
+     * Returns the mood post's attached image as a Base 64 String
      *
      * @return
-     *      Returns a Blob representing the image attached to the mood post
+     *      Returns a Base 64 String representing the image attached to the mood post
      *      Returns null when the mood post has no attached image.
      */
-    public Blob getImage() {
+    public String getImage() {
         return image;
     }
 
     /**
      * Sets the mood post's attached image
      * @param image
-     *      byte[] representing the image attached to the mood post
+     *      Base64 String representing the image attached to the mood post
      */
-    public void setImage(Blob image) {
+    public void setImage(String image) {
         this.image = image;
     }
 
