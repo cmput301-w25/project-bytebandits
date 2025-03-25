@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@color/Primary1">
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/backActionButton"
@@ -10,8 +12,11 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_marginTop="24dp"
+        android:background="@color/Accent2"
         android:clickable="true"
-        app:backgroundTint="#CC7698"
+        app:backgroundTint="@color/Accent1"
+        app:fabCustomSize="36dp"
+        app:fabSize="mini"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="?attr/actionModeCloseDrawable" />
@@ -21,8 +26,10 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="64dp"
+        android:fontFamily="@font/stix_two_text_bold"
         android:text="@string/signup_title"
-        android:textSize="48sp"
+        android:textColor="@color/Accent1"
+        android:textSize="60sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -34,6 +41,8 @@
         android:layout_marginStart="64dp"
         android:layout_marginTop="100dp"
         android:layout_marginEnd="64dp"
+        android:textColorHint="@color/Accent1"
+        app:hintTextColor="@color/Accent1"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/signupText">
@@ -42,10 +51,15 @@
             android:id="@+id/UserInputText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:fontFamily="@font/stix_two_text_bold"
             android:hint="@string/signup_user"
             android:scrollHorizontally="false"
             android:singleLine="true"
-            android:textSize="14sp" />
+            android:textColor="#A592A9"
+            android:textColorHighlight="@color/Accent1"
+            android:textColorHint="@color/Accent1"
+            android:textColorLink="@color/Accent1"
+            android:textSize="16sp" />
     </com.google.android.material.textfield.TextInputLayout>
 
     <com.google.android.material.textfield.TextInputLayout
@@ -54,6 +68,8 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="64dp"
         android:layout_marginEnd="64dp"
+        android:textColorHint="@color/Accent1"
+        app:hintTextColor="@color/Accent1"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/UserInputLayout">
@@ -62,9 +78,14 @@
             android:id="@+id/EmailInputText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:fontFamily="@font/stix_two_text_bold"
             android:hint="@string/signup_email"
             android:singleLine="true"
-            android:textSize="14sp" />
+            android:textColor="#A592A9"
+            android:textColorHighlight="@color/Accent1"
+            android:textColorHint="@color/Accent1"
+            android:textColorLink="@color/Accent1"
+            android:textSize="16sp" />
     </com.google.android.material.textfield.TextInputLayout>
 
     <com.google.android.material.textfield.TextInputLayout
@@ -73,6 +94,8 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="64dp"
         android:layout_marginEnd="64dp"
+        android:textColorHint="@color/Accent1"
+        app:hintTextColor="@color/Accent1"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/EmailInputLayout">
@@ -81,9 +104,15 @@
             android:id="@+id/PswrdInputText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:fontFamily="@font/stix_two_text_bold"
             android:hint="@string/signup_password"
             android:inputType="textPassword"
-            android:singleLine="true" />
+            android:singleLine="true"
+            android:textColor="#A592A9"
+            android:textColorHighlight="@color/Accent1"
+            android:textColorHint="@color/Accent1"
+            android:textColorLink="@color/Accent1"
+            android:textSize="16sp" />
     </com.google.android.material.textfield.TextInputLayout>
 
     <com.google.android.material.textfield.TextInputLayout
@@ -92,6 +121,8 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="64dp"
         android:layout_marginEnd="64dp"
+        android:textColorHint="@color/Accent1"
+        app:hintTextColor="@color/Accent1"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/PswrdInputLayout">
@@ -100,9 +131,15 @@
             android:id="@+id/PswrdConInputText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:fontFamily="@font/stix_two_text_bold"
             android:hint="@string/signup_confirm_password"
             android:inputType="textPassword"
-            android:singleLine="true" />
+            android:singleLine="true"
+            android:textColor="#A592A9"
+            android:textColorHighlight="@color/Accent1"
+            android:textColorHint="@color/Accent1"
+            android:textColorLink="@color/Accent1"
+            android:textSize="16sp" />
     </com.google.android.material.textfield.TextInputLayout>
 
     <Button
@@ -111,8 +148,12 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="64dp"
         android:layout_marginEnd="64dp"
-        android:layout_marginBottom="48dp"
+        android:layout_marginBottom="70dp"
+        android:backgroundTint="@color/Accent1"
+        android:fontFamily="@font/stix_two_text_bold"
         android:text="@string/signup_signup"
+        android:textColor="@color/Background"
+        android:textSize="20sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
@@ -122,10 +163,22 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:clickable="true"
+        android:fontFamily="@font/stix_two_text_bold"
         android:text="@string/signup_existing"
-        android:textSize="10sp"
+        android:textColor="@color/Accent2"
+        android:textSize="14sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/registerBtn" />
+
+    <ImageView
+        android:id="@+id/imageView3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toTopOf="@+id/registerBtn"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/PswrdConInputLayout"
+        app:srcCompat="@drawable/surprise_logo" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
