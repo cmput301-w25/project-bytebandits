@@ -15,6 +15,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import com.github.bytebandits.bithub.controller.DatabaseManager;
+import com.github.bytebandits.bithub.controller.PostFilterManager;
 import com.github.bytebandits.bithub.model.Profile;
 import com.github.bytebandits.bithub.model.MoodPost;
 import com.github.bytebandits.bithub.R;
@@ -24,6 +25,7 @@ import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -34,8 +36,9 @@ import java.util.concurrent.Executors;
  * - Providing access to the settings dialog via a settings button.
  */
 
-public class ProfileFragment extends Fragment {
+public class ProfileFragment extends Fragment implements FilterDialog.FilterListener {
     private ArrayList<MoodPost> dataList;
+    private ArrayList<MoodPost> filteredDataList;
     private ListView moodPostListHistory;
     private MoodPostArrayAdapter moodPostAdapter;
     private ImageButton settingsButton;
@@ -131,12 +134,12 @@ public class ProfileFragment extends Fragment {
 
         filterButton.setOnClickListener(v -> openFilterDialog());
 
-        // Initialize dataList to avoid NullPointerException
+        // Initialize both dataList and filteredDataList to avoid NullPointerException
         if (dataList == null) {
             dataList = new ArrayList<>();
-            Log.d("ProfileFragment", "dataList initialized as empty list");
-        } else {
-            Log.d("ProfileFragment", "dataList already initialized with size: " + dataList.size());
+        }
+        if (filteredDataList == null) {
+            filteredDataList = new ArrayList<>();
         }
 
         executor.execute(() -> {
@@ -159,6 +162,8 @@ public class ProfileFragment extends Fragment {
                 mainHandler.post(() -> {
                     dataList.clear();
                     dataList.addAll(posts);
+                    filteredDataList.clear();
+                    filteredDataList.addAll(posts);
 
                     if (moodPostAdapter != null) {
                         moodPostAdapter.notifyDataSetChanged();
@@ -168,7 +173,7 @@ public class ProfileFragment extends Fragment {
 
                     // Initialize views and adapters
                     moodPostListHistory = view.findViewById(R.id.mood_post_list_history);
-                    moodPostAdapter = new MoodPostArrayAdapter(getContext(), dataList);
+                    moodPostAdapter = new MoodPostArrayAdapter(getContext(), filteredDataList);
                     moodPostListHistory.setAdapter(moodPostAdapter);
 
                     // open detailed view of the user's clicked post
@@ -187,7 +192,8 @@ public class ProfileFragment extends Fragment {
             });
         });
 
-        // Listener so that dataList gets updated whenever the database does
+        // Listener to update dataList and filteredDataList whenever the database
+        // changes
         CollectionReference moodPostRef = DatabaseManager.getInstance().getPostsCollectionRef();
         moodPostRef.addSnapshotListener((value, error) -> {
             if (error != null) {
@@ -195,11 +201,13 @@ public class ProfileFragment extends Fragment {
             }
             if (value != null) {
                 dataList.clear();
+                filteredDataList.clear();
                 if (!value.isEmpty()) {
                     for (QueryDocumentSnapshot snapshot : value) {
-                        snapshot.toObject(MoodPost.class);
-                        dataList.add(snapshot.toObject(MoodPost.class));
+                        MoodPost post = snapshot.toObject(MoodPost.class);
+                        dataList.add(post);
                     }
+                    filteredDataList.addAll(dataList); // Copy the entire list to filteredDataList
                 }
                 if (moodPostAdapter != null) {
                     moodPostAdapter.notifyDataSetChanged();
@@ -210,19 +218,56 @@ public class ProfileFragment extends Fragment {
         return view;
     }
 
-    /**
-     * Displays the settings dialog when the settings button is clicked.
-     */
     private void openSettings() {
         SettingsDialog settingsDialog = new SettingsDialog(requireContext());
         settingsDialog.showSettingsDialog();
     }
+
     /**
      * Displays the filter dialog when the settings button is clicked.
      */
     private void openFilterDialog() {
-        FilterDialog filterDialog = new FilterDialog(requireContext());
+        FilterDialog filterDialog = new FilterDialog(requireContext(), this);
         filterDialog.showFilterDialog();
     }
-}
 
+    @Override
+    public void onFilterSelected(String mood) {
+        filteredDataList.clear();
+        if (mood.equals("last_week")) {
+            filteredDataList.addAll(filterPostsFromLastWeek(dataList));
+        } else {
+            filteredDataList.addAll(PostFilterManager.filterPostsByMood(dataList, mood));
+        }
+        moodPostAdapter.notifyDataSetChanged();
+    }
+    private List<MoodPost> filterPostsFromLastWeek(List<MoodPost> posts) {
+        List<MoodPost> filteredPosts = new ArrayList<>();
+        long currentTime = System.currentTimeMillis();
+        long oneWeekInMillis = 7 * 24 * 60 * 60 * 1000; // 7 days in milliseconds
+
+        for (MoodPost post : posts) {
+            long postTime = post.getPostedDateTime().getTime();
+            if ((currentTime - postTime) <= oneWeekInMillis) {
+                filteredPosts.add(post);
+            }
+        }
+        return filteredPosts;
+    }
+    @Override
+    public void onSearchQueryChanged(String query) {
+        filteredDataList.clear();
+
+        if (query.isEmpty()) {
+            filteredDataList.addAll(dataList);
+        } else {
+            for (MoodPost post : dataList) {
+                if (post.getDescription() != null && post.getDescription().toLowerCase().contains(query.toLowerCase())) {
+                    filteredDataList.add(post);
+                }
+            }
+        }
+
+        moodPostAdapter.notifyDataSetChanged();
+    }
+}

@@ -36,11 +36,6 @@ import java.util.HashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-/**
- * Fragment representing the homepage.
- * This fragment displays a list of mood posts and provides filtering
- * functionality.
- */
 public class HomepageFragment extends Fragment implements FilterDialog.FilterListener {
     private ArrayList<MoodPost> dataList;
     private ArrayList<MoodPost> filteredDataList; // Separate list for filtering
@@ -50,17 +45,6 @@ public class HomepageFragment extends Fragment implements FilterDialog.FilterLis
     private final ExecutorService executor = Executors.newSingleThreadExecutor();
     private final Handler mainHandler = new Handler(Looper.getMainLooper());
 
-    /**
-     * Initializes UI components and fetches posts from the database.
-     *
-     * @param inflater           The LayoutInflater object that can be used to
-     *                           inflate any views in the fragment.
-     * @param container          this is the parent view that the fragment's UI
-     *                           should be attached to.
-     * @param savedInstanceState this fragment is being re-constructed from a
-     *                           previous saved state.
-     * @return The View for the fragment’s UI.
-     */
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
@@ -237,11 +221,6 @@ public class HomepageFragment extends Fragment implements FilterDialog.FilterLis
         });
     }
 
-    /**
-     * Filters the mood posts based on the selected mood.
-     *
-     * @param mood The selected mood filter.
-     */
     @Override
     public void onFilterSelected(String mood) {
         filteredDataList.clear(); // Clear current filtered list
@@ -256,20 +235,11 @@ public class HomepageFragment extends Fragment implements FilterDialog.FilterLis
         moodPostAdapter.notifyDataSetChanged();
     }
 
-    /**
-     * Opens the filter dialog, allowing the user to filter mood posts.
-     */
     private void openFilterDialog() {
         FilterDialog filterDialog = new FilterDialog(requireContext(), this);
         filterDialog.showFilterDialog();
     }
 
-    /**
-     * Filters mood posts from the last seven days.
-     *
-     * @param posts The list of mood posts to filter.
-     * @return A list of mood posts from the last week.
-     */
     private List<MoodPost> filterPostsFromLastWeek(List<MoodPost> posts) {
         List<MoodPost> filteredPosts = new ArrayList<>();
         long currentTime = System.currentTimeMillis();
@@ -284,11 +254,6 @@ public class HomepageFragment extends Fragment implements FilterDialog.FilterLis
         return filteredPosts;
     }
 
-    /**
-     * Updates the filteredDataList based on the search query.
-     *
-     * @param query The search query to filter mood posts by description.
-     */
     @Override
     public void onSearchQueryChanged(String query) {
         filteredDataList.clear();
@@ -297,12 +262,12 @@ public class HomepageFragment extends Fragment implements FilterDialog.FilterLis
             filteredDataList.addAll(dataList);
         } else {
             for (MoodPost post : dataList) {
-                if (post.getDescription() != null
-                        && post.getDescription().toLowerCase().contains(query.toLowerCase())) {
+                if (post.getDescription() != null && post.getDescription().toLowerCase().contains(query.toLowerCase())) {
                     filteredDataList.add(post);
                 }
             }
         }
+
         moodPostAdapter.notifyDataSetChanged();
     }
 }
