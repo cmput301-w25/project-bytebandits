@@ -388,4 +388,21 @@
 
     </RadioGroup>
 
+    <View
+        android:id="@+id/divider6"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="?android:attr/listDivider" />
+
+    <EditText
+        android:id="@+id/search_edit_text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:hint="Search..."
+        android:inputType="text"
+        android:textColor="@color/white"
+        android:textColorHint="#6F6565"
+        android:textSize="24sp" />
+
 </LinearLayout>
