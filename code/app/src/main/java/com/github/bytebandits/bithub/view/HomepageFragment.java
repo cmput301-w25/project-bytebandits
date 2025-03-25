@@ -1,5 +1,7 @@
 package com.github.bytebandits.bithub.view;
 
+import static java.lang.Thread.sleep;
+
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -7,6 +9,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -29,16 +32,10 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.HashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-/**
- * Fragment representing the homepage.
- * This fragment displays a list of mood posts and provides filtering
- * functionality.
- */
 public class HomepageFragment extends Fragment implements FilterDialog.FilterListener {
     private ArrayList<MoodPost> dataList;
     private ArrayList<MoodPost> filteredDataList; // Separate list for filtering
@@ -48,17 +45,6 @@ public class HomepageFragment extends Fragment implements FilterDialog.FilterLis
     private final ExecutorService executor = Executors.newSingleThreadExecutor();
     private final Handler mainHandler = new Handler(Looper.getMainLooper());
 
-    /**
-     * Initializes UI components and fetches posts from the database.
-     *
-     * @param inflater           The LayoutInflater object that can be used to
-     *                           inflate any views in the fragment.
-     * @param container          this is the parent view that the fragment's UI
-     *                           should be attached to.
-     * @param savedInstanceState this fragment is being re-constructed from a
-     *                           previous saved state.
-     * @return The View for the fragment’s UI.
-     */
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
@@ -78,10 +64,10 @@ public class HomepageFragment extends Fragment implements FilterDialog.FilterLis
         }
 
         executor.execute(() -> {
-                DatabaseManager.getInstance().getAllPosts(posts -> {
-                    if (posts == null) {
-                        Log.e("HomepageFragment", "Error: posts is null");
-                    }
+            DatabaseManager.getInstance().getAllPosts(posts -> {
+                if (posts == null) {
+                    Log.e("HomepageFragment", "Error: posts is null");
+                }
 
                 Log.d("HomepageFragment", "Fetched posts count: " + posts.size());
 
@@ -166,7 +152,10 @@ public class HomepageFragment extends Fragment implements FilterDialog.FilterLis
         // logic of profile transition via clicking
         profileResults.setOnItemClickListener((adapterView, view1, i, l) -> {
             Profile profile = profiles.get(i);
-            ((MainActivity) requireActivity()).replaceFragment(ProfileFragment.newInstance(profile));
+            ProfileFragment profileFragment = new ProfileFragment();
+            profileFragment.setIsOtherProfile(true);
+            profileFragment.setOtherProfile(profile);
+            ((MainActivity) requireActivity()).replaceFragment(profileFragment);
         });
 
         // logic to unfocus from search view, although there are cases where if you
@@ -195,10 +184,10 @@ public class HomepageFragment extends Fragment implements FilterDialog.FilterLis
                             String profileJson = (String) user.get("profile");
                             try {
                                 JSONObject profileObj = new JSONObject(profileJson);
-                                String userId = profileObj.getString("userId");
+                                String userID = profileObj.getString("userID");
                                 String userImg;
                                 if (profileObj.isNull("img")) {
-                                    profiles.add(new Profile(userId));
+                                    profiles.add(new Profile(userID));
                                     // use default profile pic
                                 }
                                 // else{
@@ -232,11 +221,6 @@ public class HomepageFragment extends Fragment implements FilterDialog.FilterLis
         });
     }
 
-    /**
-     * Filters the mood posts based on the selected mood.
-     *
-     * @param mood The selected mood filter.
-     */
     @Override
     public void onFilterSelected(String mood) {
         filteredDataList.clear(); // Clear current filtered list
@@ -251,20 +235,11 @@ public class HomepageFragment extends Fragment implements FilterDialog.FilterLis
         moodPostAdapter.notifyDataSetChanged();
     }
 
-    /**
-     * Opens the filter dialog, allowing the user to filter mood posts.
-     */
     private void openFilterDialog() {
         FilterDialog filterDialog = new FilterDialog(requireContext(), this);
         filterDialog.showFilterDialog();
     }
 
-    /**
-     * Filters mood posts from the last seven days.
-     *
-     * @param posts The list of mood posts to filter.
-     * @return A list of mood posts from the last week.
-     */
     private List<MoodPost> filterPostsFromLastWeek(List<MoodPost> posts) {
         List<MoodPost> filteredPosts = new ArrayList<>();
         long currentTime = System.currentTimeMillis();
@@ -279,11 +254,6 @@ public class HomepageFragment extends Fragment implements FilterDialog.FilterLis
         return filteredPosts;
     }
 
-    /**
-     * Updates the filteredDataList based on the search query.
-     *
-     * @param query The search query to filter mood posts by description.
-     */
     @Override
     public void onSearchQueryChanged(String query) {
         filteredDataList.clear();
@@ -292,12 +262,12 @@ public class HomepageFragment extends Fragment implements FilterDialog.FilterLis
             filteredDataList.addAll(dataList);
         } else {
             for (MoodPost post : dataList) {
-                if (post.getDescription() != null
-                        && post.getDescription().toLowerCase().contains(query.toLowerCase())) {
+                if (post.getDescription() != null && post.getDescription().toLowerCase().contains(query.toLowerCase())) {
                     filteredDataList.add(post);
                 }
             }
         }
+
         moodPostAdapter.notifyDataSetChanged();
     }
 }
