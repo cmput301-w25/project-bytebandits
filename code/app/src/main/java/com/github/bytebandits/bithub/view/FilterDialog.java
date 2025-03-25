@@ -2,8 +2,11 @@ package com.github.bytebandits.bithub.view;
 
 import android.app.AlertDialog;
 import android.content.Context;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 
@@ -29,7 +32,7 @@ public class FilterDialog {
                 .create();
 
         RadioGroup radioGroup = dialogView.findViewById(R.id.radioGroup);
-
+        EditText searchEditText = dialogView.findViewById(R.id.search_edit_text);
 
         radioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @Override
@@ -58,10 +61,25 @@ public class FilterDialog {
             }
         });
 
+        // Search functionality
+        searchEditText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                filterListener.onSearchQueryChanged(s.toString().trim());
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {}
+        });
+
         filterDialog.show();
     }
 
     public interface FilterListener {
         void onFilterSelected(String mood);
+        void onSearchQueryChanged(String query); // New method for search
     }
 }

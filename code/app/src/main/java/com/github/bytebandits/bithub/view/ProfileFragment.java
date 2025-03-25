@@ -254,4 +254,20 @@ public class ProfileFragment extends Fragment implements FilterDialog.FilterList
         }
         return filteredPosts;
     }
+    @Override
+    public void onSearchQueryChanged(String query) {
+        filteredDataList.clear();
+
+        if (query.isEmpty()) {
+            filteredDataList.addAll(dataList);
+        } else {
+            for (MoodPost post : dataList) {
+                if (post.getDescription() != null && post.getDescription().toLowerCase().contains(query.toLowerCase())) {
+                    filteredDataList.add(post);
+                }
+            }
+        }
+
+        moodPostAdapter.notifyDataSetChanged();
+    }
 }

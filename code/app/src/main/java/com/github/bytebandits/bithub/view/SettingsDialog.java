@@ -8,11 +8,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 
 import android.widget.Button;
-import android.widget.EditText;
-import android.widget.ImageView;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
+import android.widget.Toast;
 
 import com.github.bytebandits.bithub.R;
 import com.github.bytebandits.bithub.controller.SessionManager;
+import com.github.bytebandits.bithub.model.Profile;
 
 /**
  * This class handles the display and functionality of the settings dialog in the Bithub application.
@@ -23,10 +25,9 @@ import com.github.bytebandits.bithub.controller.SessionManager;
 
 public class SettingsDialog {
     private Button logoutButton;
-    private EditText nameText;
-    private EditText emailText;
+    private CheckBox locationServices;
     private Context context;
-
+    private Profile userProfile;
     /**
      * Constructs a SettingsDialog instance with the provided context.
      *
@@ -49,13 +50,31 @@ public class SettingsDialog {
                 .setCancelable(true)
                 .create();
 
-        nameText = dialogView.findViewById(R.id.name_edit_text);
-        emailText = dialogView.findViewById(R.id.email_edit_text);
         logoutButton = dialogView.findViewById(R.id.logout_button);
+        locationServices = dialogView.findViewById(R.id.location_services_checkbox);
 
         logoutButton.setOnClickListener(v -> {
             logoutUser();
             settingsDialog.dismiss();  // Close the dialog after logout
+        });
+
+        // Set checkbox state based on user's current location service setting
+        userProfile = SessionManager.getInstance(context).getProfile();
+
+        locationServices.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked) {
+                    // Checkbox is checked
+                    userProfile.enableLocationServices();
+                    Toast.makeText(context, "Location Services Enabled", Toast.LENGTH_SHORT).show();
+                } else {
+                    // Checkbox is unchecked
+                    userProfile.disableLocationServices();
+                    Toast.makeText(context, "Location Services Disabled", Toast.LENGTH_SHORT).show();
+                }
+                SessionManager.getInstance(context).saveProfile(userProfile);
+            }
         });
 
         settingsDialog.show();
