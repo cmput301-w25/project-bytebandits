@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/Primary1"
@@ -49,7 +50,7 @@
         <View
             android:id="@+id/view"
             android:layout_width="match_parent"
-            android:layout_height="20dp"
+            android:layout_height="15dp"
             android:layout_weight="2" />
 
         <View
@@ -61,88 +62,297 @@
         <RadioButton
             android:id="@+id/all_radio_button"
             android:layout_width="match_parent"
-            android:layout_height="48dp"
+            android:layout_height="40dp"
             android:layout_weight="1"
             android:text="All"
             android:textColor="@color/gold"
             android:textSize="25dp" />
 
-        <RadioButton
-            android:id="@+id/anger_radio_button"
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="48dp"
+            android:layout_height="38dp"
             android:layout_weight="1"
-            android:text="Anger"
-            android:textColor="@color/gold"
-            android:textSize="25dp" />
+            android:orientation="horizontal">
 
-        <RadioButton
-            android:id="@+id/confusion_radio_button"
-            android:layout_width="match_parent"
-            android:layout_height="48dp"
-            android:layout_weight="1"
-            android:text="Confusion"
-            android:textColor="@color/gold"
-            android:textSize="25dp" />
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="2">
 
-        <RadioButton
-            android:id="@+id/disgust_radio_button"
-            android:layout_width="match_parent"
-            android:layout_height="48dp"
-            android:layout_weight="1"
-            android:text="Disgust"
-            android:textColor="@color/gold"
-            android:textSize="25dp" />
+                <RadioButton
+                    android:id="@+id/anger_radio_button"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:layout_weight="1"
+                    android:text="Anger"
+                    android:textColor="@color/gold"
+                    android:textSize="25dp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
 
-        <RadioButton
-            android:id="@+id/fear_radio_button"
-            android:layout_width="match_parent"
-            android:layout_height="48dp"
-            android:layout_weight="1"
-            android:text="Fear"
-            android:textColor="@color/gold"
-            android:textSize="25dp" />
+                <ImageView
+                    android:id="@+id/imageView5"
+                    android:layout_width="48dp"
+                    android:layout_height="39dp"
+                    app:layout_constraintBottom_toBottomOf="@+id/anger_radio_button"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="@+id/anger_radio_button"
+                    app:layout_constraintVertical_bias="0"
+                    app:srcCompat="@drawable/anger_logo" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </LinearLayout>
 
-        <RadioButton
-            android:id="@+id/happiness_radio_button"
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="48dp"
+            android:layout_height="38dp"
             android:layout_weight="1"
-            android:text="Happiness"
-            android:textColor="@color/gold"
-            android:textSize="25dp" />
+            android:orientation="horizontal">
 
-        <RadioButton
-            android:id="@+id/sadness_radio_button"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="Sadness"
-            android:textColor="@color/gold"
-            android:textSize="25dp" />
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
 
-        <RadioButton
-            android:id="@+id/shame_radio_button"
-            android:layout_width="match_parent"
-            android:layout_height="48dp"
-            android:layout_weight="1"
-            android:text="Shame"
-            android:textColor="@color/gold"
-            android:textSize="25dp" />
+                <RadioButton
+                    android:id="@+id/confusion_radio_button"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:layout_weight="1"
+                    android:text="Confusion"
+                    android:textColor="@color/gold"
+                    android:textSize="25dp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
 
-        <RadioButton
-            android:id="@+id/suprise_radio_button"
+                <ImageView
+                    android:id="@+id/imageView7"
+                    android:layout_width="48dp"
+                    android:layout_height="39dp"
+                    app:layout_constraintBottom_toTopOf="@+id/confusion_radio_button"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintVertical_bias="0.0"
+                    app:srcCompat="@drawable/confusion_logo" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </LinearLayout>
+
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="48dp"
+            android:layout_height="38dp"
             android:layout_weight="1"
-            android:text="Suprise"
-            android:textColor="@color/gold"
-            android:textSize="25dp" />
+            android:orientation="horizontal">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <RadioButton
+                    android:id="@+id/disgust_radio_button"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:layout_weight="1"
+                    android:text="Disgust"
+                    android:textColor="@color/gold"
+                    android:textSize="25dp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <ImageView
+                    android:id="@+id/imageView8"
+                    android:layout_width="48dp"
+                    android:layout_height="39dp"
+                    app:layout_constraintBottom_toTopOf="@+id/disgust_radio_button"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintVertical_bias="0.0"
+                    app:srcCompat="@drawable/disgust_logo" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="38dp"
+            android:layout_weight="1"
+            android:orientation="horizontal">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <RadioButton
+                    android:id="@+id/fear_radio_button"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:layout_weight="1"
+                    android:text="Fear"
+                    android:textColor="@color/gold"
+                    android:textSize="25dp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <ImageView
+                    android:id="@+id/imageView9"
+                    android:layout_width="48dp"
+                    android:layout_height="39dp"
+                    app:layout_constraintBottom_toTopOf="@+id/fear_radio_button"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintVertical_bias="0.131"
+                    app:srcCompat="@drawable/fear_logo" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="38dp"
+            android:layout_weight="1"
+            android:orientation="horizontal">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <RadioButton
+                    android:id="@+id/happiness_radio_button"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:layout_weight="1"
+                    android:text="Happiness"
+                    android:textColor="@color/gold"
+                    android:textSize="25dp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <ImageView
+                    android:id="@+id/imageView10"
+                    android:layout_width="48dp"
+                    android:layout_height="39dp"
+                    app:layout_constraintBottom_toTopOf="@+id/happiness_radio_button"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintVertical_bias="0.0"
+                    app:srcCompat="@drawable/happiness_logo" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="38dp"
+            android:layout_weight="1"
+            android:orientation="horizontal">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <RadioButton
+                    android:id="@+id/sadness_radio_button"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:layout_weight="1"
+                    android:text="Sadness"
+                    android:textColor="@color/gold"
+                    android:textSize="25dp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <ImageView
+                    android:id="@+id/imageView11"
+                    android:layout_width="48dp"
+                    android:layout_height="39dp"
+                    app:layout_constraintBottom_toTopOf="@+id/sadness_radio_button"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintVertical_bias="0.0"
+                    app:srcCompat="@drawable/sadness_logo" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="38dp"
+            android:layout_weight="1"
+            android:orientation="horizontal">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <RadioButton
+                    android:id="@+id/shame_radio_button"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:layout_weight="1"
+                    android:text="Shame"
+                    android:textColor="@color/gold"
+                    android:textSize="25dp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent" />
+
+                <ImageView
+                    android:id="@+id/imageView14"
+                    android:layout_width="48dp"
+                    android:layout_height="39dp"
+                    app:layout_constraintBottom_toTopOf="@+id/shame_radio_button"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintVertical_bias="0.0"
+                    app:srcCompat="@drawable/shame_logo" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="38dp"
+            android:layout_weight="1"
+            android:orientation="horizontal">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <RadioButton
+                    android:id="@+id/suprise_radio_button"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:layout_weight="1"
+                    android:text="Suprise"
+                    android:textColor="@color/gold"
+                    android:textSize="25dp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <ImageView
+                    android:id="@+id/imageView15"
+                    android:layout_width="48dp"
+                    android:layout_height="39dp"
+                    app:layout_constraintBottom_toTopOf="@+id/suprise_radio_button"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintVertical_bias="0.0"
+                    app:srcCompat="@drawable/surprise_logo" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </LinearLayout>
 
         <View
             android:id="@+id/view2"
             android:layout_width="match_parent"
-            android:layout_height="26dp"
+            android:layout_height="15dp"
             android:layout_weight="2" />
 
         <View
