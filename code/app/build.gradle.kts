@@ -50,6 +50,7 @@ dependencies {
     implementation(libs.play.services.maps)
     implementation(libs.gson)
     implementation(libs.firebase.firestore)
+    implementation(libs.gms.play.services.location)
     testImplementation(libs.junit)
     testImplementation(libs.robolectric)
     testImplementation("org.mockito:mockito-core:5.7.0")

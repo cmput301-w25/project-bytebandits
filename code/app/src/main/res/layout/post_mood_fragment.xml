@@ -26,36 +26,63 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
-    <ImageView
-        android:id="@+id/imageView2"
-        android:layout_width="250dp"
-        android:layout_height="250dp"
-        android:layout_marginBottom="25dp"
+    <Button
+        android:id="@+id/postMoodUploadImageButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="100dp"
+        android:text="Upload"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/postMoodImage"
+        app:layout_constraintTop_toBottomOf="@+id/postMoodDescription" />
+
+    <Button
+        android:id="@+id/postMoodDeleteImageButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="100dp"
+        android:text="Delete"
         app:layout_constraintBottom_toTopOf="@+id/postMoodConfirmButton"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/postMoodImage" />
+
+    <ImageView
+        android:id="@+id/postMoodImage"
+        android:layout_width="250dp"
+        android:layout_height="250dp"
+        android:layout_marginStart="25dp"
+        android:layout_marginBottom="25dp"
+        android:background="@color/Accent1"
+        app:layout_constraintBottom_toTopOf="@+id/postMoodConfirmButton"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         tools:srcCompat="@tools:sample/backgrounds/scenic" />
 
     <Spinner
         android:id="@+id/postMoodEmotion"
         android:layout_width="match_parent"
-        android:layout_height="70dp"
-        android:layout_marginTop="50dp"
+        android:layout_height="50dp"
+        android:layout_marginTop="21dp"
         android:background="@color/Accent1"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@+id/postMoodPublic" />
 
     <EditText
         android:id="@+id/postMoodDescription"
-        android:layout_width="wrap_content"
-        android:layout_height="70dp"
-        android:layout_marginTop="50dp"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginTop="21dp"
+        android:layout_marginBottom="21dp"
         android:background="@color/Accent1"
         android:ems="10"
+        android:gravity="top"
         android:hint="(Optional Description)"
-        android:inputType="text"
+        android:inputType="text|textMultiLine"
         android:textColor="@color/black"
+        app:layout_constraintBottom_toTopOf="@+id/postMoodImage"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/postMoodSocialSituation" />
@@ -63,11 +90,34 @@
     <Spinner
         android:id="@+id/postMoodSocialSituation"
         android:layout_width="match_parent"
-        android:layout_height="70dp"
-        android:layout_marginTop="50dp"
+        android:layout_height="50dp"
+        android:layout_marginTop="21dp"
         android:background="@color/Accent1"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/postMoodEmotion" />
+
+    <CheckBox
+        android:id="@+id/postMoodLocation"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="21dp"
+        android:text="Location?"
+        android:textColor="@color/Accent1"
+        app:layout_constraintEnd_toStartOf="@+id/postMoodPublic"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <CheckBox
+        android:id="@+id/postMoodPublic"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="21dp"
+        android:text="Private?"
+        android:textColor="@color/Accent1"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/postMoodLocation"
+        app:layout_constraintTop_toTopOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -4,16 +4,29 @@ import android.Manifest;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.util.Log;
+import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.Intent;
+import android.graphics.BitmapFactory;
+import android.net.Uri;
+import android.os.Bundle;
+import android.provider.MediaStore;
+import android.util.Base64;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.SpinnerAdapter;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
@@ -25,12 +38,17 @@ import com.github.bytebandits.bithub.MainActivity;
 import com.github.bytebandits.bithub.model.MoodPost;
 import com.github.bytebandits.bithub.R;
 import com.github.bytebandits.bithub.controller.SessionManager;
+import com.github.bytebandits.bithub.model.Profile;
 import com.github.bytebandits.bithub.model.SocialSituation;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.firebase.firestore.Blob;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -45,6 +63,10 @@ public class PostMoodFragment extends Fragment {
     private Emotion selectedEmotion;
     private SocialSituation selectedSocialSituation;
     private String selectedDescription;
+    private boolean selectedLocation;
+    private boolean selectedPublic;
+    private Uri selectedImageUri;
+    private byte[] selectedImageByteArray = null;
 
     public static PostMoodFragment newInstance(MoodPost moodPost) {
         // Use Bundle to get info between fragments
@@ -68,6 +90,14 @@ public class PostMoodFragment extends Fragment {
         Button confirmButton = view.findViewById(R.id.postMoodConfirmButton);
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(getActivity());
         findCurrentLocation();
+        CheckBox editPublic = view.findViewById(R.id.postMoodPublic);
+        CheckBox editLocation = view.findViewById(R.id.postMoodLocation);
+        Button uploadButton = view.findViewById(R.id.postMoodUploadImageButton);
+        Button deleteButton = view.findViewById(R.id.postMoodDeleteImageButton);
+        deleteButton.setVisibility(View.GONE);
+        ImageView editImage = view.findViewById(R.id.postMoodImage);
+        SessionManager sessionManager = SessionManager.getInstance(requireContext());
+
         // Get the mood post if we need to edit a mood post
         String tag = getTag();
         Bundle bundle = getArguments();
@@ -135,39 +165,121 @@ public class PostMoodFragment extends Fragment {
             }
         });
 
+        // Handle user uploading an image
+        // Initialize the activity launcher
+        ActivityResultLauncher<Intent> imagePickerLauncher;
+        imagePickerLauncher = registerForActivityResult(
+                new ActivityResultContracts.StartActivityForResult(),
+                result -> {
+                    if (result.getResultCode() == Activity.RESULT_OK && result.getData() != null) {
+                        selectedImageUri = result.getData().getData(); // The first getData() returns and intent, and the second, the URI
+                        // Convert image Uri to Byte array for storage and check the file size of image
+                        try {
+                            selectedImageByteArray = uriToByteArray(selectedImageUri);
+                            // Display the image in the imageview if no exception is thrown
+                            editImage.setImageURI(selectedImageUri);
+                            deleteButton.setVisibility(View.VISIBLE);
+                        } catch (IllegalArgumentException e) {
+                            // Show an error message
+                            new AlertDialog.Builder(getContext())
+                                    .setTitle("Error")
+                                    .setMessage("Image is too large (Must be less than 65536 bytes). Please select a smaller file.")
+                                    .setNegativeButton("Ok", (dialog, which) -> {
+                                        dialog.cancel();
+                                    })
+                                    .show();
+                        } catch (IOException e) {
+                            // Show an error message
+                            new AlertDialog.Builder(getContext())
+                                    .setTitle("Error")
+                                    .setMessage("Image cannot be read")
+                                    .setNegativeButton("Ok", (dialog, which) -> {
+                                        dialog.cancel();
+                                    })
+                                    .show();
+                        }
+                    }
+                }
+        );
+        // Launch the activity on upload button click
+        uploadButton.setOnClickListener(v -> {
+            Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+            imagePickerLauncher.launch(intent);
+        });
+
+        // Only show location checkbox if we have location services enabled
+        if (!sessionManager.getProfile().getLocationServices()) {
+            editLocation.setVisibility(View.GONE);
+        }
+
         // If editing mood post, set the input views to mood post properties
         if (postToEdit != null) {
             selectSpinnerItemByValue(editEmotion, postToEdit.getEmotion());
             selectSpinnerItemByValue(editSocialSituation, postToEdit.getSocialSituation());
+            editLocation.setChecked(postToEdit.getLocation());
+            editPublic.setChecked(postToEdit.isPublic());
             if (postToEdit.getDescription() == null) { editDescription.setText(""); }
             else { editDescription.setText(postToEdit.getDescription()); }
+            if (postToEdit.getImage() != null) {
+                byte[] postImageByteArray = Base64.decode(postToEdit.getImage(), Base64.DEFAULT);
+                selectedImageByteArray = postImageByteArray; // So if the user doesn't upload a new image, it won't update the image to null
+                    editImage.setImageBitmap(BitmapFactory.decodeByteArray(postImageByteArray,
+                        0, postImageByteArray.length));
+                deleteButton.setVisibility(View.VISIBLE);
+            }
         }
+
+        // Delete image button logic
+        deleteButton.setOnClickListener(v ->{
+            editImage.setImageBitmap(null);
+            selectedImageByteArray = null;
+            selectedImageUri = null;
+            deleteButton.setVisibility(View.GONE);
+        });
 
         confirmButton.setOnClickListener(v -> {
             // Get inputs
+            selectedLocation = editLocation.isChecked();
+            selectedPublic = editPublic.isChecked();
             if (editDescription.getText().toString().isEmpty()) { selectedDescription = null; }
             else { selectedDescription = editDescription.getText().toString(); }
 
             // Check for valid description input (max 20 char. or 3 words), if valid, add mood post
-            if (selectedDescription != null &&
-                    ((moreThanThreeWords(selectedDescription)) || selectedDescription.length() > 20)) {
-                editDescription.setError("Description can be max 20 characters or 3 words");
+            if (selectedDescription != null && selectedDescription.length() > 200) {
+                editDescription.setError("Description can be max 200 characters");
             }
             else {
                 DatabaseManager databaseManager = DatabaseManager.getInstance();
                 // Add mood post to database
+                String selectedImageBase64String;
+                if (selectedImageByteArray != null) { selectedImageBase64String = Base64.encodeToString(selectedImageByteArray, Base64.DEFAULT); }
+                else { selectedImageBase64String = null; }
                 if (postToEdit == null) {
-                    SessionManager sessionManager = SessionManager.getInstance(requireContext());
-                    MoodPost moodPost = new MoodPost(selectedEmotion, sessionManager.getProfile(), true, selectedSocialSituation, selectedDescription, null);
-                    moodPost.setLatitude(currentLatitude);
-                    moodPost.setLongitude(currentLongitude);
+                    MoodPost moodPost = new MoodPost(selectedEmotion, sessionManager.getProfile(),
+                            selectedLocation, selectedSocialSituation, selectedDescription,
+                            selectedImageBase64String, selectedPublic);
                     databaseManager.addPost(moodPost, sessionManager.getUsername(), Optional.empty());
+                    // for some reason setting the longitude and latitude then adding post doesn't work so im updating the values after adding the post
+                    if (selectedLocation) {
+                        HashMap<String, Object> updateFields = new HashMap<>();
+                        updateFields.put("longitude", currentLongitude);
+                        updateFields.put("latitude", currentLatitude);
+                        databaseManager.updatePost(moodPost.getPostID(), updateFields, Optional.empty());
+                    }
                 }
                 else {
                     HashMap<String, Object> updateFields = new HashMap<>();
                     updateFields.put("socialSituation", selectedSocialSituation);
                     updateFields.put("emotion", selectedEmotion);
                     updateFields.put("description", selectedDescription);
+                    updateFields.put("image", selectedImageBase64String);
+                    updateFields.put("location", selectedLocation);
+                    updateFields.put("public", selectedPublic);
+                    // If user wants to set the location, and no previous location is assigned to the mood post, then assign new location
+                    if (selectedLocation && (postToEdit.getLongitude() == null || postToEdit.getLatitude() == null)) {
+                        updateFields.put("longitude", currentLongitude);
+                        updateFields.put("latitude", currentLatitude);
+                    }
                     databaseManager.updatePost(postToEdit.getPostID(), updateFields, Optional.empty());
                 }
                 // Go back to homepage fragment
@@ -208,23 +320,6 @@ public class PostMoodFragment extends Fragment {
     }
 
     /**
-     * Checks if a given string contains more than three words.
-     * This method is primarily used to validate description inputs
-     * to ensure they do not exceed a specified word limit.
-     *
-     * @param string The input string to be checked. Can be {@code null}.
-     * @return {@code true} if the string contains more than three words,
-     *         {@code false} if the string is {@code null} or contains
-     *         three or fewer words.
-     *
-    */
-    private boolean moreThanThreeWords(String string) {
-        if (string == null) { return false; }
-        String[] words = string.split("\\s+"); // Groups all whitespace together and splits by the whitespace
-        return (words.length > 3);
-    }
-
-    /**
      * Selects an item in a {@link Spinner} by matching its value.
      * This method iterates through the items in the spinner's adapter
      * and selects the item that matches the given value.
@@ -244,5 +339,38 @@ public class PostMoodFragment extends Fragment {
                 return;
             }
         }
+    }
+
+/**
+ * Converts the data from a file represented by a URI into a byte array.
+ * This method reads the file in chunks using a buffer to efficiently handle large files
+ * without loading the entire file into memory at once.
+ *
+ * @param uri     The URI of the file to be converted into a byte array.
+ * @return A byte array containing the data from the file.
+ * @throws IOException If an I/O error occurs while reading the file, such as if the URI
+ *                     cannot be opened or the file cannot be read.
+ * @throws IllegalArgumentException If the file size is greater than or equal to 65536 bytes.
+ */
+    private byte[] uriToByteArray(Uri uri) throws IOException, IllegalArgumentException{
+        // Get input output streams
+        InputStream inputStream = getContext().getContentResolver().openInputStream(uri);
+        ByteArrayOutputStream byteBuffer = new ByteArrayOutputStream();
+        // Read the image 1024 bytes at a time and throw error if image is too large
+        int bufferSize = 1024;
+        byte[] buffer = new byte[bufferSize];
+        int len;
+        int totalBytesRead = 0;
+        final int MAX_FILE_SIZE = 65536;
+        while ((len = inputStream.read(buffer)) != -1) {
+            totalBytesRead += len;
+            if (totalBytesRead >= MAX_FILE_SIZE) {
+                inputStream.close();
+                byteBuffer.close();
+                throw new IllegalArgumentException();
+            }
+            byteBuffer.write(buffer, 0, len);
+        }
+        return byteBuffer.toByteArray();
     }
 }

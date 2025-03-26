@@ -9,6 +9,7 @@ import org.json.JSONObject;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.Serializable;
 
 /**
  * This class represents a user profile in the Bithub application.
@@ -19,7 +20,7 @@ import java.io.ByteArrayOutputStream;
  * Provides methods to access and modify these attributes.
  */
 
-public class Profile {
+public class Profile implements Serializable {
     private String userID;
     private Boolean locationServices;
     private Bitmap image = null;
@@ -69,6 +70,15 @@ public class Profile {
      */
     public void disableLocationServices() {
         this.locationServices = false;
+    }
+
+    /**
+     * Returns the location service status.
+     *
+     * @return a boolean representing the location service status
+     */
+    public boolean getLocationServices() {
+        return locationServices;
     }
 
     /**

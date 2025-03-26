@@ -62,11 +62,21 @@
         app:layout_constraintTop_toBottomOf="@+id/detailedViewFeelingHeader" />
 
     <ImageView
-        android:id="@+id/detailedViewImage"
+        android:id="@+id/detailedViewMoodIcon"
         android:layout_width="250dp"
         android:layout_height="250dp"
         app:layout_constraintBottom_toTopOf="@+id/deleteButton"
         app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/detailedViewDescription"
+        app:layout_constraintVertical_bias="0.0"
+        tools:srcCompat="@tools:sample/backgrounds/scenic" />
+
+    <ImageView
+        android:id="@+id/detailedViewImage"
+        android:layout_width="250dp"
+        android:layout_height="250dp"
+        app:layout_constraintBottom_toTopOf="@+id/deleteButton"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/detailedViewDescription"
         app:layout_constraintVertical_bias="0.0"
         tools:srcCompat="@tools:sample/backgrounds/scenic" />
@@ -102,4 +112,12 @@
         android:text="Comments"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
+
+    <Button
+        android:id="@+id/viewProfileButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="View Profile"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="@+id/editButton" />
 </androidx.constraintlayout.widget.ConstraintLayout>

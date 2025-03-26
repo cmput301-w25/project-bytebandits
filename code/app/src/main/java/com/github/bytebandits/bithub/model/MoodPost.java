@@ -1,7 +1,6 @@
 package com.github.bytebandits.bithub.model;
 
-import android.graphics.Bitmap;
-import android.location.Location;
+import android.util.Log;
 
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
@@ -20,12 +19,14 @@ public class MoodPost implements Serializable {
     private Emotion emotion;
     private Profile profile;
     private Date dateTime;
-    private double latitude;
-    private double longitude;
+    private Boolean location;
+    private Double latitude;
+    private Double longitude;
     private SocialSituation situation;
     private String desc;
-    private Bitmap image;
+    private String image;
     private ArrayList<Comment> comments;
+    private boolean isPublic;
 
     public MoodPost() {}
 
@@ -47,19 +48,23 @@ public class MoodPost implements Serializable {
      *      Can be a max of 20 characters or 3 words.
      *      When null is passed, it means that no description is attached to the mood post.
      * @param image
-     *      A bitmap representing the image attached to the mood post
+     *      A Base64 string representing the image attached to the mood post.
      *      When null is passed, it means that no image is attached to the mood post.
+     * @param isPublic
+     *      boolean representing whether or not this mood is public or private.
      */
     public MoodPost(Emotion emotion, Profile profile, boolean showLocation, SocialSituation situation,
-                    String desc, Bitmap image ) {
+                    String desc, String image, boolean isPublic) {
         this.postID = UUID.randomUUID().toString();
         this.emotion = emotion;
         this.profile = profile;
         this.dateTime = new Date();
+        this.location = showLocation;
         this.situation = situation;
         this.desc = desc;
         this.image = image;
         this.comments = new ArrayList<>();
+        this.isPublic = isPublic;
     }
 
     /**
@@ -145,20 +150,64 @@ public class MoodPost implements Serializable {
         return timeFormatter.format(getPostedDateTime());
     }
 
-    public void setLatitude(double latitude) {
+    /**
+     * Returns the mood post's attached latitude
+     * @return
+     *      Returns a Double object representing the mood post's attached latitude.
+     *      Returns null when the mood post has no attached location.
+     */
+    public Double getLatitude() {
+        if (location) { return latitude; }
+        else { return null; }
+    }
+
+    /**
+     * Returns the mood post's attached longitude
+     * @return
+     *      Returns a Double object representing the mood post's attached latitude.
+     *      Returns null when the mood post has no attached location.
+     */
+    public Double getLongitude() {
+        if (!location) { return longitude; }
+        else { return null; }
+    }
+
+    /**
+     * Sets the mood post's attached Latitude
+     */
+    public void setLatitude(Double latitude) {
         this.latitude = latitude;
     }
 
-    public void setLongitude(double longitude) {
+    /**
+     * Sets the mood post's attached Longitude
+     */
+    public void setLongitude(Double longitude) {
         this.longitude = longitude;
     }
 
-    public double getLatitude() {
-        return this.latitude;
+    /**
+     * Returns the mood post's show location status
+     * @return
+     *      Returns a Boolean object representing the mood post's show location status.
+     */
+    public boolean getLocation() {
+        return location;
     }
 
-    public double getLongitude() {
-        return this.longitude;
+
+    /**
+     * Enables the mood post's attached location
+     */
+    public void showLocation() {
+        this.location = true;
+    }
+
+    /**
+     * Disables the mood post's attached location
+     */
+    public void hideLocation() {
+        this.location = false;
     }
 
     /**
@@ -168,7 +217,8 @@ public class MoodPost implements Serializable {
      *      Returns null when the mood post has no attached location.
      */
     public String getLocationString() {
-        return getLatitude() + "," + getLongitude();
+        if (getLatitude() == null || getLongitude() == null) { return null; }
+        else { return getLatitude() + "," + getLongitude(); }
     }
 
     /**
@@ -211,22 +261,22 @@ public class MoodPost implements Serializable {
     }
 
     /**
-     * Returns the mood post's attached image
+     * Returns the mood post's attached image as a Base 64 String
      *
      * @return
-     *      Returns a bitmap representing the image attached to the mood post
+     *      Returns a Base 64 String representing the image attached to the mood post
      *      Returns null when the mood post has no attached image.
      */
-    public Bitmap getImage() {
+    public String getImage() {
         return image;
     }
 
     /**
      * Sets the mood post's attached image
      * @param image
-     *      bitmap representing the image attached to the mood post
+     *      Base64 String representing the image attached to the mood post
      */
-    public void setMoodImage(Bitmap image) {
+    public void setImage(String image) {
         this.image = image;
     }
 
@@ -260,5 +310,23 @@ public class MoodPost implements Serializable {
                 break;
             }
         }
+    }
+
+    /**
+     * Returns if the mood post public or not
+     * @return
+     *      A boolean representing if the mood post is public or private
+     */
+    public boolean isPublic() {
+        return isPublic;
+    }
+
+    /**
+     * Sets the mood post to be public or private
+     * @param aPublic
+     *      A boolean representing if we want the mood post to be public or private. True for public, false for private
+     */
+    public void setPublic(boolean aPublic) {
+        isPublic = aPublic;
     }
 }
