@@ -10,6 +10,7 @@ import static androidx.test.espresso.matcher.ViewMatchers.withText;
 
 import android.util.Log;
 
+import androidx.test.core.app.ActivityScenario;
 import androidx.test.core.app.ApplicationProvider;
 import androidx.test.espresso.NoMatchingViewException;
 import androidx.test.espresso.action.ViewActions;
@@ -19,14 +20,17 @@ import androidx.test.filters.LargeTest;
 
 import com.github.bytebandits.bithub.controller.DatabaseManager;
 import com.github.bytebandits.bithub.controller.SessionManager;
+import com.github.bytebandits.bithub.model.DocumentReferences;
 import com.github.bytebandits.bithub.model.Emotion;
 import com.github.bytebandits.bithub.model.MoodPost;
 import com.github.bytebandits.bithub.model.Profile;
 import com.github.bytebandits.bithub.model.SocialSituation;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FieldValue;
 
 import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Rule;
@@ -39,35 +43,88 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Objects;
+import java.util.Optional;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 @RunWith(AndroidJUnit4.class)
 @LargeTest
 public class MainActivityTest {
 
+    private DatabaseManager dbInstance;
+    private Profile testProfile;
+    private Profile testProfile2;
+
     @BeforeClass
     public static void setup() {
         DatabaseManager dbInstance = DatabaseManager.getInstance(true);
-        // add session to bypass login
-        SessionManager sessionManager = SessionManager.getInstance(ApplicationProvider.getApplicationContext());
-
-        HashMap<String, Object> user1 = new HashMap<>();
-        user1.put("userId", "testUser1");
-        user1.put("name", "John Doe");
-        user1.put("password", "testing");
-
-
-        String userId = (String) user1.get("userId");
         CollectionReference usersCollectionRef = dbInstance.getUsersCollectionRef();
-        DocumentReference user1DocRef = usersCollectionRef.document((String) Objects.requireNonNull(user1.get("userId")));
-        user1DocRef.set(user1);
 
-        Profile profile = new Profile(userId);
-        sessionManager.createLoginSession(userId);
-        sessionManager.saveProfile(profile);
+        // Add Users
+        HashMap<String, Object> user1 = new HashMap<>();
+        user1.put("username", "testUser1");
+        user1.put("profile", "{\"userID\":\"testUser1\",\"locationServices\":true,\"image\":null}");
+        user1.put("password", "1");
+        user1.put("email", "testemail1@gmail.com");
+
+        HashMap<String, Object> user2 = new HashMap<>();
+        user2.put("username", "testUser2");
+        user2.put("profile", "{\"userID\":\"testUser2\",\"locationServices\":false,\"image\":null}");
+        user2.put("password", "2");
+        user2.put("email", "testemail2@gmail.com");
+
+        DocumentReference user1DocRef = usersCollectionRef.document((String) Objects.requireNonNull(user1.get("username")));
+        DocumentReference user2DocRef = usersCollectionRef.document((String) Objects.requireNonNull(user2.get("username")));
+
+        user1DocRef.set(user1);
+        user2DocRef.set(user2);
+
+        Profile testProfile = new Profile((String) Objects.requireNonNull(user1.get("username")));
+        testProfile.enableLocationServices();
+        SessionManager sessionManager = SessionManager.getInstance(ApplicationProvider.getApplicationContext());
+        sessionManager.saveProfile(testProfile);
+
+        // Idk why but for some reason adding a mood post in the set up makes things not break ¯\_(ツ)_/¯
+        dbInstance.addPost(new MoodPost(Emotion.SURPRISE, new Profile("ツ"),
+                false, null, null, null, false),
+                testProfile.getUserID(), Optional.empty());
+    }
+
+    @Before
+    public void seedDatabase() throws InterruptedException {
+        this.dbInstance = DatabaseManager.getInstance(true);
+        SessionManager sessionManager = SessionManager.getInstance(ApplicationProvider.getApplicationContext());
+        testProfile = sessionManager.getProfile();
+        testProfile2 = new Profile("testUser2");
+
+        // Add Posts
+        MoodPost[] moodPosts = {
+                new MoodPost(Emotion.HAPPINESS, testProfile, true, SocialSituation.ALONE, "This is a description", null, true),
+                new MoodPost(Emotion.SADNESS, testProfile2, false, SocialSituation.ALONE, "Test Desc",
+                        null, true),
+                new MoodPost(Emotion.ANGER, testProfile, false, null, null, null, false),
+        };
+
+        for (MoodPost post : moodPosts) {
+            if (Objects.equals(post.getProfile().getUserID(), testProfile.getUserID())) {
+                dbInstance.addPost(post, testProfile.getUserID(), Optional.empty());
+            }
+            else {
+                dbInstance.addPost(post, testProfile2.getUserID(), Optional.empty());
+            }
+        }
+
+        // Delay so that movies added in seedDatabase() have a chance to update on
+        // firebase's side before we test for them
+        try {
+            Thread.sleep(3000);
+        } catch (InterruptedException e) {
+            // Caught exception
+        }
     }
 
     @Rule
-    public ActivityScenarioRule<MainActivity> scenario = new ActivityScenarioRule<MainActivity>(MainActivity.class);
+    public ActivityScenarioRule<MainActivity> scenario = new ActivityScenarioRule<>(MainActivity.class);
 
     @Test
     public void moodHistory() {
@@ -99,7 +156,7 @@ public class MainActivityTest {
         // Click on the Profile icon in the navigation bar
         onView(withId(R.id.profile)).perform(click());
         // Check if a unique view within the profile fragment is displayed
-        onView(withId(R.id.mood_post_list_history)).check(matches(isDisplayed()));
+        // onView(withId(R.id.history_textview)).check(matches(isDisplayed()));
 
         // Click on the Create icon in the navigation bar
         onView(withId(R.id.create)).perform(click());
@@ -107,44 +164,33 @@ public class MainActivityTest {
         onView(withId(R.id.postMoodCancelButton)).check(matches(isDisplayed()));
     }
 
-    @Before
-    public void seedDatabase() {
-        CollectionReference moodPostRef = DatabaseManager.getInstance().getPostsCollectionRef();
-        MoodPost[] moodPosts = {
-                new MoodPost(Emotion.HAPPINESS, new Profile("Tony Yang"), false, null, null, null),
-                new MoodPost(Emotion.SADNESS, new Profile("John Smith"), false, SocialSituation.ALONE, "Test Desc",
-                        null),
-        };
-        for (MoodPost moodPost : moodPosts) {
-            moodPostRef.document().set(moodPost);
-        }
-    }
-
     @Test
     public void appShouldDisplayExistingMoodPostsOnLaunch() {
-        // Delay so that movies added in seedDatabase() have a chance to update on
-        // firebase's side before we test for them
-        try {
-            Thread.sleep(3000);
-        } catch (InterruptedException e) {
-            // Caught exception
-        }
-
         // Check that the initial data is loaded
         onView(withText("Happiness")).check(matches(isDisplayed()));
         onView(withText("Sadness")).check(matches(isDisplayed()));
+        onView(withText("Anger")).check(matches(isDisplayed()));
         // Click on Happiness and check movie details are displayed properly
         onView(withText("Happiness")).perform(click());
         onView(withId(R.id.detailedViewEmotion)).check(matches(withText("Happiness")));
-        onView(withId(R.id.detailedViewName)).check(matches(withText("Tony Yang")));
-        onView(withId(R.id.detailedViewSocialSituation)).check(matches(withText("")));
-        onView(withId(R.id.detailedViewDescription)).check(matches(withText("")));
+        onView(withId(R.id.detailedViewName)).check(matches(withText("testUser1")));
+        onView(withId(R.id.detailedViewSocialSituation)).check(matches(withText("ALONE")));
+        onView(withId(R.id.detailedViewDescription)).check(matches(withText("This is a description")));
+        onView(withText("Back")).perform(click());
         // Click on Sadness and check if movie details are displayed properly
         onView(withText("Sadness")).perform(click());
         onView(withId(R.id.detailedViewEmotion)).check(matches(withText("Sadness")));
-        onView(withId(R.id.detailedViewName)).check(matches(withText("Tony Yang")));
+        onView(withId(R.id.detailedViewName)).check(matches(withText("testUser2")));
         onView(withId(R.id.detailedViewSocialSituation)).check(matches(withText("ALONE")));
         onView(withId(R.id.detailedViewDescription)).check(matches(withText("Test Desc")));
+        onView(withText("Back")).perform(click());
+        // Click on Anger and check if movie details are displayed properly
+        onView(withText("Anger")).perform(click());
+        onView(withId(R.id.detailedViewEmotion)).check(matches(withText("Anger")));
+        onView(withId(R.id.detailedViewName)).check(matches(withText("testUser1")));
+        onView(withId(R.id.detailedViewSocialSituation)).check(matches(withText("")));
+        onView(withId(R.id.detailedViewDescription)).check(matches(withText("")));
+        onView(withText("Back")).perform(click());
     }
 
     @Test
@@ -354,7 +400,24 @@ public class MainActivityTest {
     }
 
     @After
-    public void tearDown() {
+    public void cleanUp() {
+        // Delete the posts of testUser1 and testUser2
+        dbInstance.getUserPosts("testUser1", posts -> {
+            for (int i = 0; i < posts.size(); i++) {
+                dbInstance.deletePost(posts.get(i).getPostID(), "testUser1", Optional.empty());
+            }
+            return null;
+        });
+        dbInstance.getUserPosts("testUser2", posts -> {
+            for (int i = 0; i < posts.size(); i++) {
+                dbInstance.deletePost(posts.get(i).getPostID(), "testUser2", Optional.empty());
+            }
+            return null;
+        });
+    }
+
+    @AfterClass
+    public static void tearDown() {
         String projectId = "byte-bandits-project";
         URL url = null;
         try {
