@@ -15,17 +15,6 @@
         android:focusable="auto"
         android:focusableInTouchMode="true">
 
-        <TextView
-            android:id="@+id/textView2"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Mood History"
-            android:textColor="@color/white"
-            android:textSize="20sp"
-            app:layout_constraintBottom_toTopOf="@+id/divider2"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent" />
-
         <View
             android:id="@+id/divider2"
             android:layout_width="match_parent"
@@ -46,16 +35,16 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.538"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/divider4" />
+            app:layout_constraintStart_toStartOf="parent" />
 
         <TextView
-            android:id="@+id/textView4"
+            android:id="@+id/username_textview"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="168dp"
             android:layout_marginTop="56dp"
             android:layout_marginEnd="185dp"
+            android:fontFamily="@font/stix_two_text_italic"
             android:text="John_Doe"
             android:textColor="@color/white"
             android:textSize="34sp"
@@ -85,19 +74,23 @@
             app:layout_constraintTop_toTopOf="parent"
             app:tint="@color/white" />
 
-        <View
-            android:id="@+id/divider3"
-            android:layout_width="409dp"
-            android:layout_height="1dp"
-            android:background="?android:attr/listDivider"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textView4" />
+        <TextView
+            android:id="@+id/textView2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:fontFamily="@font/dm_sans_extralight"
+            android:text="Mood History"
+            android:textColor="@color/white"
+            android:textSize="20sp"
+            app:layout_constraintBottom_toTopOf="@+id/divider2"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
 
         <View
             android:id="@+id/divider4"
             android:layout_width="204dp"
             android:layout_height="2dp"
-            android:layout_marginBottom="10dp"
             android:background="?android:attr/listDivider"
             android:backgroundTint="@color/white"
             android:foregroundTint="@color/white"
