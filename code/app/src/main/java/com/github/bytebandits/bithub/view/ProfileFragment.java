@@ -9,6 +9,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -46,6 +47,7 @@ public class ProfileFragment extends Fragment implements FilterDialog.FilterList
     private final ExecutorService executor = Executors.newSingleThreadExecutor();
     private final Handler mainHandler = new Handler(Looper.getMainLooper());
     private Profile profile;
+    private TextView usernameTextView;
     private static final String PROFILE = "profile";
 
     /**
@@ -126,9 +128,12 @@ public class ProfileFragment extends Fragment implements FilterDialog.FilterList
 
         settingsButton = view.findViewById(R.id.settings_button);
         filterButton = view.findViewById(R.id.filter_button);
+        usernameTextView = view.findViewById(R.id.username_textview);
 
         String userId = profile.getUserID();
         String loggedInUser = SessionManager.getInstance(requireContext()).getUsername();
+
+        usernameTextView.setText(username);
 
         // Hide settings button if viewing another user's profile
         if (!userId.equals(loggedInUser)) {
