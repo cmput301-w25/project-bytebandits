@@ -22,7 +22,7 @@ import java.io.Serializable;
 
 public class Profile implements Serializable {
     private String userID;
-    private Boolean locationServices;
+    private Boolean locationServices = false;
     private Bitmap image = null;
 
     public Profile() {
