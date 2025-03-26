@@ -21,21 +21,23 @@ import java.util.Objects;
 
 public class CommentArrayAdapter extends ArrayAdapter<Comment> {
     private DeleteCommentListener listener;
+
     public CommentArrayAdapter(Context context, ArrayList<Comment> comments, DeleteCommentListener listener) {
         super(context, 0, comments);
         this.listener = listener;
     }
 
-    // Listener interface that will be implemented in and used to communicate with comments fragment
+    // Listener interface that will be implemented in and used to communicate with
+    // comments fragment
     interface DeleteCommentListener {
         void deleteComment(int position);
     }
 
     @NonNull
     @Override
-    public View getView(int position, @Nullable View convertView, @NonNull ViewGroup
-            parent) {
-        // Check if there is a view in convertView we can reuse, if not create a new view
+    public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
+        // Check if there is a view in convertView we can reuse, if not create a new
+        // view
         View view;
         if (convertView == null) {
             view = LayoutInflater.from(getContext()).inflate(R.layout.comment_content,
@@ -57,10 +59,10 @@ public class CommentArrayAdapter extends ArrayAdapter<Comment> {
         dateView.setText(comment.getFormattedPostedDate());
         timeView.setText(comment.getFormattedPostedTime());
         commentTextView.setText(comment.getText());
-        if (!Objects.equals(comment.getProfile().getUserID(), SessionManager.getInstance(getContext()).getProfile().getUserID())) {
+        if (!Objects.equals(comment.getProfile().getUserID(),
+                SessionManager.getInstance(getContext()).getProfile().getUserID())) {
             deleteButton.setVisibility(View.GONE);
-        }
-        else {
+        } else {
             // If this is our comment, give option to delete
             deleteButton.setOnClickListener(new View.OnClickListener() {
                 @Override

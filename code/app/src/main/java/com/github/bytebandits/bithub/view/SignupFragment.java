@@ -75,19 +75,19 @@ public class SignupFragment extends Fragment {
      */
     private void authenticate() {
         if (!(isEmptyText(userText) || isEmptyText(emailText) || isEmptyText(emailText) || isEmptyText(pswrdContext))) {
-            String username = userText.getText().toString();
+            String userId = userText.getText().toString();
             String password = pswrdText.getText().toString();
             String email = emailText.getText().toString();
 
             // Run DB check in background thread
             executor.execute(() -> {
-                DatabaseManager.getInstance().getUser(username, user -> {
+                DatabaseManager.getInstance().getUser(userId, user -> {
                     boolean userExists = (user != null);
 
                     // Switch to UI thread to handle results
                     mainHandler.post(() -> {
                         Log.d("SignupFragment", "User exists: " + userExists);
-                        handleAuthenticationResult(userExists, username, email, password);
+                        handleAuthenticationResult(userExists, userId, email, password);
                     });
                 });
             });
@@ -101,23 +101,23 @@ public class SignupFragment extends Fragment {
     /**
      * Handles the authentication result after checking the database.
      */
-    private void handleAuthenticationResult(boolean userExists, String username, String email, String password) {
-        boolean usernameReqsValid = !username.contains("@");
+    private void handleAuthenticationResult(boolean userExists, String userId, String email, String password) {
+        boolean userIdReqsValid = !userId.contains("@");
         boolean pswrdMatch = password.equals(pswrdContext.getText().toString());
 
-        if (!userExists && usernameReqsValid && pswrdMatch) {
+        if (!userExists && userIdReqsValid && pswrdMatch) {
             Log.d("SignupFragment", "Credentials are valid. Creating user...");
 
             HashMap<String, Object> userDetails = new HashMap<>();
-            userDetails.put("username", username);
+            userDetails.put("userId", userId);
             userDetails.put("email", email);
             userDetails.put("password", password);
-            userDetails.put("profile", new Profile(username).toJson());
+            userDetails.put("profile", new Profile(userId).toJson());
 
-            DatabaseManager.getInstance().addUser(username, userDetails, Optional.empty());
+            DatabaseManager.getInstance().addUser(userId, userDetails, Optional.empty());
 
             ((StartupActivity) requireActivity()).loginFragment();
-        } else if (!usernameReqsValid) {
+        } else if (!userIdReqsValid) {
             createDialog("Username cannot have '@' within it").show();
         } else {
             createDialog("Invalid information! Username or email may already exist.").show();
