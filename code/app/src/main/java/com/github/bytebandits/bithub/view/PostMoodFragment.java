@@ -258,7 +258,7 @@ public class PostMoodFragment extends Fragment {
                     MoodPost moodPost = new MoodPost(selectedEmotion, sessionManager.getProfile(),
                             selectedLocation, selectedSocialSituation, selectedDescription,
                             selectedImageBase64String, selectedPublic);
-                    databaseManager.addPost(moodPost, sessionManager.getUsername(), Optional.empty());
+                    databaseManager.addPost(moodPost, sessionManager.getProfile().getUserID(), Optional.empty());
                     // for some reason setting the longitude and latitude then adding post doesn't work so im updating the values after adding the post
                     if (selectedLocation) {
                         HashMap<String, Object> updateFields = new HashMap<>();

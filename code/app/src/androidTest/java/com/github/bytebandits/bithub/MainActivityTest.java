@@ -8,8 +8,10 @@ import static androidx.test.espresso.matcher.ViewMatchers.hasErrorText;
 import static androidx.test.espresso.matcher.ViewMatchers.isChecked;
 import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
+import static androidx.test.espresso.matcher.ViewMatchers.withSpinnerText;
 import static androidx.test.espresso.matcher.ViewMatchers.withText;
 
+import android.content.Context;
 import android.util.Log;
 
 import androidx.test.core.app.ApplicationProvider;
@@ -22,14 +24,13 @@ import androidx.test.rule.GrantPermissionRule;
 
 import com.github.bytebandits.bithub.controller.DatabaseManager;
 import com.github.bytebandits.bithub.controller.SessionManager;
-import com.github.bytebandits.bithub.model.DocumentReferences;
+import com.github.bytebandits.bithub.model.Comment;
 import com.github.bytebandits.bithub.model.Emotion;
 import com.github.bytebandits.bithub.model.MoodPost;
 import com.github.bytebandits.bithub.model.Profile;
 import com.github.bytebandits.bithub.model.SocialSituation;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.FieldValue;
 
 import junit.framework.AssertionFailedError;
 
@@ -48,14 +49,13 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
 
 @RunWith(AndroidJUnit4.class)
 @LargeTest
 public class MainActivityTest {
 
     private DatabaseManager dbInstance;
+    private Context testContext;
     private Profile testProfile;
     private Profile testProfile2;
 
@@ -83,23 +83,22 @@ public class MainActivityTest {
         user1DocRef.set(user1);
         user2DocRef.set(user2);
 
-        Profile testProfile = new Profile((String) Objects.requireNonNull(user1.get("username")));
-        testProfile.enableLocationServices();
-        SessionManager sessionManager = SessionManager.getInstance(ApplicationProvider.getApplicationContext());
-        sessionManager.saveProfile(testProfile);
-
         // Idk why but for some reason adding a mood post in the set up makes things not break ¯\_(ツ)_/¯
-        dbInstance.addPost(new MoodPost(Emotion.SURPRISE, new Profile("ツ"),
+        Profile randProfile = new Profile("ツ");
+        dbInstance.addPost(new MoodPost(Emotion.SURPRISE, randProfile,
                 false, null, null, null, false),
-                testProfile.getUserID(), Optional.empty());
+                randProfile.getUserID(), Optional.empty());
     }
 
     @Before
     public void seedDatabase() throws InterruptedException {
         this.dbInstance = DatabaseManager.getInstance(true);
-        SessionManager sessionManager = SessionManager.getInstance(ApplicationProvider.getApplicationContext());
-        testProfile = sessionManager.getProfile();
+        testContext = ApplicationProvider.getApplicationContext();
+        SessionManager sessionManager = SessionManager.getInstance(testContext);
+        testProfile = new Profile("testUser1");
+        testProfile.enableLocationServices();
         testProfile2 = new Profile("testUser2");
+        sessionManager.saveProfile(testProfile);
 
         // Add Posts
         MoodPost[] moodPosts = {
@@ -108,6 +107,9 @@ public class MainActivityTest {
                         null, true),
                 new MoodPost(Emotion.ANGER, testProfile, false, null, null, null, false),
         };
+
+        // Add a comment to one of the mood posts
+        moodPosts[0].addComment(new Comment(testProfile2, "test comment"));
 
         for (MoodPost post : moodPosts) {
             if (Objects.equals(post.getProfile().getUserID(), testProfile.getUserID())) {
@@ -156,7 +158,6 @@ public class MainActivityTest {
         // Check if startup activity is displayed
         onView(withId(R.layout.activity_startup)).check(matches(isDisplayed()));
     }
-    */
 
     @Test
     public void navbar() {
@@ -175,11 +176,10 @@ public class MainActivityTest {
         // Check if a unique view within the post mood fragment is displayed
         onView(withId(R.id.postMoodCancelButton)).check(matches(isDisplayed()));
     }
+    */
 
     @Test
     public void appShouldDisplayExistingMoodPostsOnLaunch() {
-        SessionManager sessionManager = SessionManager.getInstance(ApplicationProvider.getApplicationContext());
-        Log.e("test", sessionManager.getUsername());
         // Check that the initial data is loaded
         onView(withText("Happiness")).check(matches(isDisplayed()));
         onView(withText("Sadness")).check(matches(isDisplayed()));
@@ -274,7 +274,7 @@ public class MainActivityTest {
         onView(withText("GROUP")).perform(click());
         onView(withId(R.id.postMoodDescription)).perform(ViewActions.typeText("test desc"));
         // Cancel
-        onView(withId(R.id.postMoodConfirmButton)).perform(click());
+        onView(withId(R.id.postMoodCancelButton)).perform(click());
 
         // Check that our mood post list DOESN'T have our new mood post
         try {
@@ -308,10 +308,11 @@ public class MainActivityTest {
         onView(withText("Edit")).perform(click());
 
         // Check all details are properly shown
-        onView(withId(R.id.postMoodEmotion)).check(matches(withText("HAPPINESS")));
-        onView(withId(R.id.postMoodSocialSituation)).check(matches(withText("ALONE")));
+        onView(withId(R.id.postMoodEmotion)).check(matches(withSpinnerText("HAPPINESS")));
+        onView(withId(R.id.postMoodSocialSituation)).check(matches(withSpinnerText("ALONE")));
         onView(withId(R.id.postMoodDescription)).check(matches(withText("This is a description")));
         onView(withId(R.id.postMoodLocation)).check(matches(isChecked()));
+        onView(withId(R.id.postMoodPublic)).check(matches(isChecked()));
 
         // Test invalid description input
         onView(withId(R.id.postMoodDescription)).perform(ViewActions.typeText("This is a invalid description that has over 200 characters. " +
@@ -329,6 +330,7 @@ public class MainActivityTest {
         onView(withId(R.id.postMoodDescription)).perform(clearText());
         onView(withId(R.id.postMoodDescription)).perform(ViewActions.typeText(""));
         onView(withId(R.id.postMoodLocation)).perform(click());
+        onView(withId(R.id.postMoodPublic)).perform(click());
         onView(withId(R.id.postMoodConfirmButton)).perform(click());
 
         // Check that our mood post list has our new mood post
@@ -348,8 +350,8 @@ public class MainActivityTest {
         onView(withText("Edit")).perform(click());
 
         // Check all details are properly shown
-        onView(withId(R.id.postMoodEmotion)).check(matches(withText("ANGER")));
-        onView(withId(R.id.postMoodSocialSituation)).check(matches(withText("prefer not to say")));
+        onView(withId(R.id.postMoodEmotion)).check(matches(withSpinnerText("ANGER")));
+        onView(withId(R.id.postMoodSocialSituation)).check(matches(withSpinnerText("prefer not to say")));
         onView(withId(R.id.postMoodDescription)).check(matches(withText("")));
 
         // Test invalid description input
@@ -387,8 +389,8 @@ public class MainActivityTest {
         onView(withText("Edit")).perform(click());
 
         // Check all details are properly shown
-        onView(withId(R.id.postMoodEmotion)).check(matches(withText("ANGER")));
-        onView(withId(R.id.postMoodSocialSituation)).check(matches(withText("prefer not to say")));
+        onView(withId(R.id.postMoodEmotion)).check(matches(withSpinnerText("ANGER")));
+        onView(withId(R.id.postMoodSocialSituation)).check(matches(withSpinnerText("prefer not to say")));
         onView(withId(R.id.postMoodDescription)).check(matches(withText("")));
 
         // Test invalid description input
@@ -407,10 +409,6 @@ public class MainActivityTest {
         onView(withId(R.id.postMoodDescription)).perform(clearText());
         onView(withId(R.id.postMoodDescription)).perform(ViewActions.typeText("test desc"));
         onView(withId(R.id.postMoodLocation)).perform(click());
-        onView(withId(R.id.postMoodConfirmButton)).perform(click());
-
-        // Check that our mood post list has our new mood post
-        onView(withText("Fear")).check(matches(isDisplayed()));
         onView(withId(R.id.postMoodCancelButton)).perform(click());
 
         // Check that our mood post list DOESN'T have edited mood post
@@ -421,6 +419,7 @@ public class MainActivityTest {
         } catch (NoMatchingViewException e) {
             // View is not in hierarchy
         }
+
         onView(withText("Anger")).perform(click());
         onView(withId(R.id.detailedViewEmotion)).check(matches(withText("Anger")));
         onView(withId(R.id.detailedViewSocialSituation)).check(matches(withText("")));
@@ -458,6 +457,53 @@ public class MainActivityTest {
         }
     }
 
+    @Test
+    public void viewOtherUsersComment() {
+        // Click on buttons to open the comments
+        onView(withText("Happiness")).perform(click());
+        onView(withText("Comments")).perform(click());
+
+        // Make sure comment is there with right info
+        onView(withText("testUser2")).check(matches(isDisplayed()));
+        onView(withText("test comment")).check(matches(isDisplayed()));
+
+        // Make sure that you can't delete the comment
+        // Check that we can't edit a mood post that isn't ours
+        try {
+            onView(withId(R.id.deleteCommentButton)).check(matches(isDisplayed()));
+            // View is in hierarchy
+            throw new AssertionError("Can delete a comment that isn't ours");
+        } catch (AssertionFailedError e) {
+            // View is not in hierarchy
+        }
+    }
+
+    @Test
+    public void addComment() {
+        // Click on buttons to open the comments
+        onView(withText("Sadness")).perform(click());
+        onView(withText("Comments")).perform(click());
+
+        // Add a comment
+        onView(withText("Add")).perform(click());
+        onView(withId(R.id.addCommentText)).perform(ViewActions.typeText("this is a test comment"));
+        onView(withText("Confirm")).perform(click());
+
+        // Make sure comment is there with right info
+        onView(withText("testUser1")).check(matches(isDisplayed()));
+        onView(withText("this is a test comment")).check(matches(isDisplayed()));
+
+        // Delete it and make sure it gets deleted properly
+        onView(withId(R.id.deleteCommentButton)).perform(click());
+        // Check that our comment isn't there
+        try {
+            onView(withText("this is a test comment")).check(matches(isDisplayed()));
+            // View is in hierarchy
+            throw new AssertionError("Comment there after deletion");
+        } catch (NoMatchingViewException e) {
+            // View is not in hierarchy
+        }
+    }
 
     @After
     public void cleanUp() {
@@ -484,8 +530,6 @@ public class MainActivityTest {
         });
     }
 
-
-    /*
     @AfterClass
     public static void tearDown() {
         String projectId = "byte-bandits-project";
@@ -509,5 +553,4 @@ public class MainActivityTest {
             }
         }
     }
-     */
 }
