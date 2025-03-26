@@ -65,11 +65,11 @@ public class SettingsDialog {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if (isChecked) {
-                    // Checkbox is checked
+                    // Location Services Enabled
                     userProfile.enableLocationServices();
                     Toast.makeText(context, "Location Services Enabled", Toast.LENGTH_SHORT).show();
                 } else {
-                    // Checkbox is unchecked
+                    // Location Services Disabled
                     userProfile.disableLocationServices();
                     Toast.makeText(context, "Location Services Disabled", Toast.LENGTH_SHORT).show();
                 }
