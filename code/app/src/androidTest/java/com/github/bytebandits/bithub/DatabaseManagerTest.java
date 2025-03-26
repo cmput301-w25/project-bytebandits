@@ -22,6 +22,8 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.*;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 import static org.junit.Assert.*;
 
@@ -81,7 +83,7 @@ public class DatabaseManagerTest {
     @Test
     public void testGetUser_Success() {
         Log.d("DatabaseManagerTest", "Calling getUser...");
-        dbInstance.getUser(testProfile.getUserId(), user -> {
+        dbInstance.getUser(testProfile.getUserID(), user -> {
             Log.d("DatabaseManagerTest", "Callback executed");
             String name = (String) user.get("name");
             assertTrue(name.matches("John Doe"));
@@ -106,10 +108,12 @@ public class DatabaseManagerTest {
                 null, true
         );
 
-        dbInstance.addPost(post, testProfile.getUserId(),Optional.of(Assert::assertTrue));
+        dbInstance.addPost(post, testProfile.getUserID(),Optional.of(Assert::assertTrue));
 
         // Testing to see if post details are saved properly
-        dbInstance.getUserPosts(testProfile.getUserId(), posts -> {
+        dbInstance.getUserPosts(testProfile.getUserID(), posts -> {
+            assertEquals(2, posts.size());
+
             MoodPost newlyAddedPost = posts.getLast();
             assertEquals(Emotion.SHAME, newlyAddedPost.getEmotion());
             return null;
@@ -119,7 +123,7 @@ public class DatabaseManagerTest {
     @Test
     public void testUpdatePost_Success() {
         MoodPost post = new MoodPost(Emotion.SURPRISE, testProfile, false, null, "Test Post", null, true);
-        dbInstance.addPost(post, testProfile.getUserId(), Optional.empty());
+        dbInstance.addPost(post, testProfile.getUserID(), Optional.empty());
 
         HashMap<String, Object> updateFields = new HashMap<>();
         updateFields.put("description", "Updated Description");
@@ -131,9 +135,9 @@ public class DatabaseManagerTest {
     @Test
     public void testDeletePost_Success() {
         MoodPost post = new MoodPost(Emotion.ANGER, testProfile, false, null, "To be deleted", null, true);
-        dbInstance.addPost(post, testProfile.getUserId(), Optional.empty());
+        dbInstance.addPost(post, testProfile.getUserID(), Optional.empty());
 
-        dbInstance.deletePost(post.getPostID(), testProfile.getUserId(), Optional.of(success -> assertTrue(success)));
+        dbInstance.deletePost(post.getPostID(), testProfile.getUserID(), Optional.of(success -> assertTrue(success)));
     }
 
     @Test
@@ -154,7 +158,7 @@ public class DatabaseManagerTest {
 
     @Test
     public void testGetUserPosts_Success() {
-        dbInstance.getUserPosts(testProfile.getUserId(), posts -> {
+        dbInstance.getUserPosts(testProfile.getUserID(), posts -> {
             assertNotNull(posts);
             assertFalse(posts.isEmpty());
             return null;

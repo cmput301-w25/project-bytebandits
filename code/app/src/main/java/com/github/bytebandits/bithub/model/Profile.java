@@ -21,7 +21,7 @@ import java.io.Serializable;
  */
 
 public class Profile implements Serializable {
-    private String userId;
+    private String userID;
     private Boolean locationServices = false;
     private Bitmap image = null;
 
@@ -31,44 +31,45 @@ public class Profile implements Serializable {
     /**
      * Constructs a Profile object with the specified user ID.
      *
-     * @param userId The unique identifier for the user.
+     * @param userID The unique identifier for the user.
      */
-    public Profile(String userId) {
-        this.userId = userId;
+    public Profile(String userID) {
+        this.userID = userID;
     }
 
     /**
      * Constructs a Profile object with the specified user ID and profile picture.
      *
-     * @param userId The unique identifier for the user.
-     * @param image  The user's profile picture.
+     * @param userID The unique identifier for the user.
+     * @param image The user's profile picture.
      */
-    public Profile(String userId, Bitmap image) {
-        this.userId = userId;
+    public Profile(String userID, Bitmap image) {
+        this.userID = userID;
         this.image = image;
     }
+
 
     /**
      * Returns the current user ID.
      *
      * @return The user's unique identifier.
      */
-    public String getUserId() {
-        return userId;
+    public String getUserID() {
+        return userID;
     }
 
     /**
      * Enables the user's location services.
      */
     public void enableLocationServices() {
-        this.locationServices = Boolean.TRUE;
+        this.locationServices = true;
     }
 
     /**
      * Disables the user's location services.
      */
     public void disableLocationServices() {
-        this.locationServices = Boolean.FALSE;
+        this.locationServices = false;
     }
 
     /**
@@ -76,8 +77,8 @@ public class Profile implements Serializable {
      *
      * @return a boolean representing the location service status
      */
-    public Boolean getLocationServices() {
-        return this.locationServices;
+    public boolean getLocationServices() {
+        return locationServices;
     }
 
     /**
@@ -98,7 +99,6 @@ public class Profile implements Serializable {
         this.image = image;
     }
 
-
     /**
      * Converts the profile details to JSON
      *
@@ -107,8 +107,8 @@ public class Profile implements Serializable {
     public String toJson() {
         JSONObject json = new JSONObject();
         try {
-            // Add userId if it's not null, otherwise use JSONObject.NULL
-            json.put("userId", userId != null ? userId : JSONObject.NULL);
+            // Add userID if it's not null, otherwise use JSONObject.NULL
+            json.put("userID", userID != null ? userID : JSONObject.NULL);
 
             // Add locationServices if it's not null, otherwise use JSONObject.NULL
             json.put("locationServices", locationServices != null ? locationServices : JSONObject.NULL);
@@ -130,20 +130,19 @@ public class Profile implements Serializable {
         return json.toString();
     }
 
-    /**
-     * Converts a JSON string into a Profile object.
-     * 
-     * @param jsonString JSON representation of the Profile.
-     * @return A Profile object or null if parsing fails.
-     */
+
+        /**
+         * Converts a JSON string into a Profile object.
+         * @param jsonString JSON representation of the Profile.
+         * @return A Profile object or null if parsing fails.
+         */
     public Profile fromJson(String jsonString) {
         try {
             JSONObject json = new JSONObject(jsonString);
 
             // Update locationServices
             this.locationServices = json.has("locationServices") && !json.isNull("locationServices")
-                    ? json.getBoolean("locationServices")
-                    : null;
+                    ? json.getBoolean("locationServices") : null;
 
             // Decode and update image if present
             if (json.has("image") && !json.isNull("image")) {
