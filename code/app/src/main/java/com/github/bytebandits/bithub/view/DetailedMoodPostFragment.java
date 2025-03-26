@@ -98,10 +98,7 @@ public class DetailedMoodPostFragment extends DialogFragment{
         }
         else {
             viewProfileButton.setOnClickListener(v -> {
-                ProfileFragment pf = new ProfileFragment();
-                pf.setOtherProfile(moodPost.getProfile());
-                pf.setIsOtherProfile(true);
-                ((MainActivity) requireActivity()).replaceFragment(pf);
+                // ((MainActivity) requireActivity()).replaceFragment(ProfileFragment.newInstance(moodPost.getProfile()));
                 dialog.dismiss();
             });
             deleteButton.setVisibility(View.GONE);
