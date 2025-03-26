@@ -7,21 +7,56 @@
     android:gravity="center_horizontal"
     android:orientation="vertical">
 
+    <ImageButton
+        android:id="@+id/close_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:layout_marginRight="184dp"
+        android:background="@color/Primary1"
+        app:srcCompat="@drawable/baseline_close_24" />
+
     <TextView
         android:id="@+id/filter_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="40dp"
-        android:layout_marginBottom="20dp"
-        android:text="Filter"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="25dp"
+        android:text="Filter Mood Posts"
         android:textAllCaps="false"
         android:textColor="@color/white"
-        android:textSize="34dp" />
+        android:textSize="35dp" />
+
+    <EditText
+        android:id="@+id/search_edit_text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="0"
+        android:baselineAligned="false"
+        android:ems="10"
+        android:hint="Search..."
+        android:inputType="text"
+        android:textAppearance="@style/Base.Theme.BitHub"
+        android:textColor="@color/white"
+        android:textColorHint="#6F6565"
+        android:textSize="24sp" />
 
     <RadioGroup
         android:id="@+id/radioGroup"
-        android:layout_width="match_parent"
-        android:layout_height="482dp">
+        android:layout_width="wrap_content"
+        android:layout_height="629dp">
+
+        <View
+            android:id="@+id/view"
+            android:layout_width="match_parent"
+            android:layout_height="20dp"
+            android:layout_weight="2" />
+
+        <View
+            android:id="@+id/divider"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="?android:attr/listDivider" />
 
         <RadioButton
             android:id="@+id/all_radio_button"
@@ -105,17 +140,23 @@
             android:textSize="25dp" />
 
         <View
+            android:id="@+id/view2"
+            android:layout_width="match_parent"
+            android:layout_height="26dp"
+            android:layout_weight="2" />
+
+        <View
             android:id="@+id/divider8"
             android:layout_width="match_parent"
             android:layout_height="1dp"
-            android:layout_weight="1"
+            android:layout_weight="0"
             android:background="?android:attr/listDivider"
             android:backgroundTint="@color/white" />
 
         <RadioButton
             android:id="@+id/last_week_radio_button"
             android:layout_width="match_parent"
-            android:layout_height="48dp"
+            android:layout_height="wrap_content"
             android:layout_weight="1"
             android:height="48dp"
             android:minHeight="48dp"
@@ -124,22 +165,5 @@
             android:textSize="25dp" />
 
     </RadioGroup>
-
-    <View
-        android:id="@+id/divider6"
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:background="?android:attr/listDivider" />
-
-    <EditText
-        android:id="@+id/search_edit_text"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:ems="10"
-        android:hint="Search..."
-        android:inputType="text"
-        android:textColor="@color/white"
-        android:textColorHint="#6F6565"
-        android:textSize="24sp" />
 
 </LinearLayout>

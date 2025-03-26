@@ -220,7 +220,6 @@ public class ProfileFragment extends Fragment implements FilterDialog.FilterList
                 }
             }
         });
-
         return view;
     }
 

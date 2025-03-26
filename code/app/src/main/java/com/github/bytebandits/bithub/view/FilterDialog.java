@@ -7,6 +7,7 @@ import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.RadioGroup;
 
 import com.github.bytebandits.bithub.R;
@@ -42,8 +43,11 @@ public class FilterDialog {
                 .setCancelable(true)
                 .create();
 
+        ImageButton closeButton = dialogView.findViewById(R.id.close_button);
         RadioGroup radioGroup = dialogView.findViewById(R.id.radioGroup);
         EditText searchEditText = dialogView.findViewById(R.id.search_edit_text);
+
+        closeButton.setOnClickListener(v -> filterDialog.dismiss());
 
         // Handle radio button selections
         radioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {

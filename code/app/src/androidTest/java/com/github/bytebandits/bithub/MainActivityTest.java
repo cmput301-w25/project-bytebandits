@@ -77,13 +77,16 @@ public class MainActivityTest {
         user2.put("password", "2");
         user2.put("email", "testemail2@gmail.com");
 
-        DocumentReference user1DocRef = usersCollectionRef.document((String) Objects.requireNonNull(user1.get("username")));
-        DocumentReference user2DocRef = usersCollectionRef.document((String) Objects.requireNonNull(user2.get("username")));
+        DocumentReference user1DocRef = usersCollectionRef
+                .document((String) Objects.requireNonNull(user1.get("username")));
+        DocumentReference user2DocRef = usersCollectionRef
+                .document((String) Objects.requireNonNull(user2.get("username")));
 
         user1DocRef.set(user1);
         user2DocRef.set(user2);
 
-        // Idk why but for some reason adding a mood post in the set up makes things not break ¯\_(ツ)_/¯
+        // Idk why but for some reason adding a mood post in the set up makes things not
+        // break ¯\_(ツ)_/¯
         Profile randProfile = new Profile("ツ");
         dbInstance.addPost(new MoodPost(Emotion.SURPRISE, randProfile,
                 false, null, null, null, false),
@@ -102,7 +105,8 @@ public class MainActivityTest {
 
         // Add Posts
         MoodPost[] moodPosts = {
-                new MoodPost(Emotion.HAPPINESS, testProfile, true, SocialSituation.ALONE, "This is a description", null, true),
+                new MoodPost(Emotion.HAPPINESS, testProfile, true, SocialSituation.ALONE, "This is a description", null,
+                        true),
                 new MoodPost(Emotion.SADNESS, testProfile2, false, SocialSituation.ALONE, "Test Desc",
                         null, true),
                 new MoodPost(Emotion.ANGER, testProfile, false, null, null, null, false),
@@ -114,8 +118,7 @@ public class MainActivityTest {
         for (MoodPost post : moodPosts) {
             if (Objects.equals(post.getProfile().getUserID(), testProfile.getUserID())) {
                 dbInstance.addPost(post, testProfile.getUserID(), Optional.empty());
-            }
-            else {
+            } else {
                 dbInstance.addPost(post, testProfile2.getUserID(), Optional.empty());
             }
         }
@@ -135,48 +138,47 @@ public class MainActivityTest {
     @Rule
     public GrantPermissionRule permissionRule = GrantPermissionRule.grant(
             android.Manifest.permission.ACCESS_FINE_LOCATION,
-            android.Manifest.permission.ACCESS_COARSE_LOCATION
-    );
+            android.Manifest.permission.ACCESS_COARSE_LOCATION);
 
     /*
-    @Test
-    public void moodHistory() {
-        // Click on the profile icon in the navigation bar
-        onView(withId(R.id.profile)).perform(click());
-
-        // Check if mood post list history is displayed
-        onView(withId(R.id.mood_post_list_history)).check(matches(isDisplayed()));
-    }
-
-    @Test
-    public void logout() {
-        // Click on the profile icon in the navigation bar
-        onView(withId(R.id.profile)).perform(click());
-        onView(withId(R.id.settings_button)).perform(click());
-        onView(withId(R.id.logout_button)).perform(click());
-
-        // Check if startup activity is displayed
-        onView(withId(R.layout.activity_startup)).check(matches(isDisplayed()));
-    }
-
-    @Test
-    public void navbar() {
-        // Click on the Home icon in the navigation bar
-        onView(withId(R.id.home)).perform(click());
-        // Check if a unique view within the home fragment is displayed
-        onView(withId(R.id.moodIcon)).check(matches(isDisplayed()));
-
-        // Click on the Profile icon in the navigation bar
-        onView(withId(R.id.profile)).perform(click());
-        // Check if a unique view within the profile fragment is displayed
-        // onView(withId(R.id.history_textview)).check(matches(isDisplayed()));
-
-        // Click on the Create icon in the navigation bar
-        onView(withId(R.id.create)).perform(click());
-        // Check if a unique view within the post mood fragment is displayed
-        onView(withId(R.id.postMoodCancelButton)).check(matches(isDisplayed()));
-    }
-    */
+     * @Test
+     * public void moodHistory() {
+     * // Click on the profile icon in the navigation bar
+     * onView(withId(R.id.profile)).perform(click());
+     * 
+     * // Check if mood post list history is displayed
+     * onView(withId(R.id.mood_post_list_history)).check(matches(isDisplayed()));
+     * }
+     * 
+     * @Test
+     * public void logout() {
+     * // Click on the profile icon in the navigation bar
+     * onView(withId(R.id.profile)).perform(click());
+     * onView(withId(R.id.settings_button)).perform(click());
+     * onView(withId(R.id.logout_button)).perform(click());
+     * 
+     * // Check if startup activity is displayed
+     * onView(withId(R.layout.activity_startup)).check(matches(isDisplayed()));
+     * }
+     * 
+     * @Test
+     * public void navbar() {
+     * // Click on the Home icon in the navigation bar
+     * onView(withId(R.id.home)).perform(click());
+     * // Check if a unique view within the home fragment is displayed
+     * onView(withId(R.id.moodIcon)).check(matches(isDisplayed()));
+     * 
+     * // Click on the Profile icon in the navigation bar
+     * onView(withId(R.id.profile)).perform(click());
+     * // Check if a unique view within the profile fragment is displayed
+     * onView(withId(R.id.mood_post_list_history)).check(matches(isDisplayed()));
+     * 
+     * // Click on the Create icon in the navigation bar
+     * onView(withId(R.id.create)).perform(click());
+     * // Check if a unique view within the post mood fragment is displayed
+     * onView(withId(R.id.postMoodCancelButton)).check(matches(isDisplayed()));
+     * }
+     */
 
     @Test
     public void appShouldDisplayExistingMoodPostsOnLaunch() {
@@ -213,9 +215,11 @@ public class MainActivityTest {
         onView(withId(R.id.create)).perform(click());
 
         // Test invalid description input
-        onView(withId(R.id.postMoodDescription)).perform(ViewActions.typeText("This is a invalid description that has over 200 characters. " +
-                "This is a invalid description that has over 200 characters. This is a invalid description that has over 200 characters. " +
-                "This is a invalid description that has over 200 characters."));
+        onView(withId(R.id.postMoodDescription))
+                .perform(ViewActions.typeText("This is a invalid description that has over 200 characters. " +
+                        "This is a invalid description that has over 200 characters. This is a invalid description that has over 200 characters. "
+                        +
+                        "This is a invalid description that has over 200 characters."));
         onView(withId(R.id.postMoodConfirmButton)).perform(click());
         onView(withId(R.id.postMoodDescription))
                 .check(matches(hasErrorText("Description can be max 200 characters")));
@@ -315,9 +319,11 @@ public class MainActivityTest {
         onView(withId(R.id.postMoodPublic)).check(matches(isChecked()));
 
         // Test invalid description input
-        onView(withId(R.id.postMoodDescription)).perform(ViewActions.typeText("This is a invalid description that has over 200 characters. " +
-                "This is a invalid description that has over 200 characters. This is a invalid description that has over 200 characters. " +
-                "This is a invalid description that has over 200 characters."));
+        onView(withId(R.id.postMoodDescription))
+                .perform(ViewActions.typeText("This is a invalid description that has over 200 characters. " +
+                        "This is a invalid description that has over 200 characters. This is a invalid description that has over 200 characters. "
+                        +
+                        "This is a invalid description that has over 200 characters."));
         onView(withId(R.id.postMoodConfirmButton)).perform(click());
         onView(withId(R.id.postMoodDescription))
                 .check(matches(hasErrorText("Description can be max 200 characters")));
@@ -355,9 +361,11 @@ public class MainActivityTest {
         onView(withId(R.id.postMoodDescription)).check(matches(withText("")));
 
         // Test invalid description input
-        onView(withId(R.id.postMoodDescription)).perform(ViewActions.typeText("This is a invalid description that has over 200 characters. " +
-                "This is a invalid description that has over 200 characters. This is a invalid description that has over 200 characters. " +
-                "This is a invalid description that has over 200 characters."));
+        onView(withId(R.id.postMoodDescription))
+                .perform(ViewActions.typeText("This is a invalid description that has over 200 characters. " +
+                        "This is a invalid description that has over 200 characters. This is a invalid description that has over 200 characters. "
+                        +
+                        "This is a invalid description that has over 200 characters."));
         onView(withId(R.id.postMoodConfirmButton)).perform(click());
         onView(withId(R.id.postMoodDescription))
                 .check(matches(hasErrorText("Description can be max 200 characters")));
@@ -394,9 +402,11 @@ public class MainActivityTest {
         onView(withId(R.id.postMoodDescription)).check(matches(withText("")));
 
         // Test invalid description input
-        onView(withId(R.id.postMoodDescription)).perform(ViewActions.typeText("This is a invalid description that has over 200 characters. " +
-                "This is a invalid description that has over 200 characters. This is a invalid description that has over 200 characters. " +
-                "This is a invalid description that has over 200 characters."));
+        onView(withId(R.id.postMoodDescription))
+                .perform(ViewActions.typeText("This is a invalid description that has over 200 characters. " +
+                        "This is a invalid description that has over 200 characters. This is a invalid description that has over 200 characters. "
+                        +
+                        "This is a invalid description that has over 200 characters."));
         onView(withId(R.id.postMoodConfirmButton)).perform(click());
         onView(withId(R.id.postMoodDescription))
                 .check(matches(hasErrorText("Description can be max 200 characters")));
