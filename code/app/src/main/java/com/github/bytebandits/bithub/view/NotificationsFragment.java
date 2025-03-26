@@ -132,17 +132,39 @@ public class NotificationsFragment extends Fragment {
         return view;
     }
 
-    private List<MoodPost> getUniqueUserLatestPosts(List<MoodPost> posts) {
+//    private List<MoodPost> getUniqueUserLatestPosts(List<MoodPost> posts) {
+//
+//        String userId = sessionManager.getUserId();
+//        // Use a LinkedHashMap to maintain order and uniqueness
+//        Map<String, MoodPost> uniqueUserPosts = new LinkedHashMap<>();
+//
+//        // Sort posts by date in descending order (most recent first)
+//        List<MoodPost> sortedPosts = new ArrayList<>(posts);
+//        sortedPosts.sort((p1, p2) -> p2.getPostedDateTime().compareTo(p1.getPostedDateTime()));
+//
+//        // Iterate through sorted posts and keep only the first (latest) post for each user
+//        for (MoodPost post : sortedPosts) {
+//            String postUserId = post.getProfile().getUserID();
+//
+//            // Only add if this user's post is not already in the map
+//            if (!uniqueUserPosts.containsKey(postUserId) && !postUserId.equals(userId)) {
+//                uniqueUserPosts.put(postUserId, post);
+//            }
+//        }
+//
+//        // Return the list of unique user posts
+//        return new ArrayList<>(uniqueUserPosts.values());
+//    }
 
         String userId = sessionManager.getUserId();
         // Use a LinkedHashMap to maintain order and uniqueness
         Map<String, MoodPost> uniqueUserPosts = new LinkedHashMap<>();
 
-        // Sort posts by date in descending order (most recent first)
+        Log.d("MoodPost", "Received " + posts.size() + " posts");
+
         List<MoodPost> sortedPosts = new ArrayList<>(posts);
         sortedPosts.sort((p1, p2) -> p2.getPostedDateTime().compareTo(p1.getPostedDateTime()));
 
-        // Iterate through sorted posts and keep only the first (latest) post for each user
         for (MoodPost post : sortedPosts) {
             String postUserId = post.getProfile().getUserId();
 
@@ -152,7 +174,7 @@ public class NotificationsFragment extends Fragment {
             }
         }
 
-        // Return the list of unique user posts
+        Log.d("MoodPost", "Returning " + uniqueUserPosts.size() + " unique user posts");
         return new ArrayList<>(uniqueUserPosts.values());
     }
 }
