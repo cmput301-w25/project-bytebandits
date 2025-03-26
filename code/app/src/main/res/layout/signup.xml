@@ -148,7 +148,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="64dp"
         android:layout_marginEnd="64dp"
-        android:layout_marginBottom="70dp"
+        android:layout_marginBottom="90dp"
         android:backgroundTint="@color/Accent1"
         android:fontFamily="@font/stix_two_text_bold"
         android:text="@string/signup_signup"
@@ -172,13 +172,26 @@
         app:layout_constraintTop_toBottomOf="@+id/registerBtn" />
 
     <ImageView
-        android:id="@+id/imageView3"
+        android:id="@+id/imageView8"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_constraintBottom_toTopOf="@+id/registerBtn"
-        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginStart="64dp"
+        android:layout_marginTop="-80dp"
+        android:elevation="-5dp"
+        android:rotation="120"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/PswrdConInputLayout"
-        app:srcCompat="@drawable/surprise_logo" />
+        app:layout_constraintTop_toBottomOf="@+id/signupText"
+        app:srcCompat="@drawable/sadness_logo" />
+
+    <ImageView
+        android:id="@+id/imageView10"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="-80dp"
+        android:layout_marginEnd="64dp"
+        android:elevation="-5dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/signupText"
+        app:srcCompat="@drawable/shame_logo" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
