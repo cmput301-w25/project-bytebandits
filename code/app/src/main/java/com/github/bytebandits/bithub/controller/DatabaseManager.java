@@ -124,32 +124,40 @@ public final class DatabaseManager {
      * @throws InterruptedException If the execution is interrupted.
      */
     public void searchUsers(String query, OnUserSearchFetchListener listener) {
-        Query users =  this.usersCollectionRef.orderBy("userId").startAt(query).endAt(query + "~");
+        Log.d("DatabaseManager", "Starting searchUsers for query: " + query);
 
-        CompletableFuture.supplyAsync(() -> {
-            try {
-                QuerySnapshot querySnapshot = users.get().getResult();
+        Query users = this.usersCollectionRef
+                .orderBy("username")
+                .startAt(query)
+                .endAt(query + "~");
+
+        users.get().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                QuerySnapshot querySnapshot = task.getResult();
                 List<HashMap<String, Object>> userList = new ArrayList<>();
 
+                Log.d("DatabaseManager", "Query successful. Found " + querySnapshot.size() + " users.");
+
                 for (DocumentSnapshot doc : querySnapshot.getDocuments()) {
-                    userList.add(doc.toObject(HashMap.class));
+                    Map<String, Object> userData = doc.getData();
+                    userList.add((HashMap<String, Object>) userData);
+
+                    // Log each user entry
+                    Log.d("DatabaseManager", "Fetched user: " + userData);
                 }
 
-                return userList; // Return the fetched user list
-            } catch (Exception e) {
-                throw new RuntimeException(e);
+                if (listener != null) {
+                    listener.onUsersFetched(userList);
+                }
+            } else {
+                Log.e("DatabaseManager", "Error fetching users", task.getException());
+                if (listener != null) {
+                    listener.onUsersFetched(null);
+                }
             }
-        }).thenAccept(userList -> {
-            if (listener != null) {
-                listener.onUsersFetched(userList); // Pass the fetched users to the listener
-            }
-        }).exceptionally(e -> {
-            Log.e("DatabaseManager", "Error fetching users", e);
-            if (listener != null) {
-                listener.onUsersFetched(null); // Handle errors
-            }
-            return null;
         });
+
+        Log.d("DatabaseManager", "searchUsers() execution finished, waiting for Firestore response...");
     }
 
 

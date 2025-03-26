@@ -10,19 +10,28 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.SearchView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import com.github.bytebandits.bithub.MainActivity;
 import com.github.bytebandits.bithub.controller.DatabaseManager;
 import com.github.bytebandits.bithub.model.MoodPost;
 import com.github.bytebandits.bithub.R;
+import com.github.bytebandits.bithub.model.Profile;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -110,8 +119,93 @@ public class HomepageFragment extends Fragment {
             }
         });
 
+        profileSearchManager(view);
 
 
         return view;
     }
-}
+
+
+    /**
+     * Manages and encapsulates all logic relating to searching profiles within the homepage fragment
+     * @param view the view in question, so the method can reference the various UI elements of the layout
+     */
+    private void profileSearchManager(View view) {
+        ArrayList<Profile> profiles = new ArrayList<>();
+        ProfileSearchAdapter profileSearchAdapter = new ProfileSearchAdapter(requireContext(), profiles);
+
+        SearchView profileSearch = view.findViewById(R.id.profileSearch);
+        ListView profileResults = view.findViewById(R.id.profileResults);
+        profileResults.setAdapter(profileSearchAdapter);
+
+        // logic of profile transition via clicking
+        profileResults.setOnItemClickListener((adapterView, view1, i, l) -> {
+            Profile profile = profiles.get(i);
+            ProfileFragment profileFragment = new ProfileFragment();
+            profileFragment.setIsOtherProfile(true);
+            profileFragment.setOtherProfile(profile);
+            ((MainActivity) requireActivity()).replaceFragment(profileFragment);
+        });
+
+        // logic to unfocus from search view, although there are cases where if you click certain ui elements, the click wont register and you will be still focused
+        LinearLayout homepageLinearLayoutRoot = view.findViewById(R.id.HomepageLinearLayoutRoot);
+        homepageLinearLayoutRoot.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                profileSearch.clearFocus();
+            }
+        });
+
+        // submit logic for search results
+        ImageButton profileSearchIcon = view.findViewById(R.id.profileSearchConfirm);
+        profileSearchIcon.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View view) {
+                String query = profileSearch.getQuery().toString();
+                if (!query.isEmpty()){
+                    profileResults.setVisibility(View.VISIBLE);
+                    DatabaseManager.getInstance().searchUsers(query, users -> {
+                        profiles.clear();
+
+                        for (HashMap<String, Object> user : users) {
+                            String profileJson = (String) user.get("profile");
+                            try{
+                                JSONObject profileObj = new JSONObject(profileJson);
+                                String userID = profileObj.getString("userID");
+                                String userImg;
+                                if (profileObj.isNull("img")) {
+                                    profiles.add(new Profile(userID));
+                                    // use default profile pic
+                                }
+//                            else{
+//                                  // do stuff if profile pic exists
+//                            }
+                            }
+                            catch (JSONException e) {
+                                Log.e("ProfileSearchJSONException", e.toString());
+                            }
+                        }
+                        profileSearchAdapter.notifyDataSetChanged();
+                    });
+                }
+            }
+        });
+
+        profileSearch.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String s) {
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String s) {
+                if (s.isEmpty()) {
+                    profiles.clear();
+                    profileSearchAdapter.notifyDataSetChanged();
+                    profileResults.setVisibility(View.INVISIBLE);
+                }
+                return true;
+            }
+        });
+    }
+    }
