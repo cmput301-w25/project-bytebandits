@@ -83,7 +83,7 @@ public class SessionManager {
     // Logout user and clear session
     public void logoutUser() {
         editor.clear();
-        editor.apply();
+        editor.commit();
 
         Intent i = new Intent(context, StartupActivity.class);
         i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);

@@ -76,9 +76,6 @@ public class LoginFragment extends Fragment {
             DatabaseManager.getInstance().getUser(username, user -> {
                 if (user != null) {
                     String storedPassword = (String) user.get("password");
-                    Log.d("LoginFragment", "Fetched user data: " + user.toString());
-                    Log.d("LoginFragment", "Stored password: " + storedPassword);
-                    Log.d("LoginFragment", "Entered password: " + password);
 
                     if (password.matches(storedPassword)) {
                         isValidAccount.set(true);

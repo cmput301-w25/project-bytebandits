@@ -10,6 +10,7 @@ import com.github.bytebandits.bithub.model.Profile;
 import com.github.bytebandits.bithub.model.SocialSituation;
 import com.google.firebase.firestore.*;
 
+
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -21,22 +22,23 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.*;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 import static org.junit.Assert.*;
 
-public class DatabaseManagerTests {
+public class DatabaseManagerTest {
     private DatabaseManager dbInstance;
     private Profile testProfile;
 
     @BeforeClass
     public static void setup() {
-        DatabaseManager dbInstance = DatabaseManager.getInstance();
-        dbInstance.useEmulation();
+        DatabaseManager.getInstance(true);
     }
 
     @Before
     public void seedDatabase() {
-        DatabaseManager dbInstance = DatabaseManager.getInstance();
+        this.dbInstance = DatabaseManager.getInstance();
         CollectionReference postsCollectionRef = dbInstance.getPostsCollectionRef();
         CollectionReference usersCollectionRef = dbInstance.getUsersCollectionRef();
 
@@ -56,7 +58,7 @@ public class DatabaseManagerTests {
         DocumentReference user2DocRef = usersCollectionRef.document((String) Objects.requireNonNull(user2.get("userId")));
 
         user1DocRef.set(user1);
-        user1DocRef.set(user2);
+        user2DocRef.set(user2);
 
         // Add Posts
         this.testProfile = new Profile((String) Objects.requireNonNull(user1.get("userId")));
@@ -80,22 +82,16 @@ public class DatabaseManagerTests {
 
     @Test
     public void testGetUser_Success() {
-        DatabaseManager dbInstance = DatabaseManager.getInstance();
-
+        Log.d("DatabaseManagerTest", "Calling getUser...");
         dbInstance.getUser(testProfile.getUserID(), user -> {
-            Log.d("DatabaseManagerTests", "getUserTest");
-            if (user != null) {
-                String name = (String) user.get("name");
-                assert name != null;
-                assertTrue(name.matches("John Doe"));
-            }
+            Log.d("DatabaseManagerTest", "Callback executed");
+            String name = (String) user.get("name");
+            assertTrue(name.matches("John Doe"));
         });
     }
 
     @Test
     public void testGetAllPosts_Success() {
-        DatabaseManager dbInstance = DatabaseManager.getInstance();
-
         dbInstance.getAllPosts(
                 dbPosts -> {
                     assertEquals(2, dbPosts.size());
@@ -106,7 +102,6 @@ public class DatabaseManagerTests {
 
     @Test
     public void testAddAndGetUserPosts_Success() {
-        DatabaseManager dbInstance = DatabaseManager.getInstance();
         MoodPost post = new MoodPost(
                 Emotion.SHAME,
                 testProfile, false, SocialSituation.ALONE, "Test Desc",
@@ -134,6 +129,7 @@ public class DatabaseManagerTests {
         updateFields.put("description", "Updated Description");
 
         dbInstance.updatePost(post.getPostID(), updateFields, Optional.of(success -> assertTrue(success)));
+
     }
 
     @Test
@@ -155,8 +151,9 @@ public class DatabaseManagerTests {
 
     @Test
     public void testSearchUsers_Success() throws ExecutionException, InterruptedException {
-        List<DocumentSnapshot> users = dbInstance.searchUsers("testUser");
-        assertFalse(users.isEmpty());
+        dbInstance.searchUsers("testUser", users -> {
+            assertFalse(users.isEmpty());
+        });
     }
 
     @Test
