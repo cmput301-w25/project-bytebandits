@@ -92,6 +92,12 @@ public class ProfileFragment extends Fragment implements FilterDialog.FilterList
 
     public Profile otherProfile = null;
 
+    /**
+     * Creates a new instance of ProfileFragment with the given profile.
+     *
+     * @param profile The Profile object to be displayed in the fragment.
+     * @return A new instance of ProfileFragment.
+     */
     public static ProfileFragment newInstance(Profile profile) {
         ProfileFragment fragment = new ProfileFragment();
         Bundle args = new Bundle();
@@ -218,6 +224,10 @@ public class ProfileFragment extends Fragment implements FilterDialog.FilterList
         return view;
     }
 
+    /**
+     * Opens the settings dialog for the user.
+     * This method is only accessible when the user is viewing their own profile.
+     */
     private void openSettings() {
         SettingsDialog settingsDialog = new SettingsDialog(requireContext());
         settingsDialog.showSettingsDialog();
@@ -231,6 +241,12 @@ public class ProfileFragment extends Fragment implements FilterDialog.FilterList
         filterDialog.showFilterDialog();
     }
 
+    /**
+     * Handles the filter selection event from the filter dialog.
+     * Updates the list of displayed mood posts based on the selected mood filter.
+     *
+     * @param mood The mood selected by the user for filtering.
+     */
     @Override
     public void onFilterSelected(String mood) {
         filteredDataList.clear();
@@ -241,6 +257,14 @@ public class ProfileFragment extends Fragment implements FilterDialog.FilterList
         }
         moodPostAdapter.notifyDataSetChanged();
     }
+
+    /**
+     * Filters the list of mood posts to include only those that are recent (last 7
+     * days).
+     *
+     * @param posts The full list of mood posts.
+     * @return A list of mood posts from the last week.
+     */
     private List<MoodPost> filterPostsFromLastWeek(List<MoodPost> posts) {
         List<MoodPost> filteredPosts = new ArrayList<>();
         long currentTime = System.currentTimeMillis();
@@ -254,6 +278,12 @@ public class ProfileFragment extends Fragment implements FilterDialog.FilterList
         }
         return filteredPosts;
     }
+
+    /**
+     * Updates the displayed list of mood posts based on the user's search query.
+     *
+     * @param query The search query entered by the user.
+     */
     @Override
     public void onSearchQueryChanged(String query) {
         filteredDataList.clear();
@@ -262,12 +292,12 @@ public class ProfileFragment extends Fragment implements FilterDialog.FilterList
             filteredDataList.addAll(dataList);
         } else {
             for (MoodPost post : dataList) {
-                if (post.getDescription() != null && post.getDescription().toLowerCase().contains(query.toLowerCase())) {
+                if (post.getDescription() != null
+                        && post.getDescription().toLowerCase().contains(query.toLowerCase())) {
                     filteredDataList.add(post);
                 }
             }
         }
-
         moodPostAdapter.notifyDataSetChanged();
     }
 }
