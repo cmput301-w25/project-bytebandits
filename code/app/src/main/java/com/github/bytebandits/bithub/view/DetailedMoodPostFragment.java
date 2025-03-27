@@ -62,7 +62,7 @@ public class DetailedMoodPostFragment extends DialogFragment {
         } else {
             viewSocialStatus.setText(moodPost.getSocialSituation().name());
         }
-        viewName.setText(moodPost.getProfile().getUserID());
+        viewName.setText(moodPost.getProfile().getUserId());
         viewDate.setText(moodPost.getFormattedPostedDate());
         viewTime.setText(moodPost.getFormattedPostedTime());
         viewEmotion.setText(moodPost.getEmotion().getState());

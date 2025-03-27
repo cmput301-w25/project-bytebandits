@@ -59,8 +59,8 @@ public class CommentArrayAdapter extends ArrayAdapter<Comment> {
         dateView.setText(comment.getFormattedPostedDate());
         timeView.setText(comment.getFormattedPostedTime());
         commentTextView.setText(comment.getText());
-        if (!Objects.equals(comment.getProfile().getUserID(),
-                SessionManager.getInstance(getContext()).getProfile().getUserID())) {
+        if (!Objects.equals(comment.getProfile().getUserId(),
+                SessionManager.getInstance(getContext()).getProfile().getUserId())) {
             deleteButton.setVisibility(View.GONE);
         } else {
             // If this is our comment, give option to delete

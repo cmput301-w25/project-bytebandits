@@ -90,7 +90,7 @@ public class MainActivityTest {
         Profile randProfile = new Profile("ツ");
         dbInstance.addPost(new MoodPost(Emotion.SURPRISE, randProfile,
                 false, null, null, null, false),
-                randProfile.getUserID(), Optional.empty());
+                randProfile.getUserId(), Optional.empty());
     }
 
     @Before
@@ -116,10 +116,11 @@ public class MainActivityTest {
         moodPosts[0].addComment(new Comment(testProfile2, "test comment"));
 
         for (MoodPost post : moodPosts) {
-            if (Objects.equals(post.getProfile().getUserID(), testProfile.getUserID())) {
-                dbInstance.addPost(post, testProfile.getUserID(), Optional.empty());
-            } else {
-                dbInstance.addPost(post, testProfile2.getUserID(), Optional.empty());
+            if (Objects.equals(post.getProfile().getUserId(), testProfile.getUserId())) {
+                dbInstance.addPost(post, testProfile.getUserId(), Optional.empty());
+            }
+            else {
+                dbInstance.addPost(post, testProfile2.getUserId(), Optional.empty());
             }
         }
 

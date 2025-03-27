@@ -36,7 +36,7 @@ public class ProfileSearchAdapter extends ArrayAdapter<Profile> {
         }
         Profile profile = getItem(position);
         TextView username = view.findViewById(R.id.profileUsername);
-        username.setText(profile.getUserID());
+        username.setText(profile.getUserId());
 
         return view;
     }
