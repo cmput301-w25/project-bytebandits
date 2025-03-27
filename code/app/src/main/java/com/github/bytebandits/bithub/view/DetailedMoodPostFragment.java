@@ -25,7 +25,7 @@ import com.github.bytebandits.bithub.model.Profile;
 import java.util.Objects;
 import java.util.Optional;
 
-public class DetailedMoodPostFragment extends DialogFragment {
+public class DetailedMoodPostFragment extends DialogFragment{
     public static DetailedMoodPostFragment newInstance(MoodPost moodPost) {
         // Use Bundle to get info between fragments
         Bundle args = new Bundle();
@@ -57,12 +57,9 @@ public class DetailedMoodPostFragment extends DialogFragment {
         Profile profile = SessionManager.getInstance(getContext()).getProfile();
 
         // Set the text views to mood post data
-        if (moodPost.getSocialSituation() == null) {
-            viewSocialStatus.setText(null);
-        } else {
-            viewSocialStatus.setText(moodPost.getSocialSituation().name());
-        }
-        viewName.setText(moodPost.getProfile().getUserId());
+        if (moodPost.getSocialSituation() == null) { viewSocialStatus.setText(null); }
+        else { viewSocialStatus.setText(moodPost.getSocialSituation().name()); }
+        viewName.setText(moodPost.getProfile().getUserID());
         viewDate.setText(moodPost.getFormattedPostedDate());
         viewTime.setText(moodPost.getFormattedPostedTime());
         viewEmotion.setText(moodPost.getEmotion().getState());
@@ -87,11 +84,10 @@ public class DetailedMoodPostFragment extends DialogFragment {
         });
 
         // Show and set edit and delete buttons if this post is ours
-        if (Objects.equals(moodPost.getProfile().getUserId(), profile.getUserId())) {
+        if (Objects.equals(moodPost.getProfile().getUserID(), profile.getUserID())) {
             viewProfileButton.setVisibility(View.GONE);
             deleteButton.setOnClickListener(v -> {
-                DatabaseManager.getInstance().deletePost(moodPost.getPostID(), moodPost.getProfile().getUserId(),
-                        Optional.empty());
+                DatabaseManager.getInstance().deletePost(moodPost.getPostID(), moodPost.getProfile().getUserID(), Optional.empty());
                 dialog.dismiss();
             });
 
@@ -99,10 +95,13 @@ public class DetailedMoodPostFragment extends DialogFragment {
                 ((MainActivity) requireActivity()).editMoodFragment(moodPost);
                 dialog.dismiss();
             });
-        } else {
+        }
+        else {
             viewProfileButton.setOnClickListener(v -> {
-                 ((MainActivity)
-                 requireActivity()).replaceFragment(ProfileFragment.newInstance(moodPost.getProfile()));
+                ProfileFragment pf = new ProfileFragment();
+                pf.setOtherProfile(moodPost.getProfile());
+                pf.setIsOtherProfile(true);
+                ((MainActivity) requireActivity()).replaceFragment(pf);
                 dialog.dismiss();
             });
             deleteButton.setVisibility(View.GONE);
