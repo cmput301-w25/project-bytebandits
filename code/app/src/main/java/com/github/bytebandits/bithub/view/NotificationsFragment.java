@@ -57,7 +57,7 @@ public class NotificationsFragment extends Fragment {
         }
 
         executor.execute(() -> {
-            DatabaseManager.getInstance().getAllPosts(posts -> {
+            DatabaseManager.getInstance().getAllPublicPosts(posts -> {
                 if (posts == null) {
                     Log.e("NotificationsFragment", "Error: notifications is null");
                 }

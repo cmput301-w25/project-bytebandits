@@ -378,7 +378,7 @@ public final class DatabaseManager {
      * @param listener The listener that will receive the result (list of posts).
      */
     public void getAllPublicPosts(OnPostsFetchListener listener) {
-        Query publicPosts = this.postsCollectionRef.whereEqualTo("public", true);
+        Query publicPosts = this.postsCollectionRef.whereEqualTo("private", false);
 
         publicPosts.get().addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
@@ -386,21 +386,26 @@ public final class DatabaseManager {
                 ArrayList<MoodPost> postList = new ArrayList<>();
 
                 for (DocumentSnapshot doc : querySnapshot.getDocuments()) {
-                    Map<String, Object> postData = doc.getData();
-                    postList.add((MoodPost) postData);
+                    try {
+                        postList.add(doc.toObject(MoodPost.class));
+                    } catch (ClassCastException e) {
+                        Log.e("DatabaseManager", "Error casting document to MoodPost", e);
+                    }
+
                 }
 
                 if (listener != null) {
                     listener.onPostsFetched(postList);
                 }
             } else {
-                Log.e("DatabaseManager", "Error fetching users", task.getException());
+                Log.e("DatabaseManager", "Error fetching posts", task.getException());
                 if (listener != null) {
                     listener.onPostsFetched(null);
                 }
             }
         });
     }
+
 
     /**
      * Fetches all posts from the FireStore database that are labelled as public under one user.
@@ -441,9 +446,9 @@ public final class DatabaseManager {
                         DocumentSnapshot postDoc = (DocumentSnapshot) obj;
                         if (postDoc.exists()) {
                             MoodPost post = postDoc.toObject(MoodPost.class);
-//                            if (post.isPublic()) {
-//                                postList.add(post);
-//                            }
+                            if (!post.isPrivate()) {
+                                postList.add(post);
+                            }
                         }
                     }
 

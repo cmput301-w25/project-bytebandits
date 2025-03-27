@@ -63,7 +63,7 @@ public class ExploreFragment extends Fragment implements GoogleMap.OnMarkerClick
         }
         // Listener so that dataList gets updated whenever the database does
         executor.execute(() -> {
-                    DatabaseManager.getInstance().getAllPosts(posts -> {
+                    DatabaseManager.getInstance().getAllPublicPosts(posts -> {
                         if (posts != null) {
                             Log.e("ExploreFragment", "Error: posts is null");
                         }
@@ -186,7 +186,7 @@ public class ExploreFragment extends Fragment implements GoogleMap.OnMarkerClick
     @Override
     public boolean onMarkerClick(@NonNull Marker marker) {
         executor.execute(() -> {
-            DatabaseManager.getInstance().getAllPosts(posts -> {
+            DatabaseManager.getInstance().getAllPublicPosts(posts -> {
                 if (posts == null) {
                     Log.e("ExploreFragment", "Error: posts is null");
                 }

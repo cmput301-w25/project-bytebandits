@@ -64,7 +64,7 @@ public class PostMoodFragment extends Fragment {
     private SocialSituation selectedSocialSituation;
     private String selectedDescription;
     private boolean selectedLocation;
-    private boolean selectedPublic;
+    private boolean selectedPrivate;
     private Uri selectedImageUri;
     private byte[] selectedImageByteArray = null;
 
@@ -90,7 +90,7 @@ public class PostMoodFragment extends Fragment {
         Button confirmButton = view.findViewById(R.id.postMoodConfirmButton);
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(getActivity());
         findCurrentLocation();
-        CheckBox editPublic = view.findViewById(R.id.postMoodPublic);
+        CheckBox editVisibility = view.findViewById(R.id.postMoodVisibility);
         CheckBox editLocation = view.findViewById(R.id.postMoodLocation);
         Button uploadButton = view.findViewById(R.id.postMoodUploadImageButton);
         Button deleteButton = view.findViewById(R.id.postMoodDeleteImageButton);
@@ -220,7 +220,7 @@ public class PostMoodFragment extends Fragment {
             selectSpinnerItemByValue(editEmotion, postToEdit.getEmotion());
             selectSpinnerItemByValue(editSocialSituation, postToEdit.getSocialSituation());
             editLocation.setChecked(postToEdit.getLocation());
-            editPublic.setChecked(postToEdit.isPublic());
+            editVisibility.setChecked(postToEdit.isPrivate());
             if (postToEdit.getDescription() == null) {
                 editDescription.setText("");
             } else {
@@ -247,7 +247,8 @@ public class PostMoodFragment extends Fragment {
         confirmButton.setOnClickListener(v -> {
             // Get inputs
             selectedLocation = editLocation.isChecked();
-            selectedPublic = editPublic.isChecked();
+            selectedPrivate = editVisibility.isChecked();
+            Log.d("MoodPost", "CHECKING IF POST IS PRIVATE OR NOT: " + selectedPrivate);
             if (editDescription.getText().toString().isEmpty()) {
                 selectedDescription = null;
             } else {
@@ -270,7 +271,7 @@ public class PostMoodFragment extends Fragment {
                 if (postToEdit == null) {
                     MoodPost moodPost = new MoodPost(selectedEmotion, sessionManager.getProfile(),
                             selectedLocation, selectedSocialSituation, selectedDescription,
-                            selectedImageBase64String, selectedPublic);
+                            selectedImageBase64String, selectedPrivate);
                     databaseManager.addPost(moodPost, sessionManager.getProfile().getUserId(), Optional.empty());
                     // for some reason setting the longitude and latitude then adding post doesn't
                     // work so im updating the values after adding the post
@@ -287,7 +288,7 @@ public class PostMoodFragment extends Fragment {
                     updateFields.put("description", selectedDescription);
                     updateFields.put("image", selectedImageBase64String);
                     updateFields.put("location", selectedLocation);
-                    updateFields.put("public", selectedPublic);
+                    updateFields.put("private", selectedPrivate);
                     // If user wants to set the location, and no previous location is assigned to
                     // the mood post, then assign new location
                     if (selectedLocation && (postToEdit.getLongitude() == null || postToEdit.getLatitude() == null)) {
