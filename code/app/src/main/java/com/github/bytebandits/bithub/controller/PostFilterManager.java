@@ -23,7 +23,7 @@ public class PostFilterManager {
             filteredPosts.addAll(posts);
         } else {
             for (MoodPost post : posts) {
-                if (post.getEmotionString().equalsIgnoreCase(mood)) {
+                if (post.getEmotion().getState().equalsIgnoreCase(mood)) {
                     filteredPosts.add(post);
                 }
             }

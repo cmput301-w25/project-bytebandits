@@ -7,6 +7,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -133,7 +134,7 @@ public class ProfileFragment extends Fragment implements FilterDialog.FilterList
         String userId = profile.getUserID();
         String loggedInUser = SessionManager.getInstance(requireContext()).getUsername();
 
-        usernameTextView.setText(username);
+        usernameTextView.setText(userId);
 
         // Hide settings button if viewing another user's profile
         if (!userId.equals(loggedInUser)) {

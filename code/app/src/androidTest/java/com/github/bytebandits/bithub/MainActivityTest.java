@@ -66,21 +66,21 @@ public class MainActivityTest {
 
         // Add Users
         HashMap<String, Object> user1 = new HashMap<>();
-        user1.put("username", "testUser1");
+        user1.put("userId", "testUser1");
         user1.put("profile", "{\"userID\":\"testUser1\",\"locationServices\":true,\"image\":null}");
         user1.put("password", "1");
         user1.put("email", "testemail1@gmail.com");
 
         HashMap<String, Object> user2 = new HashMap<>();
-        user2.put("username", "testUser2");
+        user2.put("userId", "testUser2");
         user2.put("profile", "{\"userID\":\"testUser2\",\"locationServices\":false,\"image\":null}");
         user2.put("password", "2");
         user2.put("email", "testemail2@gmail.com");
 
         DocumentReference user1DocRef = usersCollectionRef
-                .document((String) Objects.requireNonNull(user1.get("username")));
+                .document((String) Objects.requireNonNull(user1.get("userId")));
         DocumentReference user2DocRef = usersCollectionRef
-                .document((String) Objects.requireNonNull(user2.get("username")));
+                .document((String) Objects.requireNonNull(user2.get("userId")));
 
         user1DocRef.set(user1);
         user2DocRef.set(user2);
