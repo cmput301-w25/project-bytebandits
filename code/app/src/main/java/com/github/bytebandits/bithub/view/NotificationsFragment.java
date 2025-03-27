@@ -132,54 +132,27 @@ public class NotificationsFragment extends Fragment {
         return view;
     }
 
-//    private List<MoodPost> getUniqueUserLatestPosts(List<MoodPost> posts) {
-//
-//        String userId = sessionManager.getUserId();
-//        // Use a LinkedHashMap to maintain order and uniqueness
-//        Map<String, MoodPost> uniqueUserPosts = new LinkedHashMap<>();
-//
-//        // Sort posts by date in descending order (most recent first)
-//        List<MoodPost> sortedPosts = new ArrayList<>(posts);
-//        sortedPosts.sort((p1, p2) -> p2.getPostedDateTime().compareTo(p1.getPostedDateTime()));
-//
-//        // Iterate through sorted posts and keep only the first (latest) post for each user
-//        for (MoodPost post : sortedPosts) {
-//            String postUserId = post.getProfile().getUserId();
-//
-//            // Only add if this user's post is not already in the map
-//            if (!uniqueUserPosts.containsKey(postUserId) && !postUserId.equals(userId)) {
-//                uniqueUserPosts.put(postUserId, post);
-//            }
-//        }
-//
-//        // Return the list of unique user posts
-//        return new ArrayList<>(uniqueUserPosts.values());
-//    }
-
     private List<MoodPost> getUniqueUserLatestPosts(List<MoodPost> posts) {
+
         String userId = sessionManager.getUserId();
+        // Use a LinkedHashMap to maintain order and uniqueness
         Map<String, MoodPost> uniqueUserPosts = new LinkedHashMap<>();
 
-        Log.d("MoodPost", "Received " + posts.size() + " posts");
-
+        // Sort posts by date in descending order (most recent first)
         List<MoodPost> sortedPosts = new ArrayList<>(posts);
         sortedPosts.sort((p1, p2) -> p2.getPostedDateTime().compareTo(p1.getPostedDateTime()));
 
+        // Iterate through sorted posts and keep only the first (latest) post for each user
         for (MoodPost post : sortedPosts) {
             String postUserId = post.getProfile().getUserId();
-            Log.d("MoodPost", "Checking postUserId: " + postUserId);
-            Log.d("MoodPost", "Checking userId: " + userId);
 
-
+            // Only add if this user's post is not already in the map
             if (!uniqueUserPosts.containsKey(postUserId) && !postUserId.equals(userId)) {
                 uniqueUserPosts.put(postUserId, post);
-                Log.d("MoodPost", "Added post from user: " + postUserId);
-            } else {
-                Log.d("MoodPost", "Skipping duplicate or own post from user: " + postUserId);
             }
         }
 
-        Log.d("MoodPost", "Returning " + uniqueUserPosts.size() + " unique user posts");
+        // Return the list of unique user posts
         return new ArrayList<>(uniqueUserPosts.values());
     }
 }
