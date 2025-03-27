@@ -211,7 +211,7 @@ public class PostMoodFragment extends Fragment {
         });
 
         // Only show location checkbox if we have location services enabled
-        if (Boolean.FALSE.equals(sessionManager.getProfile().getLocationServices())) {
+        if (!SessionManager.getInstance(requireContext()).getProfile().getLocationServices()) {
             editLocation.setVisibility(View.GONE);
         }
 
