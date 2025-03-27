@@ -128,52 +128,54 @@ public class ExploreFragment extends Fragment implements GoogleMap.OnMarkerClick
                 LatLng currentLatLng = new LatLng(location.getLatitude(), location.getLongitude());
 
                 for (MoodPost moodPost : dataList) {
-                    LatLng moodPostLatLng = new LatLng(moodPost.getLatitude(), moodPost.getLongitude());
-                    Drawable drawable = ContextCompat.getDrawable(requireContext(), moodPost.getEmotion().getLogoID());
-                    int desiredWidth = 240; // Adjust this value as needed
-                    int desiredHeight = 240; // Adjust this value as needed
+                    if (moodPost.getLocation() == Boolean.TRUE) {
+                        LatLng moodPostLatLng = new LatLng(moodPost.getLatitude(), moodPost.getLongitude());
+                        Drawable drawable = ContextCompat.getDrawable(requireContext(), moodPost.getEmotion().getLogoID());
+                        int desiredWidth = 240; // Adjust this value as needed
+                        int desiredHeight = 240; // Adjust this value as needed
 
-                    // Create a bitmap with the desired dimensions
-                    Bitmap bitmap = Bitmap.createBitmap(desiredWidth, desiredHeight, Bitmap.Config.ARGB_8888);
-                    Canvas canvas = new Canvas(bitmap);
+                        // Create a bitmap with the desired dimensions
+                        Bitmap bitmap = Bitmap.createBitmap(desiredWidth, desiredHeight, Bitmap.Config.ARGB_8888);
+                        Canvas canvas = new Canvas(bitmap);
 
-                    // Draw the off-white rounded rectangle with shadow
-                    Paint rectPaint = new Paint();
-                    rectPaint.setColor(Color.parseColor("#D3D3D3")); // Light gray color
-                    rectPaint.setAntiAlias(true);
-                    rectPaint.setShadowLayer(10f, 0f, 5f, Color.BLACK); // Shadow effect
-                    float cornerRadius = 40f; // Adjust corner radius as needed
-                    float padding = 20f; // Padding around the icon
-                    canvas.drawRoundRect(padding, padding, desiredWidth - padding, desiredHeight - padding, cornerRadius, cornerRadius, rectPaint);
+                        // Draw the off-white rounded rectangle with shadow
+                        Paint rectPaint = new Paint();
+                        rectPaint.setColor(Color.parseColor("#D3D3D3")); // Light gray color
+                        rectPaint.setAntiAlias(true);
+                        rectPaint.setShadowLayer(10f, 0f, 5f, Color.BLACK); // Shadow effect
+                        float cornerRadius = 40f; // Adjust corner radius as needed
+                        float padding = 20f; // Padding around the icon
+                        canvas.drawRoundRect(padding, padding, desiredWidth - padding, desiredHeight - padding, cornerRadius, cornerRadius, rectPaint);
 
-                    float drawablePadding = 30f; // Padding specifically for the drawable
-                    drawable.setBounds((int) (padding + drawablePadding), (int) (padding + drawablePadding), (int) (desiredWidth - padding - drawablePadding), (int) (desiredHeight - padding - drawablePadding - 40f)); // Leave space for text background
-                    drawable.draw(canvas); // Draw the drawable on top of the rectangle
+                        float drawablePadding = 30f; // Padding specifically for the drawable
+                        drawable.setBounds((int) (padding + drawablePadding), (int) (padding + drawablePadding), (int) (desiredWidth - padding - drawablePadding), (int) (desiredHeight - padding - drawablePadding - 40f)); // Leave space for text background
+                        drawable.draw(canvas); // Draw the drawable on top of the rectangle
 
-                    // Add a rounded black background for the text
-                    Paint textBackgroundPaint = new Paint();
-                    textBackgroundPaint.setColor(Color.WHITE); // White background for text
-                    textBackgroundPaint.setAntiAlias(true);
-                    float textBackgroundHeight = 50f; // Height of the text background
-                    float textBackgroundTop = desiredHeight - textBackgroundHeight - padding;
-                    canvas.drawRoundRect(padding + 10f, textBackgroundTop, desiredWidth - padding - 10f, textBackgroundTop + textBackgroundHeight, cornerRadius / 2, cornerRadius / 2, textBackgroundPaint);
+                        // Add a rounded black background for the text
+                        Paint textBackgroundPaint = new Paint();
+                        textBackgroundPaint.setColor(Color.WHITE); // White background for text
+                        textBackgroundPaint.setAntiAlias(true);
+                        float textBackgroundHeight = 50f; // Height of the text background
+                        float textBackgroundTop = desiredHeight - textBackgroundHeight - padding;
+                        canvas.drawRoundRect(padding + 10f, textBackgroundTop, desiredWidth - padding - 10f, textBackgroundTop + textBackgroundHeight, cornerRadius / 2, cornerRadius / 2, textBackgroundPaint);
 
-                    // Add text to the bitmap
-                    Paint textPaint = new Paint();
-                    textPaint.setColor(Color.BLACK); // Set text color to black
-                    textPaint.setTextSize(50f); // Set text size
-                    textPaint.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.BOLD_ITALIC)); // Bold and italic
-                    textPaint.setAntiAlias(true);
-                    textPaint.setTextAlign(Paint.Align.CENTER);
+                        // Add text to the bitmap
+                        Paint textPaint = new Paint();
+                        textPaint.setColor(Color.BLACK); // Set text color to black
+                        textPaint.setTextSize(50f); // Set text size
+                        textPaint.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.BOLD_ITALIC)); // Bold and italic
+                        textPaint.setAntiAlias(true);
+                        textPaint.setTextAlign(Paint.Align.CENTER);
 
-                    // Calculate the position for the text with padding
-                    float xPos = canvas.getWidth() / 2f;
-                    float yPos = textBackgroundTop + textBackgroundHeight / 2f - ((textPaint.descent() + textPaint.ascent()) / 2f);
+                        // Calculate the position for the text with padding
+                        float xPos = canvas.getWidth() / 2f;
+                        float yPos = textBackgroundTop + textBackgroundHeight / 2f - ((textPaint.descent() + textPaint.ascent()) / 2f);
 
-                    // Draw the text on the canvas after the drawable
-                    String userId = "@" + moodPost.getProfile().getUserId();
-                    canvas.drawText(userId, xPos, yPos, textPaint);
-                    googleMap.addMarker(new MarkerOptions().position(moodPostLatLng).title(moodPost.getProfile().getUserId()).icon(BitmapDescriptorFactory.fromBitmap(bitmap)));
+                        // Draw the text on the canvas after the drawable
+                        String userId = "@" + moodPost.getProfile().getUserId();
+                        canvas.drawText(userId, xPos, yPos, textPaint);
+                        googleMap.addMarker(new MarkerOptions().position(moodPostLatLng).title(moodPost.getProfile().getUserID()).icon(BitmapDescriptorFactory.fromBitmap(bitmap)));
+                    }
                 }
                 // Move and zoom the camera to the user's location
                 googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(currentLatLng, 15));

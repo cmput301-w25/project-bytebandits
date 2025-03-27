@@ -168,7 +168,7 @@ public class MoodPost implements Serializable {
      *      Returns null when the mood post has no attached location.
      */
     public Double getLongitude() {
-        if (!location) { return longitude; }
+        if (location) { return longitude; }
         else { return null; }
     }
 
@@ -191,7 +191,7 @@ public class MoodPost implements Serializable {
      * @return
      *      Returns a Boolean object representing the mood post's show location status.
      */
-    public boolean getLocation() {
+    public Boolean getLocation() {
         return location;
     }
 
