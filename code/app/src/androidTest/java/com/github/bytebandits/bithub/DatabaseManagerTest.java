@@ -170,6 +170,7 @@ public class DatabaseManagerTest {
         });
     }
 
+    /*
     @After
     public void tearDown() {
         String projectId = "byte-bandits-project";
@@ -184,4 +185,5 @@ public class DatabaseManagerTest {
             Log.e("Cleanup Error", Objects.requireNonNull(e.getMessage()));
         }
     }
+    */
 }

@@ -10,11 +10,13 @@ import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
 import android.widget.SearchView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
 
 import com.github.bytebandits.bithub.MainActivity;
@@ -106,6 +108,7 @@ public class HomepageFragment extends Fragment implements FilterDialog.FilterLis
                     if (!filteredDataList.isEmpty()) {
                         moodPostAdapter = new MoodPostArrayAdapter(getContext(), filteredDataList);
                         moodPostList.setAdapter(moodPostAdapter);
+                        moodPostList.setEmptyView(view.findViewById(R.id.homepageEmptyListMessage));
 
                         // on item click on list, open detailed view of post
                         moodPostList.setOnItemClickListener((parent, v, position, id) -> {
@@ -170,10 +173,9 @@ public class HomepageFragment extends Fragment implements FilterDialog.FilterLis
             ((MainActivity) requireActivity()).replaceFragment(ProfileFragment.newInstance(profile));
         });
 
-        // logic to unfocus from search view, although there are cases where if you
-        // click certain ui elements, the click wont register and you will be still focused
-        LinearLayout homepageLinearLayoutRoot = view.findViewById(R.id.HomepageLinearLayoutRoot);
-        homepageLinearLayoutRoot.setOnClickListener(new View.OnClickListener() {
+        // logic to unfocus from search view, although there are cases where if you click certain ui elements, the click wont register and you will be still focused
+        RelativeLayout homepageLayoutRoot = view.findViewById(R.id.HomepageLayoutRoot);
+        homepageLayoutRoot.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 profileSearch.clearFocus();
