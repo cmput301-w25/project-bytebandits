@@ -32,7 +32,6 @@ public class LoginFragment extends Fragment {
     TextInputEditText userEmailText;
     TextInputEditText passwordText;
     Button login;
-    TextView pswrdReset;
     FloatingActionButton back;
 
     @Nullable
@@ -43,17 +42,13 @@ public class LoginFragment extends Fragment {
         login = view.findViewById(R.id.loginBtn);
         userEmailText = view.findViewById(R.id.UserEmailInputText);
         passwordText = view.findViewById(R.id.PswrdInputText);
-        pswrdReset = view.findViewById(R.id.pswrdReset);
         back = view.findViewById(R.id.backActionButton);
 
         login.setOnClickListener(v -> {
             authenticate();
         });
 
-        pswrdReset.setOnClickListener(v -> {
-            int placeholder = 0; // remove when done implementing
-            // StartupActivity switches to PasswordRestFragment
-        });
+
 
         back.setOnClickListener(v -> {
             ((StartupActivity) requireActivity()).popBackStack("loginFragment");
