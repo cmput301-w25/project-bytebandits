@@ -131,8 +131,8 @@ public class ProfileFragment extends Fragment implements FilterDialog.FilterList
         filterButton = view.findViewById(R.id.filter_button);
         usernameTextView = view.findViewById(R.id.username_textview);
 
-        String userId = profile.getUserID();
-        String loggedInUser = SessionManager.getInstance(requireContext()).getUsername();
+        String userId = profile.getUserId();
+        String loggedInUser = SessionManager.getInstance(requireContext()).getUserId();
 
         usernameTextView.setText(userId);
 
@@ -157,9 +157,9 @@ public class ProfileFragment extends Fragment implements FilterDialog.FilterList
         executor.execute(() -> {
             String targetUserId;
             if (isOtherProfile) {
-                targetUserId = getOtherProfile().getUserID();
+                targetUserId = getOtherProfile().getUserId();
             } else {
-                targetUserId = SessionManager.getInstance(requireContext()).getUsername();
+                targetUserId = SessionManager.getInstance(requireContext()).getUserId();
             }
 
             DatabaseManager.getInstance().getUserPosts(targetUserId, posts -> {
