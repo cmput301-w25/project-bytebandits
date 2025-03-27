@@ -43,12 +43,16 @@ public final class DatabaseManager {
     }
 
     public static DatabaseManager getInstance() {
-        return getInstance(false);  // Default: Don't use emulator
+        return getInstance(false); // Default: Don't use emulator
     }
 
-    public CollectionReference getUsersCollectionRef() { return usersCollectionRef; }
-    public CollectionReference getPostsCollectionRef() { return postsCollectionRef; }
+    public CollectionReference getUsersCollectionRef() {
+        return usersCollectionRef;
+    }
 
+    public CollectionReference getPostsCollectionRef() {
+        return postsCollectionRef;
+    }
 
     /**
      * Default success handler for Firebase operations, logs the result.
@@ -74,16 +78,17 @@ public final class DatabaseManager {
      * Fetches a user by their userId from the FireStore database.
      * The result is returned via the provided listener.
      *
-     * @param userId The user ID to fetch.
-     * @param listener The listener that will receive the result (user data or null).
-     * Example usage:
-     * DatabaseManager.getUser("user123", user -> {
-     *     if (user != null) {
-     *         System.out.println("User data: " + user);
-     *     } else {
-     *         System.out.println("User not found.");
-     *     }
-     * });
+     * @param userId   The user ID to fetch.
+     * @param listener The listener that will receive the result (user data or
+     *                 null).
+     *                 Example usage:
+     *                 DatabaseManager.getUser("user123", user -> {
+     *                 if (user != null) {
+     *                 System.out.println("User data: " + user);
+     *                 } else {
+     *                 System.out.println("User not found.");
+     *                 }
+     *                 });
      */
     public void getUser(String userId, OnUserFetchListener listener) {
         usersCollectionRef.document(userId).get().addOnCompleteListener(task -> {
@@ -101,7 +106,8 @@ public final class DatabaseManager {
      *
      * @param userId      The unique identifier for the user.
      * @param userDetails A HashMap containing user details to be stored.
-     * @param listener    An optional listener to handle success or failure callbacks.
+     * @param listener    An optional listener to handle success or failure
+     *                    callbacks.
      */
     public void addUser(String userId, HashMap<String, Object> userDetails, Optional<OnUserAddListener> listener) {
         usersCollectionRef.document(userId).set(userDetails)
@@ -118,7 +124,7 @@ public final class DatabaseManager {
     /**
      * Searches for users whose userId matches or starts with the given query.
      *
-     * @param query The search term used to find users.
+     * @param query    The search term used to find users.
      * @param listener A listener to handle the searched users
      * @throws ExecutionException   If an error occurs while executing the query.
      * @throws InterruptedException If the execution is interrupted.
@@ -160,16 +166,16 @@ public final class DatabaseManager {
         Log.d("DatabaseManager", "searchUsers() execution finished, waiting for Firestore response...");
     }
 
-
     // Get Followers, Edit Post,
 
     /**
      * Sends a notification to a specific user.
      *
      * @param recipientUserId The ID of the user who will receive the notification.
-     * @param docRef          A reference to the document associated with the notification.
+     * @param docRef          A reference to the document associated with the
+     *                        notification.
      */
-    private void sendNotification(String recipientUserId, DocumentReference docRef){
+    private void sendNotification(String recipientUserId, DocumentReference docRef) {
         DocumentReference recipientDocRef = this.usersCollectionRef.document(recipientUserId);
         recipientDocRef.update(DocumentReferences.NOTIFICATIONS.getDocRefString(), FieldValue.arrayUnion(docRef));
     }
@@ -184,8 +190,10 @@ public final class DatabaseManager {
         DocumentReference requestedUserDocRef = this.usersCollectionRef.document(requestedUserId);
         DocumentReference currentUserDocRef = this.usersCollectionRef.document(currentUserId);
 
-        currentUserDocRef.update(DocumentReferences.FOLLOWERS.getDocRefString(), FieldValue.arrayUnion(requestedUserDocRef));
-        currentUserDocRef.update(DocumentReferences.NOTIFICATIONS.getDocRefString(), FieldValue.arrayRemove(requestedUserDocRef));
+        currentUserDocRef.update(DocumentReferences.FOLLOWERS.getDocRefString(),
+                FieldValue.arrayUnion(requestedUserDocRef));
+        currentUserDocRef.update(DocumentReferences.NOTIFICATIONS.getDocRefString(),
+                FieldValue.arrayRemove(requestedUserDocRef));
     }
 
     /**
@@ -198,7 +206,8 @@ public final class DatabaseManager {
         DocumentReference requestedUserDocRef = this.usersCollectionRef.document(requestedUserId);
         DocumentReference currentUserDocRef = this.usersCollectionRef.document(currentUserId);
 
-        currentUserDocRef.update(DocumentReferences.NOTIFICATIONS.getDocRefString(), FieldValue.arrayRemove(requestedUserDocRef));
+        currentUserDocRef.update(DocumentReferences.NOTIFICATIONS.getDocRefString(),
+                FieldValue.arrayRemove(requestedUserDocRef));
     }
 
     /**
@@ -214,8 +223,8 @@ public final class DatabaseManager {
         currentUserDocRef.get().addOnCompleteListener(task -> {
             if (task.isSuccessful() && task.getResult() != null) {
                 DocumentSnapshot userSnapshot = task.getResult();
-                ArrayList<DocumentReference> followerRefs =
-                        (ArrayList<DocumentReference>) userSnapshot.get(DocumentReferences.FOLLOWERS.getDocRefString());
+                ArrayList<DocumentReference> followerRefs = (ArrayList<DocumentReference>) userSnapshot
+                        .get(DocumentReferences.FOLLOWERS.getDocRefString());
 
                 // User does not have any followers
                 if (followerRefs == null || followerRefs.isEmpty()) {
@@ -223,7 +232,7 @@ public final class DatabaseManager {
                     return;
                 }
 
-                int[] remainingFollowers = {followerRefs.size()}; // Track pending follower retrievals
+                int[] remainingFollowers = { followerRefs.size() }; // Track pending follower retrievals
 
                 for (DocumentReference followerRef : followerRefs) {
                     followerRef.get().addOnCompleteListener(followerTask -> {
@@ -248,17 +257,17 @@ public final class DatabaseManager {
      * Adds a new post to the Firestore database.
      * The result is returned via the provided listener.
      *
-     * @param post The post object to be added.
+     * @param post     The post object to be added.
      * @param listener The listener that will receive the success result.
      *
-     * Example Usage:
-     * DatabaseManager.addPost(post, success -> {
-     *     if (success) {
-     *         System.out.println("Post added successfully.");
-     *     } else {
-     *         System.out.println("Failed to add post.");
-     *     }
-     * });
+     *                 Example Usage:
+     *                 DatabaseManager.addPost(post, success -> {
+     *                 if (success) {
+     *                 System.out.println("Post added successfully.");
+     *                 } else {
+     *                 System.out.println("Failed to add post.");
+     *                 }
+     *                 });
      */
     public void addPost(@NotNull MoodPost post, @NotNull String userId, Optional<OnPostAddedListener> listener) {
         String postId = post.getPostID().toString();
@@ -284,20 +293,21 @@ public final class DatabaseManager {
      * Updates a post in the Firestore database.
      * The result is returned via the provided listener.
      *
-     * @param postId The ID of the post to update.
-     * @param options A map of fields to update (field names and values).
+     * @param postId   The ID of the post to update.
+     * @param options  A map of fields to update (field names and values).
      * @param listener The listener that will receive the success result.
      *
-     * Example Usage:
-     * HashMap<String, Object> updateFields = new HashMap<>();
-     * updateFields.put("title", "Updated Title");
-     * DatabaseManager.updatePost(postId, updateFields, success -> {
-     *     if (success) {
-     *         System.out.println("Post updated.");
-     *     }
-     * });
+     *                 Example Usage:
+     *                 HashMap<String, Object> updateFields = new HashMap<>();
+     *                 updateFields.put("title", "Updated Title");
+     *                 DatabaseManager.updatePost(postId, updateFields, success -> {
+     *                 if (success) {
+     *                 System.out.println("Post updated.");
+     *                 }
+     *                 });
      */
-    public void updatePost(@NotNull String postId, HashMap<String, Object> options, Optional<OnPostUpdatedListener> listener) {
+    public void updatePost(@NotNull String postId, HashMap<String, Object> options,
+            Optional<OnPostUpdatedListener> listener) {
         DocumentReference postRef = postsCollectionRef.document(postId.toString());
 
         postRef.update(options)
@@ -316,13 +326,13 @@ public final class DatabaseManager {
      * The result is returned via the provided listener.
      *
      * @param listener The listener that will receive the result (list of posts).
-     * Example Usage:
-     * DatabaseManager.getPosts(posts -> {
-     *     for (MoodPost post : posts) {
-     *         System.out.println(post);
-     *     }
-     *   }
-     * )
+     *                 Example Usage:
+     *                 DatabaseManager.getPosts(posts -> {
+     *                 for (MoodPost post : posts) {
+     *                 System.out.println(post);
+     *                 }
+     *                 }
+     *                 )
      */
     public void getAllPosts(OnPostsFetchListener listener) {
         postsCollectionRef.get().addOnCompleteListener(task -> {
@@ -354,14 +364,14 @@ public final class DatabaseManager {
      * Fetches posts from a specific user by their userId.
      * The result is returned via the provided listener.
      *
-     * @param userId The user ID whose posts need to be fetched.
+     * @param userId   The user ID whose posts need to be fetched.
      * @param listener The listener that will receive the result (list of posts).
-     * Example Usage:
-     * DatabaseManager.getPosts(userId, postsMap -> {
-     *     if (postsMap != null) {
-     *         // Do what you need here
-     *     }
-     * });
+     *                 Example Usage:
+     *                 DatabaseManager.getPosts(userId, postsMap -> {
+     *                 if (postsMap != null) {
+     *                 // Do what you need here
+     *                 }
+     *                 });
      */
     public void getUserPosts(@NotNull String userId, OnPostsFetchListener listener) {
         ArrayList<MoodPost> posts = new ArrayList<>();
@@ -397,7 +407,7 @@ public final class DatabaseManager {
                     }
                 }
 
-                int[] postRemaining = {postRefs.size()}; // Track individual post retrieval
+                int[] postRemaining = { postRefs.size() }; // Track individual post retrieval
 
                 for (DocumentReference postRef : postRefs) {
                     postRef.get().addOnCompleteListener(postTask -> {
@@ -422,30 +432,33 @@ public final class DatabaseManager {
             }
         });
     }
+
     /**
      * Fetches posts from multiple users based on their userIds.
      * The result is returned via the provided listener.
      * Once all posts are fetched, the listener will be called with the results.
      *
-     * @param userIds List of user IDs whose posts need to be fetched.
-     * @param listener The listener that will receive the result (map of userId to their posts).
+     * @param userIds  List of user IDs whose posts need to be fetched.
+     * @param listener The listener that will receive the result (map of userId to
+     *                 their posts).
      *
-     * Example Usage:
-     * ArrayList<String> userIds = new ArrayList<>();
-     * userIds.add("user1");
-     * userIds.add("user2");
-     * DatabaseManager.getPosts(userIds, postsMap -> {
-     *     if (postsMap != null) {
-     *         for (String userId : postsMap.keySet()) {
-     *             ArrayList<MoodPost> posts = postsMap.get(userId);
-     *             Log.d("Database", "User " + userId + " has " + posts.size() + " posts.");
-     *         }
-     *     }
-     * });
+     *                 Example Usage:
+     *                 ArrayList<String> userIds = new ArrayList<>();
+     *                 userIds.add("user1");
+     *                 userIds.add("user2");
+     *                 DatabaseManager.getPosts(userIds, postsMap -> {
+     *                 if (postsMap != null) {
+     *                 for (String userId : postsMap.keySet()) {
+     *                 ArrayList<MoodPost> posts = postsMap.get(userId);
+     *                 Log.d("Database", "User " + userId + " has " + posts.size() +
+     *                 " posts.");
+     *                 }
+     *                 }
+     *                 });
      */
     public void getUsersPosts(@NotNull ArrayList<String> userIds, OnMultipleUsersPostsFetchListener listener) {
         HashMap<String, ArrayList<MoodPost>> postsMap = new HashMap<>();
-        int[] remaining = {userIds.size()}; // To track when all user posts are fetched
+        int[] remaining = { userIds.size() }; // To track when all user posts are fetched
 
         for (String userId : userIds) {
             usersCollectionRef.document(userId).get().addOnCompleteListener(task -> {
@@ -464,7 +477,7 @@ public final class DatabaseManager {
                     }
 
                     ArrayList<MoodPost> posts = new ArrayList<>();
-                    int[] postRemaining = {postRefs.size()}; // Track individual post retrieval
+                    int[] postRemaining = { postRefs.size() }; // Track individual post retrieval
 
                     for (DocumentReference postRef : postRefs) {
                         postRef.get().addOnCompleteListener(postTask -> {
@@ -499,15 +512,15 @@ public final class DatabaseManager {
      * Deletes a post from the Firestore database.
      * The result is returned via the provided listener.
      *
-     * @param postID The ID of the post to delete.
+     * @param postID   The ID of the post to delete.
      * @param listener The listener that will receive the success result.
      *
-     * Example Usage:
-     * DatabaseManager.deletePost(postId, success -> {
-     *     if (success) {
-     *         System.out.println("Post deleted.");
-     *     }
-     * });
+     *                 Example Usage:
+     *                 DatabaseManager.deletePost(postId, success -> {
+     *                 if (success) {
+     *                 System.out.println("Post deleted.");
+     *                 }
+     *                 });
      */
     public void deletePost(@NotNull String postID, @NotNull String userId, Optional<OnPostDeletedListener> listener) {
         DocumentReference postDocRef = postsCollectionRef.document(postID.toString());
@@ -534,11 +547,20 @@ public final class DatabaseManager {
                     ArrayList<DocumentReference> followersRef = (ArrayList<DocumentReference>) followersRefsObject;
 
                     for (DocumentReference followerRef : followersRef) {
-                        followerRef.update(DocumentReferences.NOTIFICATIONS.getDocRefString(), FieldValue.arrayUnion(postDocRef));
+                        followerRef.update(DocumentReferences.NOTIFICATIONS.getDocRefString(),
+                                FieldValue.arrayUnion(postDocRef));
                     }
                 }
             }
         });
+    }
+
+    private void addComment(String postId, String userId, String comment) {
+        postsCollectionRef.document(postId).update("comments", FieldValue.arrayUnion(Map.entry(userId, comment)));
+    }
+
+    private void deleteComment(String postId, Map.Entry<String, String> comment) {
+        postsCollectionRef.document(postId).update("comments", FieldValue.arrayRemove(comment));
     }
 
     /**
@@ -572,7 +594,6 @@ public final class DatabaseManager {
     public interface OnFollowersFetchListener {
         void onFollowersFetched(ArrayList<Profile> followers);
     }
-
 
     /**
      * Callback interface for fetching posts.

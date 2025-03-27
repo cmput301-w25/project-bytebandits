@@ -99,6 +99,7 @@ public class Profile implements Serializable {
         this.image = image;
     }
 
+
     /**
      * Converts the profile details to JSON
      *

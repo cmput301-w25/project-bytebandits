@@ -11,8 +11,10 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
+import com.github.bytebandits.bithub.controller.SessionManager;
 import com.github.bytebandits.bithub.databinding.ActivityMainBinding;
 import com.github.bytebandits.bithub.model.MoodPost;
+import com.github.bytebandits.bithub.model.Profile;
 import com.github.bytebandits.bithub.view.ExploreFragment;
 import com.github.bytebandits.bithub.view.HomepageFragment;
 import com.github.bytebandits.bithub.view.NotificationsFragment;
@@ -67,7 +69,8 @@ public class MainActivity extends AppCompatActivity {
             } else if (item.getItemId() == R.id.notifications) {
                 replaceFragment(new NotificationsFragment());
             } else if (item.getItemId() == R.id.profile) {
-                replaceFragment(new ProfileFragment());
+                Profile userProfile = SessionManager.getInstance(this).getProfile(); // get currently logged in profile
+                replaceFragment(ProfileFragment.newInstance(userProfile));
             }
             return true;
         });

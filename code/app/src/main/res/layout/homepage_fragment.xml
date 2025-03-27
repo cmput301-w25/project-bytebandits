@@ -16,6 +16,17 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
 
+    <ImageButton
+        android:id="@+id/filter_button_homepage"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="360dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="20dp"
+        android:background="@color/Background"
+        app:srcCompat="@drawable/baseline_filter_alt_24"
+        app:tint="@color/white" />
+        
     </LinearLayout>
 
     <ListView
