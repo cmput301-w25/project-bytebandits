@@ -133,7 +133,7 @@ public final class DatabaseManager {
         Log.d("DatabaseManager", "Starting searchUsers for query: " + query);
 
         Query users = this.usersCollectionRef
-                .orderBy("username")
+                .orderBy("userId")
                 .startAt(query)
                 .endAt(query + "~");
 

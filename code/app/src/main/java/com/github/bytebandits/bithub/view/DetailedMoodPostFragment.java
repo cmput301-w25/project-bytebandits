@@ -62,7 +62,7 @@ public class DetailedMoodPostFragment extends DialogFragment {
         } else {
             viewSocialStatus.setText(moodPost.getSocialSituation().name());
         }
-        viewName.setText(moodPost.getProfile().getUserID());
+        viewName.setText(moodPost.getProfile().getUserId());
         viewDate.setText(moodPost.getFormattedPostedDate());
         viewTime.setText(moodPost.getFormattedPostedTime());
         viewEmotion.setText(moodPost.getEmotion().getState());
@@ -87,10 +87,10 @@ public class DetailedMoodPostFragment extends DialogFragment {
         });
 
         // Show and set edit and delete buttons if this post is ours
-        if (Objects.equals(moodPost.getProfile().getUserID(), profile.getUserID())) {
+        if (Objects.equals(moodPost.getProfile().getUserId(), profile.getUserId())) {
             viewProfileButton.setVisibility(View.GONE);
             deleteButton.setOnClickListener(v -> {
-                DatabaseManager.getInstance().deletePost(moodPost.getPostID(), moodPost.getProfile().getUserID(),
+                DatabaseManager.getInstance().deletePost(moodPost.getPostID(), moodPost.getProfile().getUserId(),
                         Optional.empty());
                 dialog.dismiss();
             });

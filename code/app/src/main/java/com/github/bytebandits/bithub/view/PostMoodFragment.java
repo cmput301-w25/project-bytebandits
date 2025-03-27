@@ -80,7 +80,7 @@ public class PostMoodFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
-                             @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+            @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.post_mood_fragment, container, false);
         // Initialize views
         Spinner editEmotion = view.findViewById(R.id.postMoodEmotion);
@@ -97,15 +97,13 @@ public class PostMoodFragment extends Fragment {
         deleteButton.setVisibility(View.GONE);
         ImageView editImage = view.findViewById(R.id.postMoodImage);
         SessionManager sessionManager = SessionManager.getInstance(requireContext());
-
         // Get the mood post if we need to edit a mood post
         String tag = getTag();
         Bundle bundle = getArguments();
         MoodPost postToEdit;
-        if (tag != null && tag.equals("edit mood post") && bundle != null){
+        if (tag != null && tag.equals("edit mood post") && bundle != null) {
             postToEdit = (MoodPost) bundle.getSerializable("mood post");
-        }
-        else {
+        } else {
             postToEdit = null;
         }
 
@@ -118,15 +116,14 @@ public class PostMoodFragment extends Fragment {
         ArrayAdapter<Emotion> emotionAdapter = new ArrayAdapter<>(
                 getActivity(),
                 android.R.layout.simple_spinner_item,
-                emotions
-        );
+                emotions);
         ArrayAdapter<Object> socialSituationAdapter = new ArrayAdapter<>(
                 getActivity(),
                 android.R.layout.simple_spinner_item,
-                socialSituations
-        );
+                socialSituations);
 
-        // Specify the layout to use when the list of choices appears and apply the adapters
+        // Specify the layout to use when the list of choices appears and apply the
+        // adapters
         socialSituationAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         emotionAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         editEmotion.setAdapter(emotionAdapter);
@@ -135,14 +132,14 @@ public class PostMoodFragment extends Fragment {
         // Initialize selected emotions and social situations
         selectedEmotion = emotionAdapter.getItem(0);
         selectedSocialSituation = null;
-
         // Handle user selected input for spinners
         editEmotion.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parentView, View selectedItemView,
-                                       int position, long id) {
+                    int position, long id) {
                 selectedEmotion = (Emotion) parentView.getItemAtPosition(position);
             }
+
             @Override
             public void onNothingSelected(AdapterView<?> adapterView) {
                 // Default to first emotion on none selected
@@ -152,12 +149,17 @@ public class PostMoodFragment extends Fragment {
         editSocialSituation.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parentView, View selectedItemView,
-                                       int position, long id) {
+                    int position, long id) {
                 // if prefer not to say is selected, set social situation to null
-                if (position == 0) { selectedSocialSituation = null; }
+                if (position == 0) {
+                    selectedSocialSituation = null;
+                }
                 // else set it regularly
-                else { selectedSocialSituation = (SocialSituation) parentView.getItemAtPosition(position); }
+                else {
+                    selectedSocialSituation = (SocialSituation) parentView.getItemAtPosition(position);
+                }
             }
+
             @Override
             public void onNothingSelected(AdapterView<?> adapterView) {
                 // Default to null option on none selected
@@ -172,7 +174,8 @@ public class PostMoodFragment extends Fragment {
                 new ActivityResultContracts.StartActivityForResult(),
                 result -> {
                     if (result.getResultCode() == Activity.RESULT_OK && result.getData() != null) {
-                        selectedImageUri = result.getData().getData(); // The first getData() returns and intent, and the second, the URI
+                        selectedImageUri = result.getData().getData(); // The first getData() returns and intent, and
+                                                                       // the second, the URI
                         // Convert image Uri to Byte array for storage and check the file size of image
                         try {
                             selectedImageByteArray = uriToByteArray(selectedImageUri);
@@ -183,7 +186,8 @@ public class PostMoodFragment extends Fragment {
                             // Show an error message
                             new AlertDialog.Builder(getContext())
                                     .setTitle("Error")
-                                    .setMessage("Image is too large (Must be less than 65536 bytes). Please select a smaller file.")
+                                    .setMessage(
+                                            "Image is too large (Must be less than 65536 bytes). Please select a smaller file.")
                                     .setNegativeButton("Ok", (dialog, which) -> {
                                         dialog.cancel();
                                     })
@@ -199,8 +203,7 @@ public class PostMoodFragment extends Fragment {
                                     .show();
                         }
                     }
-                }
-        );
+                });
         // Launch the activity on upload button click
         uploadButton.setOnClickListener(v -> {
             Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
@@ -218,19 +221,23 @@ public class PostMoodFragment extends Fragment {
             selectSpinnerItemByValue(editSocialSituation, postToEdit.getSocialSituation());
             editLocation.setChecked(postToEdit.getLocation());
             editPublic.setChecked(postToEdit.isPublic());
-            if (postToEdit.getDescription() == null) { editDescription.setText(""); }
-            else { editDescription.setText(postToEdit.getDescription()); }
+            if (postToEdit.getDescription() == null) {
+                editDescription.setText("");
+            } else {
+                editDescription.setText(postToEdit.getDescription());
+            }
             if (postToEdit.getImage() != null) {
                 byte[] postImageByteArray = Base64.decode(postToEdit.getImage(), Base64.DEFAULT);
-                selectedImageByteArray = postImageByteArray; // So if the user doesn't upload a new image, it won't update the image to null
-                    editImage.setImageBitmap(BitmapFactory.decodeByteArray(postImageByteArray,
+                selectedImageByteArray = postImageByteArray; // So if the user doesn't upload a new image, it won't
+                                                             // update the image to null
+                editImage.setImageBitmap(BitmapFactory.decodeByteArray(postImageByteArray,
                         0, postImageByteArray.length));
                 deleteButton.setVisibility(View.VISIBLE);
             }
         }
 
         // Delete image button logic
-        deleteButton.setOnClickListener(v ->{
+        deleteButton.setOnClickListener(v -> {
             editImage.setImageBitmap(null);
             selectedImageByteArray = null;
             selectedImageUri = null;
@@ -241,33 +248,39 @@ public class PostMoodFragment extends Fragment {
             // Get inputs
             selectedLocation = editLocation.isChecked();
             selectedPublic = editPublic.isChecked();
-            if (editDescription.getText().toString().isEmpty()) { selectedDescription = null; }
-            else { selectedDescription = editDescription.getText().toString(); }
+            if (editDescription.getText().toString().isEmpty()) {
+                selectedDescription = null;
+            } else {
+                selectedDescription = editDescription.getText().toString();
+            }
 
-            // Check for valid description input (max 20 char. or 3 words), if valid, add mood post
+            // Check for valid description input (max 20 char. or 3 words), if valid, add
+            // mood post
             if (selectedDescription != null && selectedDescription.length() > 200) {
                 editDescription.setError("Description can be max 200 characters");
-            }
-            else {
+            } else {
                 DatabaseManager databaseManager = DatabaseManager.getInstance();
                 // Add mood post to database
                 String selectedImageBase64String;
-                if (selectedImageByteArray != null) { selectedImageBase64String = Base64.encodeToString(selectedImageByteArray, Base64.DEFAULT); }
-                else { selectedImageBase64String = null; }
+                if (selectedImageByteArray != null) {
+                    selectedImageBase64String = Base64.encodeToString(selectedImageByteArray, Base64.DEFAULT);
+                } else {
+                    selectedImageBase64String = null;
+                }
                 if (postToEdit == null) {
                     MoodPost moodPost = new MoodPost(selectedEmotion, sessionManager.getProfile(),
                             selectedLocation, selectedSocialSituation, selectedDescription,
                             selectedImageBase64String, selectedPublic);
-                    databaseManager.addPost(moodPost, sessionManager.getProfile().getUserID(), Optional.empty());
-                    // for some reason setting the longitude and latitude then adding post doesn't work so im updating the values after adding the post
+                    databaseManager.addPost(moodPost, sessionManager.getProfile().getUserId(), Optional.empty());
+                    // for some reason setting the longitude and latitude then adding post doesn't
+                    // work so im updating the values after adding the post
                     if (selectedLocation) {
                         HashMap<String, Object> updateFields = new HashMap<>();
                         updateFields.put("longitude", currentLongitude);
                         updateFields.put("latitude", currentLatitude);
                         databaseManager.updatePost(moodPost.getPostID(), updateFields, Optional.empty());
                     }
-                }
-                else {
+                } else {
                     HashMap<String, Object> updateFields = new HashMap<>();
                     updateFields.put("socialSituation", selectedSocialSituation);
                     updateFields.put("emotion", selectedEmotion);
@@ -275,7 +288,8 @@ public class PostMoodFragment extends Fragment {
                     updateFields.put("image", selectedImageBase64String);
                     updateFields.put("location", selectedLocation);
                     updateFields.put("public", selectedPublic);
-                    // If user wants to set the location, and no previous location is assigned to the mood post, then assign new location
+                    // If user wants to set the location, and no previous location is assigned to
+                    // the mood post, then assign new location
                     if (selectedLocation && (postToEdit.getLongitude() == null || postToEdit.getLatitude() == null)) {
                         updateFields.put("longitude", currentLongitude);
                         updateFields.put("latitude", currentLatitude);
@@ -296,15 +310,15 @@ public class PostMoodFragment extends Fragment {
     }
 
     private void findCurrentLocation() {
-        boolean b = ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_COARSE_LOCATION)
-                != PackageManager.PERMISSION_GRANTED;
-        if (ActivityCompat.checkSelfPermission(requireContext(), android.Manifest.permission.ACCESS_FINE_LOCATION)
-                != PackageManager.PERMISSION_GRANTED &&
-        ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_COARSE_LOCATION)
-                        != PackageManager.PERMISSION_GRANTED) {
+        boolean b = ActivityCompat.checkSelfPermission(requireContext(),
+                Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED;
+        if (ActivityCompat.checkSelfPermission(requireContext(),
+                android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
+                ActivityCompat.checkSelfPermission(requireContext(),
+                        Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
 
             // Request permissions if not granted
-            requestPermissions(new String[]{
+            requestPermissions(new String[] {
                     android.Manifest.permission.ACCESS_FINE_LOCATION,
                     android.Manifest.permission.ACCESS_COARSE_LOCATION
             }, REQUEST_LOCATION_PERMISSION);
@@ -325,12 +339,13 @@ public class PostMoodFragment extends Fragment {
      * and selects the item that matches the given value.
      *
      * @param spnr  The {@link Spinner} whose item is to be selected.
-     *             Must not be {@code null}.
+     *              Must not be {@code null}.
      * @param value The value to match against the spinner's items.
-     *             Must not be {@code null}.
+     *              Must not be {@code null}.
      *
-     * @throws NullPointerException If either {@code spnr} or {@code value} is {@code null}.
-    */
+     * @throws NullPointerException If either {@code spnr} or {@code value} is
+     *                              {@code null}.
+     */
     private void selectSpinnerItemByValue(Spinner spnr, Object value) {
         SpinnerAdapter adapter = spnr.getAdapter();
         for (int position = 0; position < adapter.getCount(); position++) {
@@ -341,18 +356,21 @@ public class PostMoodFragment extends Fragment {
         }
     }
 
-/**
- * Converts the data from a file represented by a URI into a byte array.
- * This method reads the file in chunks using a buffer to efficiently handle large files
- * without loading the entire file into memory at once.
- *
- * @param uri     The URI of the file to be converted into a byte array.
- * @return A byte array containing the data from the file.
- * @throws IOException If an I/O error occurs while reading the file, such as if the URI
- *                     cannot be opened or the file cannot be read.
- * @throws IllegalArgumentException If the file size is greater than or equal to 65536 bytes.
- */
-    private byte[] uriToByteArray(Uri uri) throws IOException, IllegalArgumentException{
+    /**
+     * Converts the data from a file represented by a URI into a byte array.
+     * This method reads the file in chunks using a buffer to efficiently handle
+     * large files
+     * without loading the entire file into memory at once.
+     *
+     * @param uri The URI of the file to be converted into a byte array.
+     * @return A byte array containing the data from the file.
+     * @throws IOException              If an I/O error occurs while reading the
+     *                                  file, such as if the URI
+     *                                  cannot be opened or the file cannot be read.
+     * @throws IllegalArgumentException If the file size is greater than or equal to
+     *                                  65536 bytes.
+     */
+    private byte[] uriToByteArray(Uri uri) throws IOException, IllegalArgumentException {
         // Get input output streams
         InputStream inputStream = getContext().getContentResolver().openInputStream(uri);
         ByteArrayOutputStream byteBuffer = new ByteArrayOutputStream();

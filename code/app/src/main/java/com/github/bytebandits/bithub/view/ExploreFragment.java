@@ -171,9 +171,9 @@ public class ExploreFragment extends Fragment implements GoogleMap.OnMarkerClick
                     float yPos = textBackgroundTop + textBackgroundHeight / 2f - ((textPaint.descent() + textPaint.ascent()) / 2f);
 
                     // Draw the text on the canvas after the drawable
-                    String userId = "@" + moodPost.getProfile().getUserID();
+                    String userId = "@" + moodPost.getProfile().getUserId();
                     canvas.drawText(userId, xPos, yPos, textPaint);
-                    googleMap.addMarker(new MarkerOptions().position(moodPostLatLng).title(moodPost.getProfile().getUserID()).icon(BitmapDescriptorFactory.fromBitmap(bitmap)));
+                    googleMap.addMarker(new MarkerOptions().position(moodPostLatLng).title(moodPost.getProfile().getUserId()).icon(BitmapDescriptorFactory.fromBitmap(bitmap)));
                 }
                 // Move and zoom the camera to the user's location
                 googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(currentLatLng, 15));

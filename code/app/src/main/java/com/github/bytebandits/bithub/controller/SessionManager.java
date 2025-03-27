@@ -11,7 +11,7 @@ import com.google.gson.Gson;
 public class SessionManager {
     private static final String PREF_NAME = "UserSession";
     private static final String KEY_PROFILE = "profile";
-    private static final String KEY_USERNAME = "username";
+    private static final String KEY_USERID = "userId";
     private static final String IS_LOGIN = "IsLoggedIn";
 
     private static SessionManager instance;
@@ -37,9 +37,9 @@ public class SessionManager {
     }
 
     // Create login session
-    public void createLoginSession(String username) {
+    public void createLoginSession(String userId) {
         editor.putBoolean(IS_LOGIN, true);
-        editor.putString(KEY_USERNAME, username);
+        editor.putString(KEY_USERID, userId);
         editor.commit();
     }
 
@@ -55,8 +55,8 @@ public class SessionManager {
         return this.editor;
     }
 
-    public String getUsername() {
-        return prefs.getString(KEY_USERNAME, null);
+    public String getUserId() {
+        return prefs.getString(KEY_USERID, null);
     }
 
     public void checkLogin() {
@@ -90,16 +90,14 @@ public class SessionManager {
         context.startActivity(i);
     }
 
-    public static String getPrefName() {
-        return PREF_NAME;
-    }
+    public static String getPrefName() { return PREF_NAME; }
 
     public static String getKeyProfile() {
         return KEY_PROFILE;
     }
 
-    public static String getKeyUsername() {
-        return KEY_USERNAME;
+    public static String getKeyUserId() {
+        return KEY_USERID;
     }
 
     public static String getIsLoginKey() {

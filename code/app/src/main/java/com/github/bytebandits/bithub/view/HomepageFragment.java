@@ -198,10 +198,10 @@ public class HomepageFragment extends Fragment implements FilterDialog.FilterLis
                             String profileJson = (String) user.get("profile");
                             try {
                                 JSONObject profileObj = new JSONObject(profileJson);
-                                String userID = profileObj.getString("userID");
+                                String userId = profileObj.getString("userId");
                                 String userImg;
                                 if (profileObj.isNull("img")) {
-                                    profiles.add(new Profile(userID));
+                                    profiles.add(new Profile(userId));
                                     // use default profile pic
                                 }
                                 // else{
