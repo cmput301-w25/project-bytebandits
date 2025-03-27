@@ -19,6 +19,7 @@ import com.github.bytebandits.bithub.R;
 import com.github.bytebandits.bithub.controller.DatabaseManager;
 import com.github.bytebandits.bithub.controller.SessionManager;
 import com.github.bytebandits.bithub.model.MoodPost;
+import com.github.bytebandits.bithub.model.Profile;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
@@ -143,7 +144,7 @@ public class NotificationsFragment extends Fragment {
 //
 //        // Iterate through sorted posts and keep only the first (latest) post for each user
 //        for (MoodPost post : sortedPosts) {
-//            String postUserId = post.getProfile().getUserID();
+//            String postUserId = post.getProfile().getUserId();
 //
 //            // Only add if this user's post is not already in the map
 //            if (!uniqueUserPosts.containsKey(postUserId) && !postUserId.equals(userId)) {
@@ -165,7 +166,7 @@ public class NotificationsFragment extends Fragment {
         sortedPosts.sort((p1, p2) -> p2.getPostedDateTime().compareTo(p1.getPostedDateTime()));
 
         for (MoodPost post : sortedPosts) {
-            String postUserId = post.getProfile().getUserID();
+            String postUserId = post.getProfile().getUserId();
             Log.d("MoodPost", "Checking postUserId: " + postUserId);
             Log.d("MoodPost", "Checking userId: " + userId);
 

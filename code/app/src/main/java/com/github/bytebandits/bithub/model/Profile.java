@@ -53,7 +53,7 @@ public class Profile implements Serializable {
      *
      * @return The user's unique identifier.
      */
-    public String getUserID() {
+    public String getUserId() {
         return userId;
     }
 

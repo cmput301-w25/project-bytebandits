@@ -62,13 +62,13 @@ public class LoginFragment extends Fragment {
      */
     private void authenticate() {
         if (!(isEmptyText(userEmailText) || isEmptyText(passwordText))) {
-            String username = userEmailText.getText().toString();
+            String userId = userEmailText.getText().toString();
             String password = passwordText.getText().toString();
 
-            Log.d("LoginFragment", "Attempting login for username: " + username);
+            Log.d("LoginFragment", "Attempting login for userId: " + userId);
 
             AtomicBoolean isValidAccount = new AtomicBoolean(false);
-            DatabaseManager.getInstance().getUser(username, user -> {
+            DatabaseManager.getInstance().getUser(userId, user -> {
                 if (user != null) {
                     String storedPassword = (String) user.get("password");
 
@@ -85,9 +85,9 @@ public class LoginFragment extends Fragment {
                 if (isValidAccount.get()) {
                     Log.d("LoginFragment", "Login successful, creating session");
                     SessionManager sessionManagerIns = SessionManager.getInstance(requireContext());
-                    sessionManagerIns.createLoginSession(username);
+                    sessionManagerIns.createLoginSession(userId);
                     String profileJson = (String) user.get("profile");
-                    Profile profile = new Profile(username).fromJson(profileJson);
+                    Profile profile = new Profile(userId).fromJson(profileJson);
 
                     sessionManagerIns.saveProfile(profile);
                     ((StartupActivity) requireActivity()).mainActivitySwitch();

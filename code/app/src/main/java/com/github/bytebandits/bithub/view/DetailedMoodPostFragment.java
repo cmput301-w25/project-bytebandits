@@ -87,10 +87,10 @@ public class DetailedMoodPostFragment extends DialogFragment {
         });
 
         // Show and set edit and delete buttons if this post is ours
-        if (Objects.equals(moodPost.getProfile().getUserID(), profile.getUserID())) {
+        if (Objects.equals(moodPost.getProfile().getUserId(), profile.getUserId())) {
             viewProfileButton.setVisibility(View.GONE);
             deleteButton.setOnClickListener(v -> {
-                DatabaseManager.getInstance().deletePost(moodPost.getPostID(), moodPost.getProfile().getUserID(),
+                DatabaseManager.getInstance().deletePost(moodPost.getPostID(), moodPost.getProfile().getUserId(),
                         Optional.empty());
                 dialog.dismiss();
             });
