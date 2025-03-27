@@ -63,9 +63,9 @@ public class DatabaseManagerTest {
         // Add Posts
         this.testProfile = new Profile((String) Objects.requireNonNull(user1.get("userId")));
         MoodPost[] moodPosts = {
-                new MoodPost(Emotion.HAPPINESS, testProfile, false, null, null, null),
+                new MoodPost(Emotion.HAPPINESS, testProfile, false, null, null, null, true),
                 new MoodPost(Emotion.SADNESS, new Profile((String) Objects.requireNonNull(user2.get("userId"))), false, SocialSituation.ALONE, "Test Desc",
-                        null),
+                        null, true),
         };
 
         int count = 0;
@@ -105,7 +105,7 @@ public class DatabaseManagerTest {
         MoodPost post = new MoodPost(
                 Emotion.SHAME,
                 testProfile, false, SocialSituation.ALONE, "Test Desc",
-                null
+                null, true
         );
 
         dbInstance.addPost(post, testProfile.getUserID(),Optional.of(Assert::assertTrue));
@@ -122,7 +122,7 @@ public class DatabaseManagerTest {
 
     @Test
     public void testUpdatePost_Success() {
-        MoodPost post = new MoodPost(Emotion.SURPRISE, testProfile, false, null, "Test Post", null);
+        MoodPost post = new MoodPost(Emotion.SURPRISE, testProfile, false, null, "Test Post", null, true);
         dbInstance.addPost(post, testProfile.getUserID(), Optional.empty());
 
         HashMap<String, Object> updateFields = new HashMap<>();
@@ -134,7 +134,7 @@ public class DatabaseManagerTest {
 
     @Test
     public void testDeletePost_Success() {
-        MoodPost post = new MoodPost(Emotion.ANGER, testProfile, false, null, "To be deleted", null);
+        MoodPost post = new MoodPost(Emotion.ANGER, testProfile, false, null, "To be deleted", null, true);
         dbInstance.addPost(post, testProfile.getUserID(), Optional.empty());
 
         dbInstance.deletePost(post.getPostID(), testProfile.getUserID(), Optional.of(success -> assertTrue(success)));
