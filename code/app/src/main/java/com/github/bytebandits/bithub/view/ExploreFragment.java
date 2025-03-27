@@ -1,5 +1,6 @@
 package com.github.bytebandits.bithub.view;
 
+import android.content.Context;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -22,6 +23,7 @@ import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import com.github.bytebandits.bithub.controller.DatabaseManager;
 import com.github.bytebandits.bithub.R;
+import com.github.bytebandits.bithub.model.MoodMarker;
 import com.github.bytebandits.bithub.model.MoodPost;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
@@ -34,6 +36,10 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MapColorScheme;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.maps.android.clustering.Cluster;
+import com.google.maps.android.clustering.ClusterManager;
+import com.google.maps.android.clustering.view.ClusterRenderer;
+import com.google.maps.android.clustering.view.DefaultClusterRenderer;
 
 import android.Manifest;
 
@@ -49,6 +55,9 @@ public class ExploreFragment extends Fragment implements GoogleMap.OnMarkerClick
     private final ExecutorService executor = Executors.newSingleThreadExecutor();
     private final Handler mainHandler = new Handler(Looper.getMainLooper());
     private static final int REQUEST_LOCATION_PERMISSION = 1001;
+
+    private ClusterManager<MoodMarker> clusterManager;
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -124,11 +133,16 @@ public class ExploreFragment extends Fragment implements GoogleMap.OnMarkerClick
         // Get and update to the current location
         fusedLocationClient.getLastLocation().addOnSuccessListener(getActivity(), location -> {
             if (location != null && googleMap != null) {
+                clusterManager = new ClusterManager<>(requireContext(), googleMap);
+                myClusterRenderer myClusterRenderer = new myClusterRenderer(requireContext(), googleMap, clusterManager);
+                clusterManager.setRenderer(myClusterRenderer);
+
                 // Convert current location to a LatLng
                 LatLng currentLatLng = new LatLng(location.getLatitude(), location.getLongitude());
 
                 for (MoodPost moodPost : dataList) {
                     if (moodPost.getLocation() == Boolean.TRUE) {
+
                         LatLng moodPostLatLng = new LatLng(moodPost.getLatitude(), moodPost.getLongitude());
                         Drawable drawable = ContextCompat.getDrawable(requireContext(), moodPost.getEmotion().getLogoID());
                         int desiredWidth = 240; // Adjust this value as needed
@@ -174,7 +188,12 @@ public class ExploreFragment extends Fragment implements GoogleMap.OnMarkerClick
                         // Draw the text on the canvas after the drawable
                         String userId = "@" + moodPost.getProfile().getUserId();
                         canvas.drawText(userId, xPos, yPos, textPaint);
-                        googleMap.addMarker(new MarkerOptions().position(moodPostLatLng).title(moodPost.getProfile().getUserID()).icon(BitmapDescriptorFactory.fromBitmap(bitmap)));
+                        MoodMarker moodMarker = new MoodMarker(moodPostLatLng.latitude, moodPostLatLng.longitude, moodPost.getEmotion().getState(), userId, moodPost);
+                        clusterManager.addItem(moodMarker);
+                        googleMap.setOnCameraIdleListener(clusterManager);
+                        googleMap.setOnMarkerClickListener(clusterManager);
+                        clusterManager.cluster();
+                        // googleMap.addMarker(new MarkerOptions().position(moodPostLatLng).title(moodPost.getProfile().getUserID()).icon(BitmapDescriptorFactory.fromBitmap(bitmap)));
                     }
                 }
                 // Move and zoom the camera to the user's location
@@ -240,3 +259,4 @@ public class ExploreFragment extends Fragment implements GoogleMap.OnMarkerClick
         }
     }
 }
+

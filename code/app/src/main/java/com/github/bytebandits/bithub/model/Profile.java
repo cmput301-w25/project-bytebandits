@@ -61,14 +61,14 @@ public class Profile implements Serializable {
      * Enables the user's location services.
      */
     public void enableLocationServices() {
-        this.locationServices = true;
+        this.locationServices = Boolean.TRUE;
     }
 
     /**
      * Disables the user's location services.
      */
     public void disableLocationServices() {
-        this.locationServices = false;
+        this.locationServices = Boolean.FALSE;
     }
 
     /**
@@ -76,8 +76,8 @@ public class Profile implements Serializable {
      *
      * @return a boolean representing the location service status
      */
-    public boolean getLocationServices() {
-        return locationServices;
+    public Boolean getLocationServices() {
+        return this.locationServices;
     }
 
     /**

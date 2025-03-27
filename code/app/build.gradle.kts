@@ -2,7 +2,6 @@ plugins {
     alias(libs.plugins.android.application)
     id("com.google.gms.google-services")
     id("com.google.android.libraries.mapsplatform.secrets-gradle-plugin")
-
 }
 
 android {
@@ -51,6 +50,7 @@ dependencies {
     implementation(libs.gson)
     implementation(libs.firebase.firestore)
     implementation(libs.gms.play.services.location)
+    implementation("com.google.maps.android:android-maps-utils:3.11.2")
     testImplementation(libs.junit)
     testImplementation(libs.robolectric)
     testImplementation("org.mockito:mockito-core:5.7.0")
