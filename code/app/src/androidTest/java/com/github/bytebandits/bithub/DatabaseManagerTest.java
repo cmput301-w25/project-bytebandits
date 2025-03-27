@@ -83,7 +83,7 @@ public class DatabaseManagerTest {
     @Test
     public void testGetUser_Success() {
         Log.d("DatabaseManagerTest", "Calling getUser...");
-        dbInstance.getUser(testProfile.getUserID(), user -> {
+        dbInstance.getUser(testProfile.getUserId(), user -> {
             Log.d("DatabaseManagerTest", "Callback executed");
             String name = (String) user.get("name");
             assertTrue(name.matches("John Doe"));
@@ -108,10 +108,10 @@ public class DatabaseManagerTest {
                 null, true
         );
 
-        dbInstance.addPost(post, testProfile.getUserID(),Optional.of(Assert::assertTrue));
+        dbInstance.addPost(post, testProfile.getUserId(),Optional.of(Assert::assertTrue));
 
         // Testing to see if post details are saved properly
-        dbInstance.getUserPosts(testProfile.getUserID(), posts -> {
+        dbInstance.getUserPosts(testProfile.getUserId(), posts -> {
             assertEquals(2, posts.size());
 
             MoodPost newlyAddedPost = posts.getLast();
@@ -123,7 +123,7 @@ public class DatabaseManagerTest {
     @Test
     public void testUpdatePost_Success() {
         MoodPost post = new MoodPost(Emotion.SURPRISE, testProfile, false, null, "Test Post", null, true);
-        dbInstance.addPost(post, testProfile.getUserID(), Optional.empty());
+        dbInstance.addPost(post, testProfile.getUserId(), Optional.empty());
 
         HashMap<String, Object> updateFields = new HashMap<>();
         updateFields.put("description", "Updated Description");
@@ -135,9 +135,9 @@ public class DatabaseManagerTest {
     @Test
     public void testDeletePost_Success() {
         MoodPost post = new MoodPost(Emotion.ANGER, testProfile, false, null, "To be deleted", null, true);
-        dbInstance.addPost(post, testProfile.getUserID(), Optional.empty());
+        dbInstance.addPost(post, testProfile.getUserId(), Optional.empty());
 
-        dbInstance.deletePost(post.getPostID(), testProfile.getUserID(), Optional.of(success -> assertTrue(success)));
+        dbInstance.deletePost(post.getPostID(), testProfile.getUserId(), Optional.of(success -> assertTrue(success)));
     }
 
     @Test
@@ -158,7 +158,7 @@ public class DatabaseManagerTest {
 
     @Test
     public void testGetUserPosts_Success() {
-        dbInstance.getUserPosts(testProfile.getUserID(), posts -> {
+        dbInstance.getUserPosts(testProfile.getUserId(), posts -> {
             assertNotNull(posts);
             assertFalse(posts.isEmpty());
             return null;
