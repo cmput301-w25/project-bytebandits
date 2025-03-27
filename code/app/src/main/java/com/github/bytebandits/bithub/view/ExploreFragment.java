@@ -1,5 +1,6 @@
 package com.github.bytebandits.bithub.view;
 
+import android.app.AlertDialog;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
@@ -42,6 +43,9 @@ import com.google.maps.android.clustering.view.ClusterRenderer;
 import com.google.maps.android.clustering.view.DefaultClusterRenderer;
 
 import android.Manifest;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -136,6 +140,21 @@ public class ExploreFragment extends Fragment implements GoogleMap.OnMarkerClick
                 clusterManager = new ClusterManager<>(requireContext(), googleMap);
                 myClusterRenderer myClusterRenderer = new myClusterRenderer(requireContext(), googleMap, clusterManager);
                 clusterManager.setRenderer(myClusterRenderer);
+                clusterManager.setOnClusterClickListener(new ClusterManager.OnClusterClickListener() {
+                    @Override
+                    public boolean onClusterClick(Cluster cluster) {
+                        List moodPosts = new ArrayList<MoodMarker>();
+                        for (Object moodMarker : cluster.getItems()) {
+                            if (moodMarker instanceof MoodMarker){
+                                moodPosts.add(((MoodMarker) moodMarker).getMoodPost());
+                            }
+                        }
+                        showMoodPostsListDialog(moodPosts);
+
+                        return true;
+                    }
+
+                });
 
                 // Convert current location to a LatLng
                 LatLng currentLatLng = new LatLng(location.getLatitude(), location.getLongitude());
@@ -257,6 +276,50 @@ public class ExploreFragment extends Fragment implements GoogleMap.OnMarkerClick
         } else {
             super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         }
+    }
+    private List getDisplayStrings(List moodPosts) {
+        List displayStrings = new ArrayList<MoodPost>();
+        for (Object post : moodPosts) {
+// For example, display the userID and perhaps a snippet of content.
+            if (post instanceof MoodPost) {
+                displayStrings.add("@" + ((MoodPost) post).getProfile().getUserID());
+            }
+        }
+        return displayStrings;
+    }
+
+
+    private void showMoodPostsListDialog(final List<MoodPost> moodPosts){
+        AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
+        builder.setTitle("Mood Posts");
+        ListView listView = new ListView(requireContext());
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(requireContext(),
+                android.R.layout.simple_list_item_1,
+                getDisplayStrings(moodPosts));
+
+        listView.setAdapter(adapter);
+
+// Handle item clicks in the list
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                // Get the corresponding MoodPost
+                MoodPost selectedPost = moodPosts.get(position);
+
+                // Open a detailed view dialog or Fragment.
+                DetailedMoodPostFragment detailedMoodPostFragment =
+                        DetailedMoodPostFragment.newInstance(selectedPost);
+                detailedMoodPostFragment.show(getActivity().getSupportFragmentManager(), "DetailedMoodPost");
+            }
+        });
+
+// Set the ListView as the dialog view
+        builder.setView(listView);
+
+// Optionally add a Cancel button.
+        builder.setNegativeButton("Cancel", null);
+        builder.show();
+
     }
 }
 
