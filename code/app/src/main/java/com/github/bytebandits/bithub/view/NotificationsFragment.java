@@ -144,7 +144,7 @@ public class NotificationsFragment extends Fragment {
 //
 //        // Iterate through sorted posts and keep only the first (latest) post for each user
 //        for (MoodPost post : sortedPosts) {
-//            String postUserId = post.getProfile().getUserID();
+//            String postUserId = post.getProfile().getUserId();
 //
 //            // Only add if this user's post is not already in the map
 //            if (!uniqueUserPosts.containsKey(postUserId) && !postUserId.equals(userId)) {
