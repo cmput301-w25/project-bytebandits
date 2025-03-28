@@ -17,7 +17,9 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_weight="1"
-        android:text="Username">
+        android:fontFamily="@font/stix_two_text_bold"
+        android:text="Username"
+        android:textColor="@color/Accent1">
 
     </TextView>
 
