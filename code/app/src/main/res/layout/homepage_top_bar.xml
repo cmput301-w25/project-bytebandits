@@ -15,17 +15,27 @@
             android:id="@+id/profileSearch"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:layout_marginStart="10dp"
             android:layout_weight="5"
             android:background="@drawable/profile_search_bg"
             android:theme="@style/profile_SearchView" />
 
         <ImageButton
             android:id="@+id/profileSearchConfirm"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:backgroundTint="@color/Accent1"
+            android:layout_weight="20"
+            android:backgroundTint="@color/Background"
             app:srcCompat="@android:drawable/ic_menu_send" />
+
+        <ImageButton
+            android:id="@+id/filter_button_homepage"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="20"
+            android:background="@color/Background"
+            app:srcCompat="@drawable/baseline_filter_alt_24"
+            app:tint="@color/white" />
     </LinearLayout>
 
     <ListView
