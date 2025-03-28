@@ -19,14 +19,11 @@ import static androidx.test.espresso.action.ViewActions.click;
 import static androidx.test.espresso.action.ViewActions.typeText;
 import static androidx.test.espresso.assertion.ViewAssertions.matches;
 import static androidx.test.espresso.matcher.RootMatchers.isDialog;
-import static androidx.test.espresso.matcher.ViewMatchers.hasErrorText;
 import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static androidx.test.espresso.matcher.ViewMatchers.withHint;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static androidx.test.espresso.matcher.ViewMatchers.withText;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
@@ -42,16 +39,12 @@ import com.github.bytebandits.bithub.controller.SessionManager;
 import com.github.bytebandits.bithub.view.LoginFragment;
 import com.github.bytebandits.bithub.view.SignupFragment;
 import com.github.bytebandits.bithub.view.StartupActivity;
-import com.google.firebase.firestore.CollectionReference;
-import com.google.firebase.firestore.DocumentReference;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.HashMap;
 import java.util.Objects;
-import java.util.Optional;
 
 
 @RunWith(AndroidJUnit4.class)
@@ -60,14 +53,6 @@ public class StartupActivityTest {
     @BeforeClass
     public static void setup(){
         DatabaseManager dbInstance = DatabaseManager.getInstance(true);
-        HashMap<String, Object> user1 = new HashMap<>();
-        user1.put("userId", "testUser1");
-        user1.put("name", "John Doe");
-        user1.put("password", "testing");
-
-        String userId = (String) user1.get("userId");
-        dbInstance.addUser(userId, user1, Optional.empty());
-
         SessionManager sessionManager = SessionManager.getInstance(ApplicationProvider.getApplicationContext());
         sessionManager.logoutUser();
     }
