@@ -1,5 +1,7 @@
 package com.github.bytebandits.bithub.view;
 
+import android.app.AlertDialog;
+import android.content.Context;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -22,6 +24,7 @@ import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import com.github.bytebandits.bithub.controller.DatabaseManager;
 import com.github.bytebandits.bithub.R;
+import com.github.bytebandits.bithub.model.MoodMarker;
 import com.github.bytebandits.bithub.model.MoodPost;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
@@ -34,8 +37,15 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MapColorScheme;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.maps.android.clustering.Cluster;
+import com.google.maps.android.clustering.ClusterManager;
+import com.google.maps.android.clustering.view.ClusterRenderer;
+import com.google.maps.android.clustering.view.DefaultClusterRenderer;
 
 import android.Manifest;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -49,6 +59,9 @@ public class ExploreFragment extends Fragment implements GoogleMap.OnMarkerClick
     private final ExecutorService executor = Executors.newSingleThreadExecutor();
     private final Handler mainHandler = new Handler(Looper.getMainLooper());
     private static final int REQUEST_LOCATION_PERMISSION = 1001;
+
+    private ClusterManager<MoodMarker> clusterManager;
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -63,17 +76,17 @@ public class ExploreFragment extends Fragment implements GoogleMap.OnMarkerClick
         }
         // Listener so that dataList gets updated whenever the database does
         executor.execute(() -> {
-                    DatabaseManager.getInstance().getAllPublicPosts(posts -> {
-                        if (posts != null) {
-                            Log.e("ExploreFragment", "Error: posts is null");
-                        }
-                        mainHandler.post(() -> {
-                            dataList.clear();
-                            dataList.addAll(posts);
+            DatabaseManager.getInstance().getAllPosts(posts -> {
+                if (posts != null) {
+                    Log.e("ExploreFragment", "Error: posts is null");
+                }
+                mainHandler.post(() -> {
+                    dataList.clear();
+                    dataList.addAll(posts);
 
-                        });
-                        return null;
-                    });
+                });
+                return null;
+            });
         });
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(getActivity());
 
@@ -124,56 +137,83 @@ public class ExploreFragment extends Fragment implements GoogleMap.OnMarkerClick
         // Get and update to the current location
         fusedLocationClient.getLastLocation().addOnSuccessListener(getActivity(), location -> {
             if (location != null && googleMap != null) {
+                clusterManager = new ClusterManager<>(requireContext(), googleMap);
+                myClusterRenderer myClusterRenderer = new myClusterRenderer(requireContext(), googleMap, clusterManager);
+                clusterManager.setRenderer(myClusterRenderer);
+                clusterManager.setOnClusterClickListener(new ClusterManager.OnClusterClickListener() {
+                    @Override
+                    public boolean onClusterClick(Cluster cluster) {
+                        List moodPosts = new ArrayList<MoodMarker>();
+                        for (Object moodMarker : cluster.getItems()) {
+                            if (moodMarker instanceof MoodMarker){
+                                moodPosts.add(((MoodMarker) moodMarker).getMoodPost());
+                            }
+                        }
+                        showMoodPostsListDialog(moodPosts);
+
+                        return true;
+                    }
+
+                });
+
                 // Convert current location to a LatLng
                 LatLng currentLatLng = new LatLng(location.getLatitude(), location.getLongitude());
 
                 for (MoodPost moodPost : dataList) {
-                    LatLng moodPostLatLng = new LatLng(moodPost.getLatitude(), moodPost.getLongitude());
-                    Drawable drawable = ContextCompat.getDrawable(requireContext(), moodPost.getEmotion().getLogoID());
-                    int desiredWidth = 240; // Adjust this value as needed
-                    int desiredHeight = 240; // Adjust this value as needed
+                    if (moodPost.getLocation() == Boolean.TRUE) {
 
-                    // Create a bitmap with the desired dimensions
-                    Bitmap bitmap = Bitmap.createBitmap(desiredWidth, desiredHeight, Bitmap.Config.ARGB_8888);
-                    Canvas canvas = new Canvas(bitmap);
+                        LatLng moodPostLatLng = new LatLng(moodPost.getLatitude(), moodPost.getLongitude());
+                        Drawable drawable = ContextCompat.getDrawable(requireContext(), moodPost.getEmotion().getLogoID());
+                        int desiredWidth = 240; // Adjust this value as needed
+                        int desiredHeight = 240; // Adjust this value as needed
 
-                    // Draw the off-white rounded rectangle with shadow
-                    Paint rectPaint = new Paint();
-                    rectPaint.setColor(Color.parseColor("#D3D3D3")); // Light gray color
-                    rectPaint.setAntiAlias(true);
-                    rectPaint.setShadowLayer(10f, 0f, 5f, Color.BLACK); // Shadow effect
-                    float cornerRadius = 40f; // Adjust corner radius as needed
-                    float padding = 20f; // Padding around the icon
-                    canvas.drawRoundRect(padding, padding, desiredWidth - padding, desiredHeight - padding, cornerRadius, cornerRadius, rectPaint);
+                        // Create a bitmap with the desired dimensions
+                        Bitmap bitmap = Bitmap.createBitmap(desiredWidth, desiredHeight, Bitmap.Config.ARGB_8888);
+                        Canvas canvas = new Canvas(bitmap);
 
-                    float drawablePadding = 30f; // Padding specifically for the drawable
-                    drawable.setBounds((int) (padding + drawablePadding), (int) (padding + drawablePadding), (int) (desiredWidth - padding - drawablePadding), (int) (desiredHeight - padding - drawablePadding - 40f)); // Leave space for text background
-                    drawable.draw(canvas); // Draw the drawable on top of the rectangle
+                        // Draw the off-white rounded rectangle with shadow
+                        Paint rectPaint = new Paint();
+                        rectPaint.setColor(Color.parseColor("#D3D3D3")); // Light gray color
+                        rectPaint.setAntiAlias(true);
+                        rectPaint.setShadowLayer(10f, 0f, 5f, Color.BLACK); // Shadow effect
+                        float cornerRadius = 40f; // Adjust corner radius as needed
+                        float padding = 20f; // Padding around the icon
+                        canvas.drawRoundRect(padding, padding, desiredWidth - padding, desiredHeight - padding, cornerRadius, cornerRadius, rectPaint);
 
-                    // Add a rounded black background for the text
-                    Paint textBackgroundPaint = new Paint();
-                    textBackgroundPaint.setColor(Color.WHITE); // White background for text
-                    textBackgroundPaint.setAntiAlias(true);
-                    float textBackgroundHeight = 50f; // Height of the text background
-                    float textBackgroundTop = desiredHeight - textBackgroundHeight - padding;
-                    canvas.drawRoundRect(padding + 10f, textBackgroundTop, desiredWidth - padding - 10f, textBackgroundTop + textBackgroundHeight, cornerRadius / 2, cornerRadius / 2, textBackgroundPaint);
+                        float drawablePadding = 30f; // Padding specifically for the drawable
+                        drawable.setBounds((int) (padding + drawablePadding), (int) (padding + drawablePadding), (int) (desiredWidth - padding - drawablePadding), (int) (desiredHeight - padding - drawablePadding - 40f)); // Leave space for text background
+                        drawable.draw(canvas); // Draw the drawable on top of the rectangle
 
-                    // Add text to the bitmap
-                    Paint textPaint = new Paint();
-                    textPaint.setColor(Color.BLACK); // Set text color to black
-                    textPaint.setTextSize(50f); // Set text size
-                    textPaint.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.BOLD_ITALIC)); // Bold and italic
-                    textPaint.setAntiAlias(true);
-                    textPaint.setTextAlign(Paint.Align.CENTER);
+                        // Add a rounded black background for the text
+                        Paint textBackgroundPaint = new Paint();
+                        textBackgroundPaint.setColor(Color.WHITE); // White background for text
+                        textBackgroundPaint.setAntiAlias(true);
+                        float textBackgroundHeight = 50f; // Height of the text background
+                        float textBackgroundTop = desiredHeight - textBackgroundHeight - padding;
+                        canvas.drawRoundRect(padding + 10f, textBackgroundTop, desiredWidth - padding - 10f, textBackgroundTop + textBackgroundHeight, cornerRadius / 2, cornerRadius / 2, textBackgroundPaint);
 
-                    // Calculate the position for the text with padding
-                    float xPos = canvas.getWidth() / 2f;
-                    float yPos = textBackgroundTop + textBackgroundHeight / 2f - ((textPaint.descent() + textPaint.ascent()) / 2f);
+                        // Add text to the bitmap
+                        Paint textPaint = new Paint();
+                        textPaint.setColor(Color.BLACK); // Set text color to black
+                        textPaint.setTextSize(50f); // Set text size
+                        textPaint.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.BOLD_ITALIC)); // Bold and italic
+                        textPaint.setAntiAlias(true);
+                        textPaint.setTextAlign(Paint.Align.CENTER);
 
-                    // Draw the text on the canvas after the drawable
-                    String userId = "@" + moodPost.getProfile().getUserId();
-                    canvas.drawText(userId, xPos, yPos, textPaint);
-                    googleMap.addMarker(new MarkerOptions().position(moodPostLatLng).title(moodPost.getProfile().getUserId()).icon(BitmapDescriptorFactory.fromBitmap(bitmap)));
+                        // Calculate the position for the text with padding
+                        float xPos = canvas.getWidth() / 2f;
+                        float yPos = textBackgroundTop + textBackgroundHeight / 2f - ((textPaint.descent() + textPaint.ascent()) / 2f);
+
+                        // Draw the text on the canvas after the drawable
+                        String userId = "@" + moodPost.getProfile().getUserId();
+                        canvas.drawText(userId, xPos, yPos, textPaint);
+                        MoodMarker moodMarker = new MoodMarker(moodPostLatLng.latitude, moodPostLatLng.longitude, moodPost.getEmotion().getState(), userId, moodPost);
+                        clusterManager.addItem(moodMarker);
+                        googleMap.setOnCameraIdleListener(clusterManager);
+                        googleMap.setOnMarkerClickListener(clusterManager);
+                        clusterManager.cluster();
+                        // googleMap.addMarker(new MarkerOptions().position(moodPostLatLng).title(moodPost.getProfile().getUserID()).icon(BitmapDescriptorFactory.fromBitmap(bitmap)));
+                    }
                 }
                 // Move and zoom the camera to the user's location
                 googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(currentLatLng, 15));
@@ -236,5 +276,49 @@ public class ExploreFragment extends Fragment implements GoogleMap.OnMarkerClick
         } else {
             super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         }
+    }
+    private List getDisplayStrings(List moodPosts) {
+        List displayStrings = new ArrayList<MoodPost>();
+        for (Object post : moodPosts) {
+// For example, display the userID and perhaps a snippet of content.
+            if (post instanceof MoodPost) {
+                displayStrings.add("@" + ((MoodPost) post).getProfile().getUserId());
+            }
+        }
+        return displayStrings;
+    }
+
+
+    private void showMoodPostsListDialog(final List<MoodPost> moodPosts){
+        AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
+        builder.setTitle("Mood Posts");
+        ListView listView = new ListView(requireContext());
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(requireContext(),
+                android.R.layout.simple_list_item_1,
+                getDisplayStrings(moodPosts));
+
+        listView.setAdapter(adapter);
+
+// Handle item clicks in the list
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                // Get the corresponding MoodPost
+                MoodPost selectedPost = moodPosts.get(position);
+
+                // Open a detailed view dialog or Fragment.
+                DetailedMoodPostFragment detailedMoodPostFragment =
+                        DetailedMoodPostFragment.newInstance(selectedPost);
+                detailedMoodPostFragment.show(getActivity().getSupportFragmentManager(), "DetailedMoodPost");
+            }
+        });
+
+// Set the ListView as the dialog view
+        builder.setView(listView);
+
+// Optionally add a Cancel button.
+        builder.setNegativeButton("Cancel", null);
+        builder.show();
+
     }
 }
