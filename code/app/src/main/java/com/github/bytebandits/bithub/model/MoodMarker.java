@@ -17,7 +17,7 @@ public class MoodMarker implements ClusterItem{
     }
 
     public String getUserId() {
-        return this.moodPost.getProfile().getUserID();
+        return this.moodPost.getProfile().getUserId();
     }
 
     public Emotion getEmotion() {

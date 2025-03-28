@@ -57,7 +57,7 @@ public class NotificationsFragment extends Fragment {
         }
 
         executor.execute(() -> {
-            DatabaseManager.getInstance().getAllPublicPosts(posts -> {
+            DatabaseManager.getInstance().getAllPosts(posts -> {
                 if (posts == null) {
                     Log.e("NotificationsFragment", "Error: notifications is null");
                 }
@@ -134,7 +134,7 @@ public class NotificationsFragment extends Fragment {
 
     private List<MoodPost> getUniqueUserLatestPosts(List<MoodPost> posts) {
 
-        String userId = sessionManager.getUserId();
+        String userId = sessionManager.getInstance(requireContext()).getProfile().getUserId();
         // Use a LinkedHashMap to maintain order and uniqueness
         Map<String, MoodPost> uniqueUserPosts = new LinkedHashMap<>();
 
@@ -147,7 +147,7 @@ public class NotificationsFragment extends Fragment {
             String postUserId = post.getProfile().getUserId();
 
             // Only add if this user's post is not already in the map
-            if (!uniqueUserPosts.containsKey(postUserId) && !postUserId.equals(userId)) {
+            if (!uniqueUserPosts.containsKey(postUserId) && !userId.equals(postUserId)) {
                 uniqueUserPosts.put(postUserId, post);
             }
         }
