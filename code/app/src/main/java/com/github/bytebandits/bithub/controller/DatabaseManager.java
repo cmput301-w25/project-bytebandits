@@ -61,10 +61,6 @@ public final class DatabaseManager {
     public CollectionReference getUsersCollectionRef() { return usersCollectionRef; }
     public CollectionReference getPostsCollectionRef() { return postsCollectionRef; }
 
-    public CollectionReference getPostsCollectionRef() {
-        return postsCollectionRef;
-    }
-
     /**
      * Default success handler for Firebase operations, logs the result.
      *
