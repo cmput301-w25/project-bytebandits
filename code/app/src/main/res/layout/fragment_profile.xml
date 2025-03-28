@@ -27,8 +27,8 @@
 
         <ListView
             android:id="@+id/mood_post_list_history"
-            android:layout_width="406dp"
-            android:layout_height="530dp"
+            android:layout_width="407dp"
+            android:layout_height="562dp"
             android:layout_marginStart="1dp"
             android:layout_marginEnd="1dp"
             android:layout_marginBottom="2dp"
@@ -39,18 +39,17 @@
 
         <TextView
             android:id="@+id/username_textview"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="168dp"
-            android:layout_marginTop="56dp"
-            android:layout_marginEnd="185dp"
+            android:layout_width="209dp"
+            android:layout_height="86dp"
+            android:layout_marginStart="5dp"
+            android:layout_marginTop="136dp"
             android:fontFamily="@font/stix_two_text_italic"
             android:text="John_Doe"
             android:textColor="@color/white"
-            android:textSize="34sp"
+            android:textSize="40sp"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.413"
-            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintHorizontal_bias="0.285"
+            app:layout_constraintStart_toEndOf="@+id/profile_picture"
             app:layout_constraintTop_toTopOf="parent" />
 
         <ImageButton
@@ -100,6 +99,24 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/textView2"
             app:layout_constraintVertical_bias="0.204" />
+
+        <ImageButton
+            android:id="@+id/follow_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:backgroundTint="@color/Background"
+            android:src="@drawable/baseline_add_circle_24"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <ImageView
+            android:id="@+id/profile_picture"
+            android:layout_width="198dp"
+            android:layout_height="149dp"
+            android:layout_marginTop="92dp"
+            android:src="@drawable/profile_picture"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

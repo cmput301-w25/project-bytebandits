@@ -12,8 +12,8 @@
         android:id="@+id/close_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="5dp"
-        android:layout_marginRight="184dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginRight="165dp"
         android:background="@color/Primary1"
         app:srcCompat="@drawable/baseline_close_24" />
 
