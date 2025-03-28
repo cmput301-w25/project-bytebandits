@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center_horizontal">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="380dp"
+        android:layout_height="72dp"
+        android:background="@drawable/notification_background"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
+
+        <TextView
+            android:id="@+id/textDate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="40dp"
+            android:layout_marginTop="4dp"
+            android:alpha="0.25"
+            android:fontFamily="@font/dm_sans_extralight"
+            android:letterSpacing="0.25"
+            android:text="Jan. 11, 2025"
+            android:textColor="@color/white"
+            android:textSize="12sp"
+            app:layout_constraintEnd_toStartOf="@+id/textTime"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/textTime"
+            android:layout_width="80dp"
+            android:layout_height="18dp"
+            android:layout_marginTop="4dp"
+            android:alpha="0.25"
+            android:fontFamily="@font/dm_sans_extralight"
+            android:letterSpacing="0.25"
+            android:text="10:59AM"
+            android:textColor="@color/white"
+            android:textSize="12sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/textTime3"
+            android:layout_width="35dp"
+            android:layout_height="15dp"
+            android:text="Decline"
+            android:textAlignment="center"
+            android:fontFamily="@font/dm_sans_extralight"
+            android:textColor="@color/white"
+            android:textSize="8sp"
+            app:layout_constraintBottom_toTopOf="@+id/Decline"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="1.0"
+            tools:layout_editor_absoluteX="316dp" />
+
+        <TextView
+            android:id="@+id/textTime4"
+            android:layout_width="35dp"
+            android:layout_height="15dp"
+            android:text="Accept"
+            android:textAlignment="center"
+            android:fontFamily="@font/dm_sans_extralight"
+            android:textColor="@color/white"
+            android:textSize="8sp"
+            app:layout_constraintBottom_toTopOf="@+id/Accept"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="1.0"
+            tools:layout_editor_absoluteX="261dp" />
+
+        <TextView
+            android:id="@+id/textUserName"
+            android:layout_width="wrap_content"
+            android:layout_height="24dp"
+            android:layout_marginStart="4dp"
+            android:layout_marginBottom="16dp"
+            android:fontFamily="@font/stix_two_text_bold"
+            android:text="John Doe"
+            android:textColor="@color/Accent2"
+            android:textSize="16sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <TextView
+            android:id="@+id/action"
+            android:layout_width="wrap_content"
+            android:layout_height="24dp"
+            android:layout_marginStart="4dp"
+            android:layout_marginBottom="16dp"
+            android:fontFamily="@font/stix_two_text_regular"
+            android:text=" requested to follow you "
+            android:textColor="@color/Accent1"
+            android:textSize="16sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/textUserName" />
+
+        <ImageButton
+            android:id="@+id/Accept"
+            android:layout_width="35dp"
+            android:layout_height="35dp"
+            android:layout_marginBottom="12dp"
+            android:backgroundTint="#00FFFFFF"
+            android:contentDescription="@string/follow_accept"
+            android:cropToPadding="false"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:srcCompat="@drawable/baseline_add_24"
+            app:tint="@color/white"
+            tools:layout_editor_absoluteX="261dp" />
+
+        <ImageButton
+            android:id="@+id/Decline"
+            android:layout_width="35dp"
+            android:layout_height="35dp"
+            android:layout_marginStart="20dp"
+            android:layout_marginBottom="12dp"
+            android:backgroundTint="#00FFFFFF"
+            android:contentDescription="TODO"
+            android:cropToPadding="false"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/Accept"
+            app:srcCompat="@drawable/baseline_close_24_notif"
+            app:tint="@color/white" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</LinearLayout>
