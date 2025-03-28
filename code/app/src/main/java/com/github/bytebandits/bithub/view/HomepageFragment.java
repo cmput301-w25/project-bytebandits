@@ -1,7 +1,5 @@
 package com.github.bytebandits.bithub.view;
 
-import static java.lang.Thread.sleep;
-
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -9,7 +7,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -32,6 +29,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.HashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -80,10 +78,10 @@ public class HomepageFragment extends Fragment implements FilterDialog.FilterLis
         }
 
         executor.execute(() -> {
-            DatabaseManager.getInstance().getAllPosts(posts -> {
-                if (posts == null) {
-                    Log.e("HomepageFragment", "Error: posts is null");
-                }
+                DatabaseManager.getInstance().getAllPosts(posts -> {
+                    if (posts == null) {
+                        Log.e("HomepageFragment", "Error: posts is null");
+                    }
 
                 Log.d("HomepageFragment", "Fetched posts count: " + posts.size());
 
@@ -168,10 +166,7 @@ public class HomepageFragment extends Fragment implements FilterDialog.FilterLis
         // logic of profile transition via clicking
         profileResults.setOnItemClickListener((adapterView, view1, i, l) -> {
             Profile profile = profiles.get(i);
-            ProfileFragment profileFragment = new ProfileFragment();
-            profileFragment.setIsOtherProfile(true);
-            profileFragment.setOtherProfile(profile);
-            ((MainActivity) requireActivity()).replaceFragment(profileFragment);
+            ((MainActivity) requireActivity()).replaceFragment(ProfileFragment.newInstance(profile));
         });
 
         // logic to unfocus from search view, although there are cases where if you
