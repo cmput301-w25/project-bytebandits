@@ -11,6 +11,7 @@ import android.widget.AdapterView;
 import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -49,6 +50,7 @@ public class ProfileFragment extends Fragment implements FilterDialog.FilterList
     private final Handler mainHandler = new Handler(Looper.getMainLooper());
     private Profile profile;
     private TextView usernameTextView;
+    private ImageButton followingButton;
     private static final String PROFILE = "profile";
 
 
@@ -83,7 +85,7 @@ public class ProfileFragment extends Fragment implements FilterDialog.FilterList
             @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_profile, container, false); // display profile fragment layout
         profile = (Profile) getArguments().getSerializable(PROFILE);
-
+        followingButton = view.findViewById(R.id.follow_button);
         settingsButton = view.findViewById(R.id.settings_button);
         filterButton = view.findViewById(R.id.filter_button);
         usernameTextView = view.findViewById(R.id.username_textview);
@@ -94,10 +96,14 @@ public class ProfileFragment extends Fragment implements FilterDialog.FilterList
         usernameTextView.setText(userId);
 
         // Hide settings button if viewing another user's profile
+        // Show following button if viewing another user's profile
         if (!userId.equals(loggedInUser)) {
             settingsButton.setVisibility(View.GONE);
+            followingButton.setVisibility(View.VISIBLE);
+            followingButton.setOnClickListener(v -> sendFollowRequest());
         } else {
             settingsButton.setVisibility(View.VISIBLE);
+            followingButton.setVisibility(View.GONE);
             settingsButton.setOnClickListener(v -> openSettings());
         }
 
@@ -263,5 +269,9 @@ public class ProfileFragment extends Fragment implements FilterDialog.FilterList
             }
         }
         moodPostAdapter.notifyDataSetChanged();
+    }
+
+    public void sendFollowRequest() {
+
     }
 }
