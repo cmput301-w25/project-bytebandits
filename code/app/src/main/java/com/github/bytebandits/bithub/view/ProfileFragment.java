@@ -51,49 +51,6 @@ public class ProfileFragment extends Fragment implements FilterDialog.FilterList
     private TextView usernameTextView;
     private static final String PROFILE = "profile";
 
-    /**
-     * Getter method to get the state on whether a profile fragment represents
-     * another person's profile
-     * 
-     * @return boolean value on whether the above is true or false
-     */
-    public boolean getIsOtherProfile() {
-        return isOtherProfile;
-    }
-
-    /**
-     * Setter method to set the state on whether a profile fragment represents
-     * another person's profile
-     * 
-     * @param newIsOtherProfile boolean value on whether the above is true or false
-     */
-    public void setIsOtherProfile(boolean newIsOtherProfile) {
-        isOtherProfile = newIsOtherProfile;
-    }
-
-    public boolean isOtherProfile = false;
-
-    /**
-     * Getter method to get the profile object if the fragment represents another
-     * person (not the current user)
-     * 
-     * @return profile object
-     */
-    public Profile getOtherProfile() {
-        return otherProfile;
-    }
-
-    /**
-     * Setter method to set the profile object of the fragment
-     * 
-     * @param otherProfile profile object that represents another profile (not the
-     *                     current user)
-     */
-    public void setOtherProfile(Profile otherProfile) {
-        this.otherProfile = otherProfile;
-    }
-
-    public Profile otherProfile = null;
 
     /**
      * Creates a new instance of ProfileFragment with the given profile.
@@ -155,14 +112,16 @@ public class ProfileFragment extends Fragment implements FilterDialog.FilterList
         }
 
         executor.execute(() -> {
-            String targetUserId;
-            if (isOtherProfile) {
-                targetUserId = getOtherProfile().getUserId();
+            String userIdToBeRendered;
+            String localUserId = SessionManager.getInstance(requireContext()).getUserId();
+
+            if (userId.equals(localUserId)) {
+                userIdToBeRendered = localUserId;  // render the current user
             } else {
-                targetUserId = SessionManager.getInstance(requireContext()).getUserId();
+                userIdToBeRendered = userId;   // render another user
             }
 
-            DatabaseManager.getInstance().getUserPosts(targetUserId, posts -> {
+            DatabaseManager.getInstance().getUserPosts(userIdToBeRendered, posts -> {
                 if (posts == null) {
                     Log.e("ProfileFragment", "Error: posts is null");
                     return null;
