@@ -166,10 +166,7 @@ public class HomepageFragment extends Fragment implements FilterDialog.FilterLis
         // logic of profile transition via clicking
         profileResults.setOnItemClickListener((adapterView, view1, i, l) -> {
             Profile profile = profiles.get(i);
-            ProfileFragment profileFragment = new ProfileFragment();
-            profileFragment.setIsOtherProfile(true);
-            profileFragment.setOtherProfile(profile);
-            ((MainActivity) requireActivity()).replaceFragment(profileFragment);
+            ((MainActivity) requireActivity()).replaceFragment(ProfileFragment.newInstance(profile));
         });
 
         // logic to unfocus from search view, although there are cases where if you
