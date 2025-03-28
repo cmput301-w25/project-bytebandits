@@ -27,7 +27,8 @@ public class StartupActivity extends AppCompatActivity {
         SessionManager sessionManager = SessionManager.getInstance(this);
 
         if (sessionManager.isLoggedIn()) {
-            mainActivitySwitch();
+            startupFragment();
+            //mainActivitySwitch();
         } else {
             startupFragment();
         }
