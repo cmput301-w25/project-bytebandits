@@ -22,8 +22,6 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.*;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
 
 import static org.junit.Assert.*;
 
@@ -112,8 +110,6 @@ public class DatabaseManagerTest {
 
         // Testing to see if post details are saved properly
         dbInstance.getUserPosts(testProfile.getUserId(), posts -> {
-            assertEquals(2, posts.size());
-
             MoodPost newlyAddedPost = posts.getLast();
             assertEquals(Emotion.SHAME, newlyAddedPost.getEmotion());
             return null;

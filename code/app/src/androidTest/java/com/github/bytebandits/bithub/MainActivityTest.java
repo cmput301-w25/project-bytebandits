@@ -317,7 +317,7 @@ public class MainActivityTest {
         onView(withId(R.id.postMoodSocialSituation)).check(matches(withSpinnerText("ALONE")));
         onView(withId(R.id.postMoodDescription)).check(matches(withText("This is a description")));
         onView(withId(R.id.postMoodLocation)).check(matches(isChecked()));
-        onView(withId(R.id.postMoodPublic)).check(matches(isChecked()));
+        onView(withId(R.id.postMoodVisibility)).check(matches(isChecked()));
 
         // Test invalid description input
         onView(withId(R.id.postMoodDescription))
@@ -337,7 +337,7 @@ public class MainActivityTest {
         onView(withId(R.id.postMoodDescription)).perform(clearText());
         onView(withId(R.id.postMoodDescription)).perform(ViewActions.typeText(""));
         onView(withId(R.id.postMoodLocation)).perform(click());
-        onView(withId(R.id.postMoodPublic)).perform(click());
+        onView(withId(R.id.postMoodVisibility)).perform(click());
         onView(withId(R.id.postMoodConfirmButton)).perform(click());
 
         // Check that our mood post list has our new mood post

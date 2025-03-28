@@ -26,7 +26,7 @@ public class MoodPost implements Serializable {
     private String desc;
     private String image;
     private ArrayList<Comment> comments;
-    private boolean isPublic;
+    private boolean isPrivate;
 
     public MoodPost() {}
 
@@ -50,11 +50,11 @@ public class MoodPost implements Serializable {
      * @param image
      *      A Base64 string representing the image attached to the mood post.
      *      When null is passed, it means that no image is attached to the mood post.
-     * @param isPublic
+     * @param isPrivate
      *      boolean representing whether or not this mood is public or private.
      */
     public MoodPost(Emotion emotion, Profile profile, boolean showLocation, SocialSituation situation,
-                    String desc, String image, boolean isPublic) {
+                    String desc, String image, boolean isPrivate) {
         this.postID = UUID.randomUUID().toString();
         this.emotion = emotion;
         this.profile = profile;
@@ -64,7 +64,7 @@ public class MoodPost implements Serializable {
         this.desc = desc;
         this.image = image;
         this.comments = new ArrayList<>();
-        this.isPublic = isPublic;
+        this.isPrivate = isPrivate;
     }
 
     /**
@@ -313,12 +313,12 @@ public class MoodPost implements Serializable {
     }
 
     /**
-     * Returns if the mood post public or not
+     * Returns if the mood post is private or not
      * @return
      *      A boolean representing if the mood post is public or private
      */
-    public boolean isPublic() {
-        return isPublic;
+    public boolean isPrivate() {
+        return isPrivate;
     }
 
     /**
@@ -326,7 +326,7 @@ public class MoodPost implements Serializable {
      * @param aPublic
      *      A boolean representing if we want the mood post to be public or private. True for public, false for private
      */
-    public void setPublic(boolean aPublic) {
-        isPublic = aPublic;
+    public void setPrivate(boolean aPublic) {
+        isPrivate = aPublic;
     }
 }
