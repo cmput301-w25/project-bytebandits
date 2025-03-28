@@ -78,10 +78,10 @@ public class HomepageFragment extends Fragment implements FilterDialog.FilterLis
         }
 
         executor.execute(() -> {
-            DatabaseManager.getInstance().getAllPosts(posts -> {
-                if (posts == null) {
-                    Log.e("HomepageFragment", "Error: posts is null");
-                }
+                DatabaseManager.getInstance().getAllPublicPosts(posts -> {
+                    if (posts == null) {
+                        Log.e("HomepageFragment", "Error: posts is null");
+                    }
 
                 Log.d("HomepageFragment", "Fetched posts count: " + posts.size());
 

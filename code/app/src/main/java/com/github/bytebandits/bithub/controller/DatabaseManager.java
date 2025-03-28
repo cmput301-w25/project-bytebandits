@@ -6,6 +6,8 @@ import android.util.Log;
 import com.github.bytebandits.bithub.model.DocumentReferences;
 import com.github.bytebandits.bithub.model.MoodPost;
 import com.github.bytebandits.bithub.model.Profile;
+import com.google.android.gms.tasks.Task;
+import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.firestore.*;
 import com.google.firebase.firestore.auth.User;
 
@@ -46,13 +48,18 @@ public final class DatabaseManager {
         return getInstance(false); // Default: Don't use emulator
     }
 
-    public CollectionReference getUsersCollectionRef() {
-        return usersCollectionRef;
+    // Testing functions for offline persistence
+
+    public void setOffline() {
+        this.firestoreDb.disableNetwork();
     }
 
-    public CollectionReference getPostsCollectionRef() {
-        return postsCollectionRef;
+    public void setOnline(){
+        this.firestoreDb.enableNetwork();
     }
+
+    public CollectionReference getUsersCollectionRef() { return usersCollectionRef; }
+    public CollectionReference getPostsCollectionRef() { return postsCollectionRef; }
 
     /**
      * Default success handler for Firebase operations, logs the result.
@@ -359,6 +366,108 @@ public final class DatabaseManager {
             }
         });
     }
+
+    /**
+     * Fetches all posts from the FireStore database that are labelled as public.
+     * The result is returned via the provided listener
+     *
+     * @param listener The listener that will receive the result (list of posts).
+     */
+    public void getAllPublicPosts(OnPostsFetchListener listener) {
+        Query publicPosts = this.postsCollectionRef.whereEqualTo("private", false);
+
+        publicPosts.get().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                QuerySnapshot querySnapshot = task.getResult();
+                ArrayList<MoodPost> postList = new ArrayList<>();
+
+                for (DocumentSnapshot doc : querySnapshot.getDocuments()) {
+                    try {
+                        postList.add(doc.toObject(MoodPost.class));
+                    } catch (ClassCastException e) {
+                        Log.e("DatabaseManager", "Error casting document to MoodPost", e);
+                    }
+
+                }
+
+                if (listener != null) {
+                    listener.onPostsFetched(postList);
+                }
+            } else {
+                Log.e("DatabaseManager", "Error fetching posts", task.getException());
+                if (listener != null) {
+                    listener.onPostsFetched(null);
+                }
+            }
+        });
+    }
+
+
+    /**
+     * Fetches all posts from the FireStore database that are labelled as public under one user.
+     * The result is returned via the provided listener
+     *
+     * @param userId The userId (typically the current session user) which to get the private posts of
+     * @param listener The listener that will receive the result (list of posts).
+     *
+     */
+    public void getUserPublicPosts(String userId, OnPostsFetchListener listener) {
+        Query userQuery = this.usersCollectionRef.whereEqualTo("userId", userId);
+
+        userQuery.get().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                QuerySnapshot userSnapshot = task.getResult();
+
+                if (userSnapshot.isEmpty()) {
+                    Log.e("DatabaseManager", "User not found");
+                    if (listener != null) {
+                        listener.onPostsFetched(null);
+                    }
+                    return;
+                }
+
+                DocumentSnapshot userDoc = userSnapshot.getDocuments().get(0);
+                List<DocumentReference> postRefs = (List<DocumentReference>) userDoc.get(DocumentReferences.POSTS.getDocRefString());
+
+                // Fetch posts from the list of DocumentReferences
+                List<Task<DocumentSnapshot>> postTasks = new ArrayList<>();
+                for (DocumentReference postRef : postRefs) {
+                    postTasks.add(postRef.get());
+                }
+
+                // Wait for all post fetch tasks to complete
+                Tasks.whenAllSuccess(postTasks).addOnSuccessListener(posts -> {
+                    ArrayList<MoodPost> postList = new ArrayList<>();
+                    for (Object obj : posts) {
+                        DocumentSnapshot postDoc = (DocumentSnapshot) obj;
+                        if (postDoc.exists()) {
+                            MoodPost post = postDoc.toObject(MoodPost.class);
+                            if (!post.isPrivate()) {
+                                postList.add(post);
+                            }
+                        }
+                    }
+
+                    // Return posts to listener
+                    if (listener != null) {
+                        listener.onPostsFetched(postList);
+                    }
+                }).addOnFailureListener(e -> {
+                    Log.e("DatabaseManager", "Error fetching posts", e);
+                    if (listener != null) {
+                        listener.onPostsFetched(null);
+                    }
+                });
+
+            } else {
+                Log.e("DatabaseManager", "Error fetching user", task.getException());
+                if (listener != null) {
+                    listener.onPostsFetched(null);
+                }
+            }
+        });
+    }
+
 
     /**
      * Fetches posts from a specific user by their userId.

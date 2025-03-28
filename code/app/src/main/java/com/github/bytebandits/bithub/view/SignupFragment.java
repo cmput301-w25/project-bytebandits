@@ -56,15 +56,9 @@ public class SignupFragment extends Fragment {
         pswrdText = view.findViewById(R.id.PswrdInputText);
         pswrdContext = view.findViewById(R.id.PswrdConInputText);
 
-        signup.setOnClickListener(v ->
-            authenticate()
-        );
-        accountExists.setOnClickListener(v ->
-            ((StartupActivity) requireActivity()).loginFragment()
-        );
-        back.setOnClickListener(v ->
-            ((StartupActivity) requireActivity()).popBackStack("signupFragment")
-        );
+        signup.setOnClickListener(v -> authenticate());
+        accountExists.setOnClickListener(v -> ((StartupActivity) requireActivity()).loginFragment());
+        back.setOnClickListener(v -> ((StartupActivity) requireActivity()).popBackStack("signupFragment"));
 
         return view;
     }
@@ -123,7 +117,6 @@ public class SignupFragment extends Fragment {
             createDialog("Invalid information! Username or email may already exist.").show();
         }
     }
-
 
     /**
      * Helper function to check if text is not null nor empty
