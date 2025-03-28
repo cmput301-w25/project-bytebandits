@@ -7,6 +7,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ImageButton;
 import android.widget.ListView;
 
@@ -127,8 +128,8 @@ public class ProfileFragment extends Fragment implements FilterDialog.FilterList
         settingsButton = view.findViewById(R.id.settings_button);
         filterButton = view.findViewById(R.id.filter_button);
 
-        String userId = profile.getUserID();
-        String loggedInUser = SessionManager.getInstance(requireContext()).getUsername();
+        String userId = profile.getUserId();
+        String loggedInUser = SessionManager.getInstance(requireContext()).getUserId();
 
         // Hide settings button if viewing another user's profile
         if (!userId.equals(loggedInUser)) {
@@ -151,9 +152,9 @@ public class ProfileFragment extends Fragment implements FilterDialog.FilterList
         executor.execute(() -> {
             String targetUserId;
             if (isOtherProfile) {
-                targetUserId = getOtherProfile().getUserID();
+                targetUserId = getOtherProfile().getUserId();
             } else {
-                targetUserId = SessionManager.getInstance(requireContext()).getUsername();
+                targetUserId = SessionManager.getInstance(requireContext()).getUserId();
             }
 
             DatabaseManager.getInstance().getUserPosts(targetUserId, posts -> {
