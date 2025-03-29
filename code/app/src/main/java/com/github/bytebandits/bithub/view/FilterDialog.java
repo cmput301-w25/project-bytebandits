@@ -70,7 +70,7 @@ public class FilterDialog {
                 } else if (checkedId == R.id.shame_radio_button) {
                     filterListener.onFilterSelected("shame");
                 } else if (checkedId == R.id.suprise_radio_button) {
-                    filterListener.onFilterSelected("suprise");
+                    filterListener.onFilterSelected("surprise");
                 } else if (checkedId == R.id.last_week_radio_button) {
                     filterListener.onFilterSelected("last_week");
                 }

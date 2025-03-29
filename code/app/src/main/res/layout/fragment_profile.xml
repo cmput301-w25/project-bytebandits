@@ -27,30 +27,33 @@
 
         <ListView
             android:id="@+id/mood_post_list_history"
-            android:layout_width="407dp"
-            android:layout_height="562dp"
+            android:layout_width="418dp"
+            android:layout_height="556dp"
             android:layout_marginStart="1dp"
+            android:layout_marginTop="100dp"
             android:layout_marginEnd="1dp"
-            android:layout_marginBottom="2dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.538"
-            app:layout_constraintStart_toStartOf="parent" />
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/profile_picture" />
 
         <TextView
             android:id="@+id/username_textview"
             android:layout_width="209dp"
             android:layout_height="86dp"
             android:layout_marginStart="5dp"
-            android:layout_marginTop="136dp"
+            android:layout_marginTop="90dp"
             android:fontFamily="@font/stix_two_text_italic"
             android:text="John_Doe"
             android:textColor="@color/white"
             android:textSize="40sp"
+            app:layout_constraintBottom_toTopOf="@+id/textView2"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.285"
+            app:layout_constraintHorizontal_bias="1.0"
             app:layout_constraintStart_toEndOf="@+id/profile_picture"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.0" />
 
         <ImageButton
             android:id="@+id/settings_button"
@@ -112,9 +115,11 @@
         <ImageView
             android:id="@+id/profile_picture"
             android:layout_width="198dp"
-            android:layout_height="149dp"
-            android:layout_marginTop="92dp"
+            android:layout_height="145dp"
+            android:layout_marginTop="75dp"
+            android:layout_marginBottom="71dp"
             android:src="@drawable/profile_picture"
+            app:layout_constraintBottom_toTopOf="@+id/textView2"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 

@@ -97,12 +97,14 @@ public class ProfileFragment extends Fragment implements FilterDialog.FilterList
 
         // Hide settings button if viewing another user's profile
         // Show following button if viewing another user's profile
-        if (!userId.equals(loggedInUser)) {
+        if (!userId.equalsIgnoreCase(loggedInUser)) {
             settingsButton.setVisibility(View.GONE);
+            filterButton.setVisibility(View.GONE);
             followingButton.setVisibility(View.VISIBLE);
             followingButton.setOnClickListener(v -> sendFollowRequest());
         } else {
             settingsButton.setVisibility(View.VISIBLE);
+            filterButton.setVisibility(View.VISIBLE);
             followingButton.setVisibility(View.GONE);
             settingsButton.setOnClickListener(v -> openSettings());
         }
@@ -219,13 +221,18 @@ public class ProfileFragment extends Fragment implements FilterDialog.FilterList
      */
     @Override
     public void onFilterSelected(String mood) {
+        Log.d("ProfileFragment", "Filter selected: " + mood);
         filteredDataList.clear();
         if (mood.equals("last_week")) {
             filteredDataList.addAll(filterPostsFromLastWeek(dataList));
         } else {
             filteredDataList.addAll(PostFilterManager.filterPostsByMood(dataList, mood));
         }
-        moodPostAdapter.notifyDataSetChanged();
+        if (moodPostAdapter != null) {
+            moodPostAdapter.notifyDataSetChanged();
+        } else {
+            Log.e("Profile fragment","Mood Post adapter is null in profile fragment");
+        }
     }
 
     /**
