@@ -47,7 +47,7 @@ public class NotificationArrayAdapter extends ArrayAdapter<Notification> {
         TextView textD = view.findViewById(R.id.textTime5);
 
         // Set the text views of the view based on the movie object
-        if (notification.getNotificationType()){
+        if (notification.getNotificationType() == 1){
             buttonA.setVisibility(View.VISIBLE);
             buttonD.setVisibility(View.VISIBLE);
             textD.setVisibility(View.VISIBLE);
