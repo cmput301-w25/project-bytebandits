@@ -91,7 +91,6 @@ public class MainActivity extends AppCompatActivity {
         FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
         fragmentTransaction.replace(R.id.frameLayout, fragment);
-//        binding.bottomNavigation.setSelectedItemId(R.id.profile);
         fragmentTransaction.commit();
     }
 
