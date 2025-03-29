@@ -20,6 +20,7 @@ import androidx.fragment.app.Fragment;
 import com.github.bytebandits.bithub.MainActivity;
 import com.github.bytebandits.bithub.controller.DatabaseManager;
 import com.github.bytebandits.bithub.controller.PostFilterManager;
+import com.github.bytebandits.bithub.controller.SessionManager;
 import com.github.bytebandits.bithub.model.MoodPost;
 import com.github.bytebandits.bithub.R;
 import com.github.bytebandits.bithub.model.Profile;
@@ -78,7 +79,7 @@ public class HomepageFragment extends Fragment implements FilterDialog.FilterLis
         }
 
         executor.execute(() -> {
-                DatabaseManager.getInstance().getAllPublicPosts(posts -> {
+                DatabaseManager.getInstance().getAllFollowerPosts(SessionManager.getInstance(requireContext()).getUserId(), posts -> {
                     if (posts == null) {
                         Log.e("HomepageFragment", "Error: posts is null");
                     }

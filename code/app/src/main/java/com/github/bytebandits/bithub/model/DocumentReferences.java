@@ -2,7 +2,9 @@ package com.github.bytebandits.bithub.model;
 
 public enum DocumentReferences {
     FOLLOWERS("followerRefs"),
-    NOTIFICATIONS("notificationRefs"),
+    FOLLOWINGS("followingRefs"),
+    NOTIFICATION_POSTS("notificationRefs.posts"),
+    NOTIFICATION_REQS("notificationRefs.requests"),
     POSTS("postRefs");
 
     private String docRefString;
