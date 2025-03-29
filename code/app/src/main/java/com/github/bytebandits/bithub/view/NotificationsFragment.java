@@ -9,7 +9,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.Button;
 import android.widget.ListView;
 
 import androidx.annotation.NonNull;
@@ -21,27 +20,29 @@ import com.github.bytebandits.bithub.controller.DatabaseManager;
 import com.github.bytebandits.bithub.controller.SessionManager;
 import com.github.bytebandits.bithub.model.MoodPost;
 import com.github.bytebandits.bithub.model.Notification;
+import com.github.bytebandits.bithub.model.Profile;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class NotificationsFragment extends Fragment {
     private ArrayList<MoodPost> dataList;
+
     private ArrayList<Notification> notifications;
     private ListView moodPostList;
     private NotificationArrayAdapter notifAdapter;
+
     private final ExecutorService executor = Executors.newSingleThreadExecutor();
     private final Handler mainHandler = new Handler(Looper.getMainLooper());
+
     private SessionManager sessionManager;
-    private boolean isNotificationCleared = false;
+
 
     @Nullable
     @Override
@@ -50,139 +51,108 @@ public class NotificationsFragment extends Fragment {
 
         sessionManager = SessionManager.getInstance(getContext());
 
-        // Initialize lists
-        dataList = new ArrayList<>();
-        notifications = new ArrayList<>();
-
-        Button clearNotificationsButton = view.findViewById(R.id.clear_notifications_button);
-        clearNotificationsButton.setOnClickListener(v -> clearAllNotifications());
-
-        // Setup initial notification fetch
-        fetchNotifications();
-
-        // Setup snapshot listener for real-time updates
-        setupSnapshotListener();
-
-        return view;
-    }
-
-    private void clearAllNotifications() {
-        String userId = sessionManager.getUserId();
-
-        // Clear notifications in Firestore
-        DatabaseManager.getInstance().clearAllNotifications(userId);
-
-        // Clear local lists
-        notifications.clear();
-        dataList.clear();
-
-        // Update UI
-        if (notifAdapter != null) {
-            notifAdapter.notifyDataSetChanged();
+        // Initialize dataList to avoid NullPointerException
+        if (dataList == null) {
+            dataList = new ArrayList<>();
+            Log.d("NotificationsFragment", "dataList initialized as empty list");
+        } else {
+            Log.d("NotificationsFragment", "dataList already initialized with size: " + dataList.size());
         }
 
-        // Set flag to prevent refetching
-        isNotificationCleared = true;
-
-        Log.d("NotificationsFragment", "All notifications cleared");
-    }
-
-    private void fetchNotifications() {
-        // Skip fetching if notifications were just cleared
-        if (isNotificationCleared) {
-            isNotificationCleared = false;
-            return;
+        // Initialize notifications to avoid NullPointerException
+        if (notifications == null) {
+            notifications = new ArrayList<>();
+            Log.d("NotificationsFragment", "notifications initialized as empty list");
         }
 
         executor.execute(() -> {
-            DatabaseManager.getInstance().getNotifications(
-                    sessionManager.getUserId(),
-                    (posts, requests) -> {
-                        mainHandler.post(() -> {
-                            // Process and filter posts
-                            List<MoodPost> uniqueUserPosts = getUniqueUserLatestPosts(posts);
-                            List<Notification> newNotifications = latestPosts(uniqueUserPosts, requests);
+            DatabaseManager.getInstance().getNotifications(SessionManager.getInstance(requireContext()).getUserId(), (posts, requests) -> {
+                Log.d("NotificationsFragment", "Data");
 
-                            // Update lists
-                            dataList.clear();
-                            dataList.addAll(uniqueUserPosts);
-                            notifications.clear();
-                            notifications.addAll(newNotifications);
+            });
 
-                            // Setup ListView and adapter
-                            setupListView();
-                        });
-                    }
-            );
-        });
-    }
+            DatabaseManager.getInstance().getAllPublicPosts(posts -> {
+                if (posts == null) {
+                    Log.e("NotificationsFragment", "Error: notifications is null");
+                }
 
-    private void setupListView() {
-        if (getView() == null) return;
+                Log.d("NotificationsFragment", "Fetched notifications count: " + posts.size());
 
-        moodPostList = getView().findViewById(R.id.notificationList);
+                // Process and filter posts
+                List<MoodPost> uniqueUserPosts = getUniqueUserLatestPosts(posts);
 
-        if (notifications.isEmpty()) {
-            // Optional: Show empty state
-            return;
-        }
+                List<Notification> newNotifications = latestPosts(uniqueUserPosts);
 
-        notifAdapter = new NotificationArrayAdapter(getContext(), notifications);
-        moodPostList.setAdapter(notifAdapter);
+                // Switch to UI thread for UI updates
+                mainHandler.post(() -> {
+                    dataList.clear();
+                    dataList.addAll(uniqueUserPosts);
+                    notifications.clear();
+                    notifications.addAll(newNotifications);
 
-        moodPostList.setOnItemClickListener((parent, view, position, id) -> {
-            Notification notification = notifications.get(position);
-
-            if (notification.getPost() != null) {
-                DetailedMoodPostFragment detailedMoodPostFragment =
-                        DetailedMoodPostFragment.newInstance(notification.getPost());
-                detailedMoodPostFragment.show(getParentFragmentManager(), "Detailed Mood Post View");
-            }
-        });
-    }
-
-    private void setupSnapshotListener() {
-        DatabaseManager.getInstance().getPostsCollectionRef()
-                .addSnapshotListener((value, error) -> {
-                    if (error != null) {
-                        Log.e("Firestore", error.toString());
-                        return;
+                    if (notifAdapter != null) {
+                        notifAdapter.notifyDataSetChanged();
+                    } else {
+                        Log.e("NotificationsFragment", "notificationAdapter is null");
                     }
 
-                    if (value != null && !isNotificationCleared) {
-                        // Convert snapshots to MoodPosts
-                        List<MoodPost> allPosts = new ArrayList<>();
-                        for (QueryDocumentSnapshot snapshot : value) {
-                            allPosts.add(snapshot.toObject(MoodPost.class));
-                        }
+                    // Initialize views and adapters
+                    moodPostList = view.findViewById(R.id.notificationList);
+                    if (dataList.size() > 0) {
+                        notifAdapter = new NotificationArrayAdapter(getContext(),notifications);
+                        moodPostList.setAdapter(notifAdapter);
 
-                        // Process and filter posts
-                        List<Notification> newNotifications = latestPosts(allPosts, new ArrayList<>());
-                        List<MoodPost> uniqueUserPosts = getUniqueUserLatestPosts(allPosts);
+                        // on item click on list, open detailed view of post
+                        moodPostList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                            @Override
+                            public void onItemClick(AdapterView<?> parent, View view,
+                                                    int position, long id) {
 
-                        mainHandler.post(() -> {
-                            dataList.clear();
-                            dataList.addAll(uniqueUserPosts);
-                            notifications.clear();
-                            notifications.addAll(newNotifications);
-
-                            if (notifAdapter != null) {
-                                notifAdapter.notifyDataSetChanged();
+                                DetailedMoodPostFragment detailedMoodPostFragment =
+                                        DetailedMoodPostFragment.newInstance(dataList.get(position));
+                                detailedMoodPostFragment.show(getActivity().getSupportFragmentManager(), "Detailed Mood Post View");
                             }
                         });
                     }
                 });
+                return null;
+            });
+        });
+
+        // Listener so that dataList gets updated whenever the database does
+        CollectionReference moodPostRef = DatabaseManager.getInstance().getPostsCollectionRef();
+        moodPostRef.addSnapshotListener((value, error) -> {
+            if (error != null){
+                Log.e("Firestore", error.toString());
+            }
+            if (value != null){
+                Log.d("Firestore", "SnapshotListener triggered, updating dataList");
+                // Convert snapshots to MoodPosts
+                List<MoodPost> allPosts = new ArrayList<>();
+                for (QueryDocumentSnapshot snapshot : value) {
+                    allPosts.add(snapshot.toObject(MoodPost.class));
+                }
+
+                // Process and filter posts
+                Log.d("NotificationsFragment", "Prior to unique user latest post call: " + allPosts.size());
+                List<MoodPost> uniqueUserPosts = getUniqueUserLatestPosts(allPosts);
+
+                dataList.clear();
+                dataList.addAll(uniqueUserPosts);
+
+                if (notifAdapter != null) {
+                    notifAdapter.notifyDataSetChanged();
+                }
+            }
+        });
+
+
+
+        return view;
     }
 
-
-    private List<Notification> latestPosts(List<MoodPost> uniqueUserPosts, ArrayList<HashMap<String, Object>> requests) {
-
+    private List<Notification> latestPosts(List<MoodPost> uniqueUserPosts) {
         List<Notification> notifications = new ArrayList<>();
-        for (HashMap<String, Object> request : requests) {
-            Notification notification = new Notification();
-            notification.setRequest(request);
-            notifications.add(notification);
-        }
         for (MoodPost post : uniqueUserPosts) {
             Notification notification = new Notification();
             notification.setMoodPost(post);

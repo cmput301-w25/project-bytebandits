@@ -18,55 +18,50 @@
             android:id="@+id/accept"
             android:layout_width="35dp"
             android:layout_height="35dp"
-            android:layout_marginEnd="32dp"
             android:layout_marginBottom="12dp"
             android:backgroundTint="#00FFFFFF"
             android:contentDescription="Accept"
             android:cropToPadding="false"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/decline"
-            app:srcCompat="@drawable/check"
-            app:tint="@color/white" />
+            app:srcCompat="@drawable/baseline_add_24"
+            app:tint="@color/white"
+            tools:layout_editor_absoluteX="269dp" />
 
         <ImageButton
             android:id="@+id/decline"
             android:layout_width="35dp"
             android:layout_height="35dp"
-            android:layout_marginEnd="24dp"
-            android:layout_marginBottom="12dp"
             android:backgroundTint="#00FFFFFF"
             android:contentDescription="TODO"
             android:cropToPadding="false"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
             app:srcCompat="@drawable/baseline_close_24_notif"
-            app:tint="@color/white" />
+            app:tint="@color/white"
+            tools:layout_editor_absoluteX="329dp"
+            tools:layout_editor_absoluteY="25dp" />
 
         <TextView
             android:id="@+id/textTime2"
             android:layout_width="35dp"
             android:layout_height="15dp"
-            android:layout_marginEnd="24dp"
             android:fontFamily="@font/dm_sans_extralight"
             android:text="Decline"
             android:textAlignment="center"
             android:textColor="@color/white"
             android:textSize="8sp"
-            app:layout_constraintBottom_toTopOf="@+id/decline"
-            app:layout_constraintEnd_toEndOf="parent" />
+            tools:layout_editor_absoluteX="328dp"
+            tools:layout_editor_absoluteY="10dp" />
 
         <TextView
             android:id="@+id/textTime5"
             android:layout_width="35dp"
             android:layout_height="15dp"
-            android:layout_marginEnd="32dp"
             android:fontFamily="@font/dm_sans_extralight"
             android:text="Accept"
             android:textAlignment="center"
             android:textColor="@color/white"
             android:textSize="8sp"
-            app:layout_constraintBottom_toTopOf="@+id/accept"
-            app:layout_constraintEnd_toStartOf="@+id/textTime2" />
+            tools:layout_editor_absoluteX="269dp"
+            tools:layout_editor_absoluteY="10dp" />
 
         <TextView
             android:id="@+id/textDate"
