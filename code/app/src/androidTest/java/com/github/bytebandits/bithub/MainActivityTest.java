@@ -3,6 +3,7 @@ package com.github.bytebandits.bithub;
 import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.action.ViewActions.clearText;
 import static androidx.test.espresso.action.ViewActions.click;
+import static androidx.test.espresso.assertion.ViewAssertions.doesNotExist;
 import static androidx.test.espresso.assertion.ViewAssertions.matches;
 import static androidx.test.espresso.matcher.ViewMatchers.hasErrorText;
 import static androidx.test.espresso.matcher.ViewMatchers.isChecked;
@@ -517,8 +518,23 @@ public class MainActivityTest {
     }
 
     @Test
-    public void testOpenFilterDialog() {
+    public void testOpenFilterDialogInProfilePage() {
+        // Click on profile on navbar
         onView(withId(R.id.profile)).perform(click());
+
+        // Click the filter button
+        onView(withId(R.id.filter_button)).perform(click());
+
+        // Check if filter dialog is displayed
+        onView(withId(R.id.radioGroup)).check(matches(isDisplayed()));
+        onView(withId(R.id.search_edit_text)).check(matches(isDisplayed()));
+    }
+
+    @Test
+    public void testOpenFilterDialogInHomePage() {
+        // Click on home on navbar
+        onView(withId(R.id.home)).perform(click());
+
         // Click the filter button
         onView(withId(R.id.filter_button)).perform(click());
 
@@ -529,6 +545,7 @@ public class MainActivityTest {
 
     @Test
     public void testFilterByMood() {
+        // Click on profile on navbar
         onView(withId(R.id.profile)).perform(click());
 
         // Click the filter button
@@ -541,45 +558,56 @@ public class MainActivityTest {
         onView(withId(R.id.close_button)).perform(click());
 
         // Verify that the filter is applied and the list is updated
-        onView(withId(R.id.mood_post_list_history)).check(matches(hasItem(withText(containsString("happiness")))));
-    }
-//
-//    @Test
-//    public void testFilterByLastWeek() {
-//        // Simulate clicking the filter button
-//        onView(withId(R.id.filter_button)).perform(click());
-//
-//        // Select "last week" from the radio buttons
-//        onView(withId(R.id.last_week_radio_button)).perform(click());
-//
-//        // Verify that the filtered list contains only posts from the last 7 days
-//        onView(withId(R.id.mood_post_list_history)).check(matches(hasItem(withText(containsString("posted within the last week")))));
-//    }
-//
-//    @Test
-//    public void testSearchFilter() {
-//        // Simulate clicking the filter button
-//        onView(withId(R.id.filter_button)).perform(click());
-//
-//        // Enter a search query
-//        onView(withId(R.id.search_edit_text)).perform(typeText("happy"), closeSoftKeyboard());
-//
-//        // Verify that the filtered posts contain the search query in the description
-//        onView(withId(R.id.mood_post_list_history)).check(matches(hasItem(withText(containsString("happy")))));
-//    }
-//
-//    @Test
-//    public void testFilterReset() {
-//        // Simulate clicking the filter button
-//        onView(withId(R.id.filter_button)).perform(click());
-//
-//        // Select "all" filter from the radio buttons
-//        onView(withId(R.id.all_radio_button)).perform(click());
-//
-//        // Verify that the filteredDataList contains all posts
-//        onView(withId(R.id.mood_post_list_history)).check(matches(hasItem(withText(containsString("any mood")))));
-//    }
+        onView(withText("Anger")).check(matches(isDisplayed()));
 
+        // Verify the other post is not displaying while the filter is applied
+        onView(withText("Surprise")).check(doesNotExist());
+    }
+
+    @Test
+    public void testFilterByLastWeek() {
+        // Click on profile on navbar
+        onView(withId(R.id.profile)).perform(click());
+
+        // Simulate clicking the filter button
+        onView(withId(R.id.filter_button)).perform(click());
+
+        // Select "last week" from the radio buttons
+        onView(withId(R.id.last_week_radio_button)).perform(click());
+
+        // Click off the filter dialog
+        onView(withId(R.id.close_button)).perform(click());
+
+        // Click on post with "anger" emotion to view the posts details
+        onView(withText("Anger")).perform(click());
+
+        // Verify that the filtered list contains only posts from the last 7 days
+        onView(withText("Mar. 29, 2025")).check(matches(isDisplayed()));
+
+        // Verify posts from more than a week ago are not displayed
+        onView(withText("Mar. 20, 2025")).check(doesNotExist());  // update the date later
+    }
+
+    @Test
+    public void testSearchFilter() {
+        // Click on profile on navbar
+        onView(withId(R.id.profile)).perform(click());
+
+        // Simulate clicking the filter button
+        onView(withId(R.id.filter_button)).perform(click());
+
+        // Enter a search query
+        onView(withId(R.id.search_edit_text)).perform(ViewActions.typeText("this"));
+
+        // Click off the filter dialog
+        onView(withId(R.id.close_button)).perform(click());
+
+        // Click on post with "Happiness" emotion to view the posts details
+        onView(withText("Happiness")).perform(click());
+
+        // Verify that the filter is applied and the list is updated
+        onView(withText("This is a description")).check(matches(isDisplayed()));
+    }
 
     @After
     public void cleanUp() {
