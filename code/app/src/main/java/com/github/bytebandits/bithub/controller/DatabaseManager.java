@@ -307,6 +307,23 @@ public final class DatabaseManager {
     }
 
     /**
+     * Unfollow a user.
+     *
+     * @param currentUserId The ID of the current user.
+     * @param targetUserId  The ID of the user that will be unfollowed.
+     */
+    public void unfollowUser(String currentUserId, String targetUserId) {
+        DocumentReference currentUserDocRef = this.usersCollectionRef.document(currentUserId);
+        DocumentReference targetUserDocRef = this.usersCollectionRef.document(targetUserId);
+
+        // Remove following from current user
+        currentUserDocRef.update(DocumentReferences.FOLLOWINGS.getDocRefString(), FieldValue.arrayRemove(targetUserDocRef));
+
+        // Remove follower from target user
+        targetUserDocRef.update(DocumentReferences.FOLLOWERS.getDocRefString(), FieldValue.arrayRemove(currentUserDocRef));
+    }
+
+    /**
      * Retrieves a list of followers for a given user.
      *
      * @param userId   The ID of the user whose followers are being fetched.
