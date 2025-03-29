@@ -11,6 +11,7 @@ import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.SearchView;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -64,7 +65,6 @@ public class HomepageFragment extends Fragment implements FilterDialog.FilterLis
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
             @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.homepage_fragment, container, false);
-
         filterButton = view.findViewById(R.id.filter_button_homepage);
         filterButton.setOnClickListener(v -> openFilterDialog());
 
@@ -161,6 +161,7 @@ public class HomepageFragment extends Fragment implements FilterDialog.FilterLis
 
         SearchView profileSearch = view.findViewById(R.id.profileSearch);
         ListView profileResults = view.findViewById(R.id.profileResults);
+        TextView noResults = view.findViewById(R.id.noResults);
         profileResults.setAdapter(profileSearchAdapter);
 
         // logic of profile transition via clicking
@@ -170,8 +171,7 @@ public class HomepageFragment extends Fragment implements FilterDialog.FilterLis
         });
 
         // logic to unfocus from search view, although there are cases where if you
-        // click certain ui elements, the click wont register and you will be still
-        // focused
+        // click certain ui elements, the click wont register and you will be still focused
         LinearLayout homepageLinearLayoutRoot = view.findViewById(R.id.HomepageLinearLayoutRoot);
         homepageLinearLayoutRoot.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -181,15 +181,25 @@ public class HomepageFragment extends Fragment implements FilterDialog.FilterLis
         });
 
         // submit logic for search results
-        ImageButton profileSearchIcon = view.findViewById(R.id.profileSearchConfirm);
-        profileSearchIcon.setOnClickListener(new View.OnClickListener() {
+        ImageButton profileSearchConfirm = view.findViewById(R.id.profileSearchConfirm);
+        profileSearchConfirm.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 String query = profileSearch.getQuery().toString();
                 if (!query.isEmpty()) {
-                    profileResults.setVisibility(View.VISIBLE);
+
                     DatabaseManager.getInstance().searchUsers(query, users -> {
                         profiles.clear();
+
+                        // required because of a side effect where submitting a query not in the db will still render an empty list view with a border visible
+                        if (!users.isEmpty()) {
+                            profileResults.setVisibility(View.VISIBLE);
+                            noResults.setVisibility(View.INVISIBLE);
+                        }
+
+                        else{
+                            noResults.setVisibility(View.VISIBLE);
+                        }
 
                         for (HashMap<String, Object> user : users) {
                             String profileJson = (String) user.get("profile");
@@ -226,6 +236,7 @@ public class HomepageFragment extends Fragment implements FilterDialog.FilterLis
                     profiles.clear();
                     profileSearchAdapter.notifyDataSetChanged();
                     profileResults.setVisibility(View.INVISIBLE);
+                    noResults.setVisibility(View.INVISIBLE);
                 }
                 return true;
             }

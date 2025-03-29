@@ -29,7 +29,7 @@ public class ProfileSearchAdapter extends ArrayAdapter<Profile> {
     public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
         View view;
         if (convertView == null) {
-            view = LayoutInflater.from(getContext()).inflate(R.layout.profile_text_result,
+            view = LayoutInflater.from(getContext()).inflate(R.layout.profile_search_result_item,
                     parent, false);
         } else {
             view = convertView;

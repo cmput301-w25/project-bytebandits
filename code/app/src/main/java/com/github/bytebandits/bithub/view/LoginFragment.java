@@ -48,8 +48,6 @@ public class LoginFragment extends Fragment {
             authenticate();
         });
 
-
-
         back.setOnClickListener(v -> {
             ((StartupActivity) requireActivity()).popBackStack("loginFragment");
         });
@@ -132,5 +130,4 @@ public class LoginFragment extends Fragment {
         });
         return builder.create();
     }
-
 }
