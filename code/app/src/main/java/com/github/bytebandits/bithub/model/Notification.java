@@ -8,16 +8,16 @@ import java.util.UUID;
 public class Notification implements Serializable {
     private String notificationID;
     private MoodPost post;
-    private int notificationType;
+    private boolean followRequest;
     private Profile profile;
     private Date dateTime;
 
     public Notification() {}
 
-    public Notification(String message, MoodPost post, int notificationType, Profile profile) {
+    public Notification(String message, MoodPost post, boolean notificationType, Profile profile) {
         this.notificationID = UUID.randomUUID().toString();
         this.post = post;
-        this.notificationType = notificationType;
+        this.followRequest = notificationType;
         this.profile = profile;
     }
 
@@ -25,12 +25,12 @@ public class Notification implements Serializable {
         return notificationID;
     }
 
-    public int getNotificationType() {
-        return notificationType;
+    public boolean getNotificationType() {
+        return followRequest;
     }
 
-    public void setNotificationType(int notificationType) {
-        this.notificationType = notificationType;
+    public void followRequest(boolean notificationType) {
+        this.followRequest = notificationType;
     }
 
     public MoodPost getPost() {
@@ -72,7 +72,7 @@ public class Notification implements Serializable {
     public void setMoodPost(MoodPost post) {
         this.post = post;
         this.dateTime = new Date();
-        this.notificationType = 0;
+        this.followRequest = false;
         this.notificationID = UUID.randomUUID().toString();
         this.profile = post.getProfile();
     }
