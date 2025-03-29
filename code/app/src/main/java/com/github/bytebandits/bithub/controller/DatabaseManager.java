@@ -240,6 +240,14 @@ public final class DatabaseManager {
         });
     }
 
+    public void deletePostNotification(String userId, String postId) {
+        DocumentReference postDocRef = this.postsCollectionRef.document(postId);
+        DocumentReference userDocRef = this.usersCollectionRef.document(userId);
+
+        userDocRef.update(DocumentReferences.NOTIFICATION_POSTS.getDocRefString(), FieldValue.arrayRemove(postDocRef));
+    }
+
+
     /**
      * Sends a follow request to a specific user.
      *
