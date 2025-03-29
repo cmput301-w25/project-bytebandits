@@ -516,6 +516,71 @@ public class MainActivityTest {
         }
     }
 
+    @Test
+    public void testOpenFilterDialog() {
+        onView(withId(R.id.profile)).perform(click());
+        // Click the filter button
+        onView(withId(R.id.filter_button)).perform(click());
+
+        // Check if filter dialog is displayed
+        onView(withId(R.id.radioGroup)).check(matches(isDisplayed()));
+        onView(withId(R.id.search_edit_text)).check(matches(isDisplayed()));
+    }
+
+    @Test
+    public void testFilterByMood() {
+        onView(withId(R.id.profile)).perform(click());
+
+        // Click the filter button
+        onView(withId(R.id.filter_button)).perform(click());
+
+        // Select "happiness" from the radio buttons
+        onView(withId(R.id.anger_radio_button)).perform(click());
+
+        // Click off the filter dialog
+        onView(withId(R.id.close_button)).perform(click());
+
+        // Verify that the filter is applied and the list is updated
+        onView(withId(R.id.mood_post_list_history)).check(matches(hasItem(withText(containsString("happiness")))));
+    }
+//
+//    @Test
+//    public void testFilterByLastWeek() {
+//        // Simulate clicking the filter button
+//        onView(withId(R.id.filter_button)).perform(click());
+//
+//        // Select "last week" from the radio buttons
+//        onView(withId(R.id.last_week_radio_button)).perform(click());
+//
+//        // Verify that the filtered list contains only posts from the last 7 days
+//        onView(withId(R.id.mood_post_list_history)).check(matches(hasItem(withText(containsString("posted within the last week")))));
+//    }
+//
+//    @Test
+//    public void testSearchFilter() {
+//        // Simulate clicking the filter button
+//        onView(withId(R.id.filter_button)).perform(click());
+//
+//        // Enter a search query
+//        onView(withId(R.id.search_edit_text)).perform(typeText("happy"), closeSoftKeyboard());
+//
+//        // Verify that the filtered posts contain the search query in the description
+//        onView(withId(R.id.mood_post_list_history)).check(matches(hasItem(withText(containsString("happy")))));
+//    }
+//
+//    @Test
+//    public void testFilterReset() {
+//        // Simulate clicking the filter button
+//        onView(withId(R.id.filter_button)).perform(click());
+//
+//        // Select "all" filter from the radio buttons
+//        onView(withId(R.id.all_radio_button)).perform(click());
+//
+//        // Verify that the filteredDataList contains all posts
+//        onView(withId(R.id.mood_post_list_history)).check(matches(hasItem(withText(containsString("any mood")))));
+//    }
+
+
     @After
     public void cleanUp() {
         // Delay so that movies added in seedDatabase() have a chance to update on
