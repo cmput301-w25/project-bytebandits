@@ -49,11 +49,9 @@ public final class DatabaseManager {
     }
 
     // Testing functions for offline persistence
-
     public void setOffline() {
         this.firestoreDb.disableNetwork();
     }
-
     public void setOnline(){
         this.firestoreDb.enableNetwork();
     }
@@ -182,9 +180,17 @@ public final class DatabaseManager {
      * @param docRef          A reference to the document associated with the
      *                        notification.
      */
-    private void sendNotification(String recipientUserId, DocumentReference docRef) {
+    public void sendNotification(String recipientUserId, DocumentReference docRef) {
         DocumentReference recipientDocRef = this.usersCollectionRef.document(recipientUserId);
         recipientDocRef.update(DocumentReferences.NOTIFICATIONS.getDocRefString(), FieldValue.arrayUnion(docRef));
+    }
+
+    public void sendFollowRequest(String currentUserId, String requestedUserId) {
+        DocumentReference currentDocRef = this.usersCollectionRef.document(currentUserId);
+        this.sendNotification(requestedUserId, currentDocRef);
+
+        // TODO: REMOVE LATER
+        this.acceptUserFollow(requestedUserId, currentUserId);
     }
 
     /**
@@ -193,14 +199,19 @@ public final class DatabaseManager {
      * @param currentUserId   The ID of the current user.
      * @param requestedUserId The ID of the user requesting to follow.
      */
-    private void acceptUserFollow(String currentUserId, String requestedUserId) {
+    public void acceptUserFollow(String currentUserId, String requestedUserId) {
         DocumentReference requestedUserDocRef = this.usersCollectionRef.document(requestedUserId);
         DocumentReference currentUserDocRef = this.usersCollectionRef.document(currentUserId);
 
+        // Add the requesting user document reference to your followers
         currentUserDocRef.update(DocumentReferences.FOLLOWERS.getDocRefString(),
                 FieldValue.arrayUnion(requestedUserDocRef));
         currentUserDocRef.update(DocumentReferences.NOTIFICATIONS.getDocRefString(),
                 FieldValue.arrayRemove(requestedUserDocRef));
+
+        // Add current user document reference to requesting's followings
+        requestedUserDocRef.update(DocumentReferences.FOLLOWINGS.getDocRefString(),
+                FieldValue.arrayUnion(currentUserDocRef));
     }
 
     /**
@@ -209,7 +220,7 @@ public final class DatabaseManager {
      * @param currentUserId   The ID of the current user.
      * @param requestedUserId The ID of the user whose request is being rejected.
      */
-    private void rejectUserFollow(String currentUserId, String requestedUserId) {
+    public void rejectUserFollow(String currentUserId, String requestedUserId) {
         DocumentReference requestedUserDocRef = this.usersCollectionRef.document(requestedUserId);
         DocumentReference currentUserDocRef = this.usersCollectionRef.document(currentUserId);
 
@@ -223,7 +234,7 @@ public final class DatabaseManager {
      * @param userId   The ID of the user whose followers are being fetched.
      * @param listener A listener to handle the list of fetched followers.
      */
-    private void getFollowers(String userId, OnFollowersFetchListener listener) {
+    public void getFollowers(String userId, OnFollowersFetchListener listener) {
         DocumentReference currentUserDocRef = this.usersCollectionRef.document(userId);
         ArrayList<Profile> followers = new ArrayList<>();
 
@@ -335,10 +346,10 @@ public final class DatabaseManager {
      * @param listener The listener that will receive the result (list of posts).
      *                 Example Usage:
      *                 DatabaseManager.getPosts(posts -> {
-     *                 for (MoodPost post : posts) {
-     *                 System.out.println(post);
-     *                 }
-     *                 }
+     *                       for (MoodPost post : posts) {
+     *                          System.out.println(post);
+     *                       }
+     *                    }
      *                 )
      */
     public void getAllPosts(OnPostsFetchListener listener) {

@@ -101,7 +101,12 @@ public class ProfileFragment extends Fragment implements FilterDialog.FilterList
             settingsButton.setVisibility(View.GONE);
             filterButton.setVisibility(View.GONE);
             followingButton.setVisibility(View.VISIBLE);
-            followingButton.setOnClickListener(v -> sendFollowRequest());
+            followingButton.setOnClickListener(v -> {
+                // Should be sending a request to the user, however will currently auto-accept requests
+                DatabaseManager databaseManager = DatabaseManager.getInstance();
+                Log.d("ProfileFragment", "sending follow request");
+                databaseManager.sendFollowRequest(userId, loggedInUser);
+            });
         } else {
             settingsButton.setVisibility(View.VISIBLE);
             filterButton.setVisibility(View.VISIBLE);

@@ -2,6 +2,7 @@ package com.github.bytebandits.bithub.model;
 
 public enum DocumentReferences {
     FOLLOWERS("followerRefs"),
+    FOLLOWINGS("followingRefs"),
     NOTIFICATIONS("notificationRefs"),
     POSTS("postRefs");
 
