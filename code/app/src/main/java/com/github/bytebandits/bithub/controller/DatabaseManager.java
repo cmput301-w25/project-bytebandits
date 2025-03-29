@@ -176,6 +176,7 @@ public final class DatabaseManager {
      * @param recipientUserId The ID of the user who will receive the notification.
      * @param docRef          A reference to the document associated with the
      *                        notification.
+     * @param type            Determine whether it is a post notification or follow notification.
      */
     public void sendNotification(String recipientUserId, DocumentReference docRef, DocumentReferences type) {
         DocumentReference recipientDocRef = this.usersCollectionRef.document(recipientUserId);
@@ -186,6 +187,7 @@ public final class DatabaseManager {
      * Fetches notifications for a given user from Firestore.
      *
      * @param userId The unique ID of the user whose notifications are to be retrieved.
+     *
      *
      */
     public void getNotifications(String userId, OnNotificationsFetchListener listener) {
@@ -240,6 +242,12 @@ public final class DatabaseManager {
         });
     }
 
+    /**
+     * Remove a post notification from user.
+     *
+     * @param userId current userId logged in.
+     * @param postId postId to remove the notification.
+     */
     public void deletePostNotification(String userId, String postId) {
         DocumentReference postDocRef = this.postsCollectionRef.document(postId);
         DocumentReference userDocRef = this.usersCollectionRef.document(userId);
@@ -260,7 +268,7 @@ public final class DatabaseManager {
         this.sendNotification(requestedUserId, currentDocRef, DocumentReferences.NOTIFICATION_REQS);
 
         // TODO: REMOVE LATER
-//        this.acceptUserFollow(requestedUserId, currentUserId);
+        // this.acceptUserFollow(requestedUserId, currentUserId);
     }
 
     /**
