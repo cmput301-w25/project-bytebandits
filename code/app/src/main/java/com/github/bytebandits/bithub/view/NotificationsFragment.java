@@ -19,6 +19,7 @@ import com.github.bytebandits.bithub.R;
 import com.github.bytebandits.bithub.controller.DatabaseManager;
 import com.github.bytebandits.bithub.controller.SessionManager;
 import com.github.bytebandits.bithub.model.MoodPost;
+import com.github.bytebandits.bithub.model.Notification;
 import com.github.bytebandits.bithub.model.Profile;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
@@ -32,6 +33,8 @@ import java.util.concurrent.Executors;
 
 public class NotificationsFragment extends Fragment {
     private ArrayList<MoodPost> dataList;
+
+    private ArrayList<Notification> notifications;
     private ListView moodPostList;
     private NotificationArrayAdapter notifAdapter;
 
@@ -56,6 +59,12 @@ public class NotificationsFragment extends Fragment {
             Log.d("NotificationsFragment", "dataList already initialized with size: " + dataList.size());
         }
 
+        // Initialize notifications to avoid NullPointerException
+        if (notifications == null) {
+            notifications = new ArrayList<>();
+            Log.d("NotificationsFragment", "notifications initialized as empty list");
+        }
+
         executor.execute(() -> {
             DatabaseManager.getInstance().getAllPublicPosts(posts -> {
                 if (posts == null) {
@@ -67,10 +76,14 @@ public class NotificationsFragment extends Fragment {
                 // Process and filter posts
                 List<MoodPost> uniqueUserPosts = getUniqueUserLatestPosts(posts);
 
+                List<Notification> newNotifications = latestPosts(uniqueUserPosts);
+
                 // Switch to UI thread for UI updates
                 mainHandler.post(() -> {
                     dataList.clear();
                     dataList.addAll(uniqueUserPosts);
+                    notifications.clear();
+                    notifications.addAll(newNotifications);
 
                     if (notifAdapter != null) {
                         notifAdapter.notifyDataSetChanged();
@@ -81,7 +94,7 @@ public class NotificationsFragment extends Fragment {
                     // Initialize views and adapters
                     moodPostList = view.findViewById(R.id.notificationList);
                     if (dataList.size() > 0) {
-                        notifAdapter = new NotificationArrayAdapter(getContext(), dataList);
+                        notifAdapter = new NotificationArrayAdapter(getContext(),notifications);
                         moodPostList.setAdapter(notifAdapter);
 
                         // on item click on list, open detailed view of post
@@ -89,6 +102,7 @@ public class NotificationsFragment extends Fragment {
                             @Override
                             public void onItemClick(AdapterView<?> parent, View view,
                                                     int position, long id) {
+
                                 DetailedMoodPostFragment detailedMoodPostFragment =
                                         DetailedMoodPostFragment.newInstance(dataList.get(position));
                                 detailedMoodPostFragment.show(getActivity().getSupportFragmentManager(), "Detailed Mood Post View");
@@ -130,6 +144,16 @@ public class NotificationsFragment extends Fragment {
 
 
         return view;
+    }
+
+    private List<Notification> latestPosts(List<MoodPost> uniqueUserPosts) {
+        List<Notification> notifications = new ArrayList<>();
+        for (MoodPost post : uniqueUserPosts) {
+            Notification notification = new Notification();
+            notification.setMoodPost(post);
+            notifications.add(notification);
+        }
+        return notifications;
     }
 
     private List<MoodPost> getUniqueUserLatestPosts(List<MoodPost> posts) {

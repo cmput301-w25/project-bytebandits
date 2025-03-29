@@ -14,6 +14,55 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent">
 
+        <ImageButton
+            android:id="@+id/accept"
+            android:layout_width="35dp"
+            android:layout_height="35dp"
+            android:layout_marginBottom="12dp"
+            android:backgroundTint="#00FFFFFF"
+            android:contentDescription="Accept"
+            android:cropToPadding="false"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:srcCompat="@drawable/baseline_add_24"
+            app:tint="@color/white"
+            tools:layout_editor_absoluteX="269dp" />
+
+        <ImageButton
+            android:id="@+id/decline"
+            android:layout_width="35dp"
+            android:layout_height="35dp"
+            android:backgroundTint="#00FFFFFF"
+            android:contentDescription="TODO"
+            android:cropToPadding="false"
+            app:srcCompat="@drawable/baseline_close_24_notif"
+            app:tint="@color/white"
+            tools:layout_editor_absoluteX="329dp"
+            tools:layout_editor_absoluteY="25dp" />
+
+        <TextView
+            android:id="@+id/textTime2"
+            android:layout_width="35dp"
+            android:layout_height="15dp"
+            android:fontFamily="@font/dm_sans_extralight"
+            android:text="Decline"
+            android:textAlignment="center"
+            android:textColor="@color/white"
+            android:textSize="8sp"
+            tools:layout_editor_absoluteX="328dp"
+            tools:layout_editor_absoluteY="10dp" />
+
+        <TextView
+            android:id="@+id/textTime5"
+            android:layout_width="35dp"
+            android:layout_height="15dp"
+            android:fontFamily="@font/dm_sans_extralight"
+            android:text="Accept"
+            android:textAlignment="center"
+            android:textColor="@color/white"
+            android:textSize="8sp"
+            tools:layout_editor_absoluteX="269dp"
+            tools:layout_editor_absoluteY="10dp" />
+
         <TextView
             android:id="@+id/textDate"
             android:layout_width="wrap_content"
@@ -64,30 +113,17 @@
             app:layout_constraintVertical_bias="1.0" />
 
         <TextView
-            android:id="@+id/recent"
-            android:layout_width="wrap_content"
-            android:layout_height="24dp"
-            android:layout_marginStart="8dp"
-            android:layout_marginBottom="16dp"
-            android:fontFamily="@font/stix_two_text_regular"
-            android:text="Recently "
-            android:textColor="@color/Accent1"
-            android:textSize="16sp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent" />
-
-        <TextView
             android:id="@+id/textUserName"
             android:layout_width="wrap_content"
             android:layout_height="24dp"
-            android:layout_marginStart="4dp"
+            android:layout_marginStart="8dp"
             android:layout_marginBottom="16dp"
             android:fontFamily="@font/stix_two_text_bold"
             android:text="John Doe"
             android:textColor="@color/Accent2"
             android:textSize="16sp"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/recent" />
+            app:layout_constraintStart_toStartOf="parent" />
 
         <TextView
             android:id="@+id/action"
@@ -96,7 +132,7 @@
             android:layout_marginStart="4dp"
             android:layout_marginBottom="16dp"
             android:fontFamily="@font/stix_two_text_regular"
-            android:text=" has been feeling "
+            android:text="has been feeling"
             android:textColor="@color/Accent1"
             android:textSize="16sp"
             app:layout_constraintBottom_toBottomOf="parent"
