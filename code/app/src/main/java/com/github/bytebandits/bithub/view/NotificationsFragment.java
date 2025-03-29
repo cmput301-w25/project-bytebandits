@@ -94,6 +94,12 @@ public class NotificationsFragment extends Fragment {
             return;
         }
 
+        // Initialize notifications to avoid NullPointerException
+        if (notifications == null) {
+            notifications = new ArrayList<>();
+            Log.d("NotificationsFragment", "notifications initialized as empty list");
+        }
+
         executor.execute(() -> {
             DatabaseManager.getInstance().getNotifications(
                     sessionManager.getUserId(),
@@ -183,6 +189,16 @@ public class NotificationsFragment extends Fragment {
             notification.setRequest(request);
             notifications.add(notification);
         }
+        for (MoodPost post : uniqueUserPosts) {
+            Notification notification = new Notification();
+            notification.setMoodPost(post);
+            notifications.add(notification);
+        }
+        return notifications;
+    }
+
+    private List<Notification> latestPosts(List<MoodPost> uniqueUserPosts) {
+        List<Notification> notifications = new ArrayList<>();
         for (MoodPost post : uniqueUserPosts) {
             Notification notification = new Notification();
             notification.setMoodPost(post);
