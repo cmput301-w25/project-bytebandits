@@ -3,6 +3,7 @@ package com.github.bytebandits.bithub.controller;
 import android.content.Context;
 import android.util.Log;
 
+import com.github.bytebandits.bithub.model.CollectionPath;
 import com.github.bytebandits.bithub.model.DocumentReferences;
 import com.github.bytebandits.bithub.model.MoodPost;
 import com.github.bytebandits.bithub.model.Profile;
@@ -185,6 +186,13 @@ public final class DatabaseManager {
         recipientDocRef.update(DocumentReferences.NOTIFICATIONS.getDocRefString(), FieldValue.arrayUnion(docRef));
     }
 
+    /**
+     * Sends a follow request to a specific user.
+     *
+     * @param currentUserId   The ID of the current user.
+     * @param requestedUserId The ID of the user that the request is for.
+     *
+     */
     public void sendFollowRequest(String currentUserId, String requestedUserId) {
         DocumentReference currentDocRef = this.usersCollectionRef.document(currentUserId);
         this.sendNotification(requestedUserId, currentDocRef);
@@ -375,6 +383,61 @@ public final class DatabaseManager {
                     Log.e("DatabaseManager", "Listener is null on Firestore query failure");
                 }
             }
+        });
+    }
+
+    /**
+     * Fetches all public posts from the users that the given user follows.
+     *
+     * @param userId   The unique ID of the user whose followed users' posts are to be retrieved.
+     * @param listener A callback interface to handle the fetched posts.
+     *
+     */
+
+    public void getAllFollowerPosts(String userId, OnPostsFetchListener listener) {
+        DocumentReference userDocRef = this.usersCollectionRef.document(userId);
+        userDocRef.get().addOnSuccessListener(userDocSnapshot -> {
+            if (!userDocSnapshot.exists() || !userDocSnapshot.contains(DocumentReferences.FOLLOWINGS.getDocRefString())) {
+                listener.onPostsFetched(new ArrayList<>());
+                return;
+            }
+
+            List<DocumentReference> followingDocRefs = (List<DocumentReference>) userDocSnapshot.get(DocumentReferences.FOLLOWINGS.getDocRefString());
+            List<String> followingUserIds = new ArrayList<>();
+
+            for (DocumentReference ref : followingDocRefs) {
+                followingUserIds.add(ref.getId());
+            }
+
+            Log.d("DatabaseManager", "Following user IDs: " + followingUserIds);
+
+            if (followingUserIds.isEmpty()) {
+                listener.onPostsFetched(new ArrayList<>());
+                return;
+            }
+
+            this.postsCollectionRef
+                    .whereIn("profile.userId", followingUserIds)
+                    .whereEqualTo("private", false)
+                    .get()
+                    .addOnCompleteListener(task -> {
+                        if (task.isSuccessful()) {
+                            ArrayList<MoodPost> allPosts = new ArrayList<>();
+                            for (QueryDocumentSnapshot doc : task.getResult()) {
+                                MoodPost post = doc.toObject(MoodPost.class);
+                                Log.d("DatabaseManager", "Post found: " + post.toString());
+                                allPosts.add(post);
+                            }
+
+                            if (allPosts.isEmpty()) {
+                                Log.d("DatabaseManager", "No public posts found from followed users.");
+                            }
+                            listener.onPostsFetched(allPosts);
+                        }
+                    }).addOnFailureListener(e -> {
+                        Log.e("DatabaseManager", "Error fetching posts: " + e.getMessage(), e);
+                        listener.onPostsFetched(new ArrayList<>()); // Return empty list on failure
+                    });
         });
     }
 

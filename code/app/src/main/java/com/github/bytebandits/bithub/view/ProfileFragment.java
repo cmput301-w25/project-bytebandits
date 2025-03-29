@@ -105,7 +105,8 @@ public class ProfileFragment extends Fragment implements FilterDialog.FilterList
                 // Should be sending a request to the user, however will currently auto-accept requests
                 DatabaseManager databaseManager = DatabaseManager.getInstance();
                 Log.d("ProfileFragment", "sending follow request");
-                databaseManager.sendFollowRequest(userId, loggedInUser);
+                databaseManager.sendFollowRequest(loggedInUser, userId);
+                Toast.makeText(requireContext(), "Follow Request Sent!", Toast.LENGTH_SHORT).show();
             });
         } else {
             settingsButton.setVisibility(View.VISIBLE);
@@ -281,9 +282,5 @@ public class ProfileFragment extends Fragment implements FilterDialog.FilterList
             }
         }
         moodPostAdapter.notifyDataSetChanged();
-    }
-
-    public void sendFollowRequest() {
-
     }
 }
