@@ -11,6 +11,7 @@ import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.SearchView;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -160,6 +161,7 @@ public class HomepageFragment extends Fragment implements FilterDialog.FilterLis
 
         SearchView profileSearch = view.findViewById(R.id.profileSearch);
         ListView profileResults = view.findViewById(R.id.profileResults);
+        TextView noResults = view.findViewById(R.id.noResults);
         profileResults.setAdapter(profileSearchAdapter);
 
         // logic of profile transition via clicking
@@ -192,6 +194,11 @@ public class HomepageFragment extends Fragment implements FilterDialog.FilterLis
                         // required because of a side effect where submitting a query not in the db will still render an empty list view with a border visible
                         if (!users.isEmpty()) {
                             profileResults.setVisibility(View.VISIBLE);
+                            noResults.setVisibility(View.INVISIBLE);
+                        }
+
+                        else{
+                            noResults.setVisibility(View.VISIBLE);
                         }
 
                         for (HashMap<String, Object> user : users) {
@@ -229,6 +236,7 @@ public class HomepageFragment extends Fragment implements FilterDialog.FilterLis
                     profiles.clear();
                     profileSearchAdapter.notifyDataSetChanged();
                     profileResults.setVisibility(View.INVISIBLE);
+                    noResults.setVisibility(View.INVISIBLE);
                 }
                 return true;
             }

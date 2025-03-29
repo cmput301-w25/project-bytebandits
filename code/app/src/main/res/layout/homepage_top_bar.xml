@@ -40,7 +40,22 @@
             android:background="@color/Background"
             app:srcCompat="@drawable/baseline_filter_alt_24"
             app:tint="@color/white" />
+
     </LinearLayout>
+
+    <TextView
+        android:id="@+id/noResults"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:fontFamily="@font/stix_two_text_bold"
+        android:text="Profile not found :("
+        android:textColor="@color/Accent1"
+        android:textSize="20sp"
+        android:visibility="invisible"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/linearLayout" />
 
     <ListView
         android:id="@+id/profileResults"
