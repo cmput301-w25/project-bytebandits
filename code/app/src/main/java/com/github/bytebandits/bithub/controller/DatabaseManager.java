@@ -1,20 +1,16 @@
 package com.github.bytebandits.bithub.controller;
 
-import android.content.Context;
 import android.util.Log;
 
-import com.github.bytebandits.bithub.model.CollectionPath;
 import com.github.bytebandits.bithub.model.DocumentReferences;
 import com.github.bytebandits.bithub.model.MoodPost;
 import com.github.bytebandits.bithub.model.Profile;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.firestore.*;
-import com.google.firebase.firestore.auth.User;
 
 import org.jetbrains.annotations.NotNull;
 import java.util.*;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
 import javax.inject.Singleton;
@@ -181,9 +177,67 @@ public final class DatabaseManager {
      * @param docRef          A reference to the document associated with the
      *                        notification.
      */
-    public void sendNotification(String recipientUserId, DocumentReference docRef) {
+    public void sendNotification(String recipientUserId, DocumentReference docRef, DocumentReferences type) {
         DocumentReference recipientDocRef = this.usersCollectionRef.document(recipientUserId);
-        recipientDocRef.update(DocumentReferences.NOTIFICATIONS.getDocRefString(), FieldValue.arrayUnion(docRef));
+        recipientDocRef.update(type.getDocRefString(), FieldValue.arrayUnion(docRef));
+    }
+
+    /**
+     * Fetches notifications for a given user from Firestore.
+     *
+     * @param userId The unique ID of the user whose notifications are to be retrieved.
+     *
+     */
+    public void getNotifications(String userId, OnNotificationsFetchListener listener) {
+        DocumentReference userDocRef = this.usersCollectionRef.document(userId);
+        userDocRef.get().addOnSuccessListener(userDocSnapshot -> {
+            if (!userDocSnapshot.exists()) {
+                Log.d("DatabaseManager", "User document does not exist.");
+                return;
+            }
+            ArrayList<MoodPost> postNotifications = new ArrayList<>();
+            ArrayList<HashMap<String, Object>> requestNotifications = new ArrayList<>();
+
+            // Fetch post notifications
+            if (userDocSnapshot.contains(DocumentReferences.NOTIFICATION_POSTS.getDocRefString())) {
+                List<DocumentReference> postRefs =
+                        (List<DocumentReference>) userDocSnapshot.get(DocumentReferences.NOTIFICATION_POSTS.getDocRefString());
+
+                for (DocumentReference postRef : postRefs) {
+                    postRef.get().addOnSuccessListener(postDoc -> {
+                        if (postDoc.exists()) {
+                            MoodPost post = postDoc.toObject(MoodPost.class);
+                            postNotifications.add(post);
+                            Log.d("DatabaseManager", "Post notification fetched: " + post.toString());
+                        }
+                    }).addOnFailureListener(e -> Log.e("DatabaseManager", "Error fetching post: " + e.getMessage(), e));
+                }
+            } else {
+                Log.d("DatabaseManager", "No post notifications found.");
+            }
+
+            // Fetch request notifications
+            if (userDocSnapshot.contains(DocumentReferences.NOTIFICATION_REQS.getDocRefString())) {
+                List<DocumentReference> userRefs =
+                        (List<DocumentReference>) userDocSnapshot.get(DocumentReferences.NOTIFICATION_REQS.getDocRefString());
+                Log.d("DatabaseManager", "Request notifications: " + userRefs);
+
+                for (DocumentReference userRef : userRefs) {
+                    userRef.get().addOnSuccessListener(userDoc -> {
+                        if (userDoc.exists()) {
+                            HashMap<String, Object> user = (HashMap<String, Object>) userDoc.getData();
+                            requestNotifications.add(user);
+                        }
+                    });
+                }
+            } else {
+                Log.d("DatabaseManager", "No request notifications found.");
+            }
+
+            listener.onNotificationsFetchListener(postNotifications, requestNotifications);
+        }).addOnFailureListener(e -> {
+            Log.e("DatabaseManager", "Error fetching notifications: " + e.getMessage(), e);
+        });
     }
 
     /**
@@ -195,10 +249,10 @@ public final class DatabaseManager {
      */
     public void sendFollowRequest(String currentUserId, String requestedUserId) {
         DocumentReference currentDocRef = this.usersCollectionRef.document(currentUserId);
-        this.sendNotification(requestedUserId, currentDocRef);
+        this.sendNotification(requestedUserId, currentDocRef, DocumentReferences.NOTIFICATION_REQS);
 
         // TODO: REMOVE LATER
-        this.acceptUserFollow(requestedUserId, currentUserId);
+//        this.acceptUserFollow(requestedUserId, currentUserId);
     }
 
     /**
@@ -214,7 +268,7 @@ public final class DatabaseManager {
         // Add the requesting user document reference to your followers
         currentUserDocRef.update(DocumentReferences.FOLLOWERS.getDocRefString(),
                 FieldValue.arrayUnion(requestedUserDocRef));
-        currentUserDocRef.update(DocumentReferences.NOTIFICATIONS.getDocRefString(),
+        currentUserDocRef.update(DocumentReferences.NOTIFICATION_REQS.getDocRefString(),
                 FieldValue.arrayRemove(requestedUserDocRef));
 
         // Add current user document reference to requesting's followings
@@ -232,7 +286,7 @@ public final class DatabaseManager {
         DocumentReference requestedUserDocRef = this.usersCollectionRef.document(requestedUserId);
         DocumentReference currentUserDocRef = this.usersCollectionRef.document(currentUserId);
 
-        currentUserDocRef.update(DocumentReferences.NOTIFICATIONS.getDocRefString(),
+        currentUserDocRef.update(DocumentReferences.NOTIFICATION_REQS.getDocRefString(),
                 FieldValue.arrayRemove(requestedUserDocRef));
     }
 
@@ -725,12 +779,12 @@ public final class DatabaseManager {
     private void sendPostNotifications(DocumentReference userDocRef, DocumentReference postDocRef) {
         userDocRef.get().addOnSuccessListener(documentSnapshot -> {
             if (documentSnapshot.exists()) {
-                Object followersRefsObject = documentSnapshot.get("followersRefs");
+                Object followersRefsObject = documentSnapshot.get(DocumentReferences.FOLLOWERS.getDocRefString());
                 if (followersRefsObject instanceof ArrayList<?>) {
                     ArrayList<DocumentReference> followersRef = (ArrayList<DocumentReference>) followersRefsObject;
 
                     for (DocumentReference followerRef : followersRef) {
-                        followerRef.update(DocumentReferences.NOTIFICATIONS.getDocRefString(),
+                        followerRef.update(DocumentReferences.NOTIFICATION_POSTS.getDocRefString(),
                                 FieldValue.arrayUnion(postDocRef));
                     }
                 }
@@ -792,6 +846,14 @@ public final class DatabaseManager {
      */
     public interface OnMultipleUsersPostsFetchListener {
         void onMultipleUsersPostsFetched(HashMap<String, ArrayList<MoodPost>> postsMap);
+    }
+
+    /**
+     * Callback interface for fetching notifications from a user.
+     * Implement this interface to handle the fetched notifications.
+     */
+    public interface OnNotificationsFetchListener {
+        void onNotificationsFetchListener(ArrayList<MoodPost> posts, ArrayList<HashMap<String, Object>> requests);
     }
 
     /**
