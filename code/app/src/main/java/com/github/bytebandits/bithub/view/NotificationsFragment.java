@@ -21,6 +21,10 @@ import com.github.bytebandits.bithub.controller.DatabaseManager;
 import com.github.bytebandits.bithub.controller.SessionManager;
 import com.github.bytebandits.bithub.model.MoodPost;
 import com.github.bytebandits.bithub.model.Notification;
+<<<<<<< HEAD
+=======
+import com.github.bytebandits.bithub.model.Profile;
+>>>>>>> c307e62 (Notification model added)
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
@@ -35,6 +39,10 @@ import java.util.concurrent.Executors;
 
 public class NotificationsFragment extends Fragment {
     private ArrayList<MoodPost> dataList;
+<<<<<<< HEAD
+=======
+
+>>>>>>> c307e62 (Notification model added)
     private ArrayList<Notification> notifications;
     private ListView moodPostList;
     private NotificationArrayAdapter notifAdapter;
@@ -92,6 +100,12 @@ public class NotificationsFragment extends Fragment {
         if (isNotificationCleared) {
             isNotificationCleared = false;
             return;
+        }
+
+        // Initialize notifications to avoid NullPointerException
+        if (notifications == null) {
+            notifications = new ArrayList<>();
+            Log.d("NotificationsFragment", "notifications initialized as empty list");
         }
 
         // Initialize notifications to avoid NullPointerException
@@ -189,6 +203,16 @@ public class NotificationsFragment extends Fragment {
             notification.setRequest(request);
             notifications.add(notification);
         }
+        for (MoodPost post : uniqueUserPosts) {
+            Notification notification = new Notification();
+            notification.setMoodPost(post);
+            notifications.add(notification);
+        }
+        return notifications;
+    }
+
+    private List<Notification> latestPosts(List<MoodPost> uniqueUserPosts) {
+        List<Notification> notifications = new ArrayList<>();
         for (MoodPost post : uniqueUserPosts) {
             Notification notification = new Notification();
             notification.setMoodPost(post);
