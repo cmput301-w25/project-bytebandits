@@ -3,22 +3,21 @@ package com.github.bytebandits.bithub.model;
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.UUID;
 
 public class Notification implements Serializable {
     private String notificationID;
     private MoodPost post;
-    private boolean followRequest;
+    private int notificationType;
     private Profile profile;
     private Date dateTime;
 
     public Notification() {}
 
-    public Notification(String message, MoodPost post, boolean notificationType, Profile profile) {
+    public Notification(String message, MoodPost post, int notificationType, Profile profile) {
         this.notificationID = UUID.randomUUID().toString();
         this.post = post;
-        this.followRequest = notificationType;
+        this.notificationType = notificationType;
         this.profile = profile;
     }
 
@@ -26,12 +25,12 @@ public class Notification implements Serializable {
         return notificationID;
     }
 
-    public boolean getNotificationType() {
-        return followRequest;
+    public int getNotificationType() {
+        return notificationType;
     }
 
-    public void followRequest(boolean notificationType) {
-        this.followRequest = notificationType;
+    public void setNotificationType(int notificationType) {
+        this.notificationType = notificationType;
     }
 
     public MoodPost getPost() {
@@ -73,15 +72,8 @@ public class Notification implements Serializable {
     public void setMoodPost(MoodPost post) {
         this.post = post;
         this.dateTime = new Date();
-        this.followRequest = false;
+        this.notificationType = 0;
         this.notificationID = UUID.randomUUID().toString();
         this.profile = post.getProfile();
-    }
-
-    public void setRequest(HashMap<String, Object> request) {
-        this.followRequest = true;
-        this.dateTime = new Date();
-        this.notificationID = UUID.randomUUID().toString();
-        this.profile = new Profile(request.get("userId").toString());
     }
 }
