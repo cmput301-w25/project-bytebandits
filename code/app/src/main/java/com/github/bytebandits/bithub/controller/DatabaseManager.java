@@ -12,6 +12,7 @@ import com.google.firebase.firestore.*;
 import org.jetbrains.annotations.NotNull;
 import java.util.*;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.inject.Singleton;
 
@@ -193,13 +194,12 @@ public final class DatabaseManager {
     public void getNotifications(String userId, OnNotificationsFetchListener listener) {
         DocumentReference userDocRef = this.usersCollectionRef.document(userId);
         userDocRef.get().addOnSuccessListener(userDocSnapshot -> {
-            if (!userDocSnapshot.exists()) {
-                listener.onNotificationsFetchListener(new ArrayList<>(), new ArrayList<>());
-                return;
-            }
-
             ArrayList<MoodPost> postNotifications = new ArrayList<>();
             ArrayList<HashMap<String, Object>> requestNotifications = new ArrayList<>();
+            if (!userDocSnapshot.exists()) {
+                listener.onNotificationsFetchListener(postNotifications, new ArrayList<>());
+                return;
+            };
 
             // Prepare lists of tasks
             List<Task<DocumentSnapshot>> postTasks = new ArrayList<>();
@@ -246,19 +246,6 @@ public final class DatabaseManager {
 
                                 // Handle profile conversion if needed
                                 if (post != null) {
-                                    // If profile is stored as a map or needs special handling
-                                    Object profileObj = postDoc.get("profile");
-                                    if (profileObj instanceof Map) {
-                                        Map<String, Object> profileMap = (Map<String, Object>) profileObj;
-                                        Profile profile = convertMapToProfile(profileMap);
-                                        post.setProfile(profile);
-                                    } else if (profileObj instanceof String) {
-                                        // If it's a string, you might need to parse it or create a default profile
-                                        Profile profile;
-                                        profile = new Profile((String) profileObj);
-                                        post.setProfile(profile);
-                                    }
-
                                     postNotifications.add(post);
                                     Log.d("DatabaseManager", "Post notification fetched: " + post.toString());
                                 }
@@ -278,20 +265,6 @@ public final class DatabaseManager {
                         if (userDoc.exists()) {
                             try {
                                 HashMap<String, Object> user = new HashMap<>(userDoc.getData());
-
-                                // Optional: Convert profile if needed
-                                Object profileObj = user.get("profile");
-                                if (profileObj instanceof Map) {
-                                    Map<String, Object> profileMap = (Map<String, Object>) profileObj;
-                                    Profile profile = convertMapToProfile(profileMap);
-                                    user.put("profile", profile);
-                                } else if (profileObj instanceof String) {
-                                    // Create a basic profile if only userId is available
-                                    Profile profile;
-                                    profile = new Profile((String) profileObj);
-                                    user.put("profile", profile);
-                                }
-
                                 requestNotifications.add(user);
                                 Log.d("DatabaseManager", "Request notification fetched: " + user.toString());
                             } catch (Exception e) {
@@ -310,25 +283,6 @@ public final class DatabaseManager {
             Log.e("DatabaseManager", "Error fetching user document: " + e.getMessage(), e);
             listener.onNotificationsFetchListener(new ArrayList<>(), new ArrayList<>());
         });
-    }
-
-    // Helper method to convert a map to a Profile object
-    private Profile convertMapToProfile(Map<String, Object> profileMap) {
-        Profile profile = new Profile();
-
-        // Safely extract and set profile fields
-        if (profileMap.containsKey("userId")) {
-            profile = new Profile(String.valueOf(profileMap.get("userId")));
-        }
-
-        // Add more fields as needed
-        if (profileMap.containsKey("username")) {
-            profile= new Profile(String.valueOf(profileMap.get("username")));
-        }
-
-        // Add more fields based on your Profile class
-
-        return profile;
     }
 
     /**
@@ -372,9 +326,6 @@ public final class DatabaseManager {
     public void sendFollowRequest(String currentUserId, String requestedUserId) {
         DocumentReference currentDocRef = this.usersCollectionRef.document(currentUserId);
         this.sendNotification(requestedUserId, currentDocRef, DocumentReferences.NOTIFICATION_REQS);
-
-        // TODO: REMOVE LATER
-//         this.acceptUserFollow(requestedUserId, currentUserId);
     }
 
     /**
@@ -535,7 +486,8 @@ public final class DatabaseManager {
         DocumentReference userDocRef = usersCollectionRef.document(userId);
         userDocRef.update(DocumentReferences.POSTS.getDocRefString(), FieldValue.arrayUnion(postDocRef));
 
-        sendPostNotifications(userDocRef, postDocRef);
+        if (!post.isPrivate())
+            sendPostNotifications(userDocRef, postDocRef);
     }
 
     /**
@@ -655,6 +607,8 @@ public final class DatabaseManager {
                             if (allPosts.isEmpty()) {
                                 Log.d("DatabaseManager", "No public posts found from followed users.");
                             }
+
+                            allPosts.sort((p1, p2) -> p2.getPostedDateTime().compareTo(p1.getPostedDateTime()));
                             listener.onPostsFetched(allPosts);
                         }
                     }).addOnFailureListener(e -> {
@@ -780,61 +734,40 @@ public final class DatabaseManager {
      *                 });
      */
     public void getUserPosts(@NotNull String userId, OnPostsFetchListener listener) {
-        ArrayList<MoodPost> posts = new ArrayList<>();
-        usersCollectionRef.document(userId).get().addOnCompleteListener(task -> {
-            if (task.isSuccessful() && task.getResult() != null) {
-                DocumentSnapshot userSnapshot = task.getResult();
-                Object postRefsObject = userSnapshot.get("postRefs");
+        DocumentReference userDocRef = usersCollectionRef.document(userId);
+        userDocRef.get().addOnSuccessListener(userSnapshot  -> {
+            if (!userSnapshot.exists() || !userSnapshot.contains(DocumentReferences.POSTS.getDocRefString())) {
+                Log.d("DatabaseManager", "User document does not exist or has no postRefs");
+                listener.onPostsFetched(new ArrayList<>());
+                return;
+            }
 
-                List<DocumentReference> postRefs = new ArrayList<>();
+            ArrayList<DocumentReference> postRefs = (ArrayList<DocumentReference>) userSnapshot.get(DocumentReferences.POSTS.getDocRefString());
+            AtomicInteger remainingPosts = new AtomicInteger(postRefs.size());
+            List<MoodPost> posts = Collections.synchronizedList(new ArrayList<>());
 
-                if (postRefsObject instanceof List) {
-                    List<?> rawList = (List<?>) postRefsObject;
-                    for (Object item : rawList) {
-                        if (item instanceof DocumentReference) {
-                            postRefs.add((DocumentReference) item);
-                        } else if (item instanceof String) {
-                            // Convert string to DocumentReference
-                            postRefs.add(firestoreDb.document((String) item));
-                        } else {
-                            Log.e("getUserPosts", "Unexpected item in postRefs: " + item);
-                        }
-                    }
-                }
-
-                if (postRefs.isEmpty()) {
-                    Log.d("getUserPosts", "postRefs is empty");
-                    listener.onPostsFetched(posts);
-                    return;
-                } else {
-                    Log.d("getUserPosts", "postRefs size: " + postRefs.size());
-                    for (DocumentReference ref : postRefs) {
-                        Log.d("getUserPosts", "postRef: " + ref.getPath());
-                    }
-                }
-
-                int[] postRemaining = { postRefs.size() }; // Track individual post retrieval
-
-                for (DocumentReference postRef : postRefs) {
-                    postRef.get().addOnCompleteListener(postTask -> {
-                        if (postTask.isSuccessful() && postTask.getResult().exists()) {
-                            MoodPost moodPost = postTask.getResult().toObject(MoodPost.class);
+            for (DocumentReference postRef : postRefs) {
+                postRef.get().addOnSuccessListener(postSnapshot -> {
+                    if (postSnapshot.exists()) {
+                        MoodPost moodPost = postSnapshot.toObject(MoodPost.class);
+                        if (moodPost != null) {
                             posts.add(moodPost);
-                            Log.d("getUserPosts", "Fetched post: " + moodPost);
-                        } else {
-                            Log.d("getUserPosts", "Failed to fetch post: " + postRef.getPath());
+                            Log.d("DatabaseManager", "Fetched post: " + moodPost);
                         }
-                        postRemaining[0]--;
+                    } else {
+                        Log.d("DatabaseManager", "Post not found: " + postRef.getPath());
+                    }
 
-                        // When all postRefs are processed, update the map
-                        if (postRemaining[0] == 0) {
-                            Log.d("getUserPosts", "All posts fetched, returning list");
-                            listener.onPostsFetched(posts);
-                        }
-                    });
-                }
-            } else {
-                Log.e("getUserPosts", "Failed to fetch user document", task.getException());
+                    if (remainingPosts.decrementAndGet() == 0) {
+                        posts.sort((p1, p2) -> p2.getPostedDateTime().compareTo(p1.getPostedDateTime()));
+                        listener.onPostsFetched(new ArrayList<MoodPost>(posts));
+                    }
+                }).addOnFailureListener(e -> {
+                    Log.e("DatabaseManager", "Error fetching post: " + postRef.getPath(), e);
+                    if (remainingPosts.decrementAndGet() == 0) {
+                        listener.onPostsFetched(new ArrayList<MoodPost>(posts));
+                    }
+                });
             }
         });
     }
