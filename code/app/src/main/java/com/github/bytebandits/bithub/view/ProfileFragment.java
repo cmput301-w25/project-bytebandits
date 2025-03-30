@@ -114,7 +114,7 @@ public class ProfileFragment extends Fragment implements FilterDialog.FilterList
                 });
 
             // else (you already follow this user) do this...
-
+                // followingButton.setVisibility(View.VISIBLE);
                 // followingButton.setImageResource(R.drawable.baseline_group_remove_24);
                 // followingButton.setOnClickListener(v -> {
                 //  });
