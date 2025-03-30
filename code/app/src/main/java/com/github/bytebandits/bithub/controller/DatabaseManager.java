@@ -268,7 +268,7 @@ public final class DatabaseManager {
         this.sendNotification(requestedUserId, currentDocRef, DocumentReferences.NOTIFICATION_REQS);
 
         // TODO: REMOVE LATER
-        // this.acceptUserFollow(requestedUserId, currentUserId);
+//         this.acceptUserFollow(requestedUserId, currentUserId);
     }
 
     /**
@@ -321,6 +321,36 @@ public final class DatabaseManager {
 
         // Remove follower from target user
         targetUserDocRef.update(DocumentReferences.FOLLOWERS.getDocRefString(), FieldValue.arrayRemove(currentUserDocRef));
+    }
+
+    /**
+     * Check if a user is being followed by the current user signed in
+     *
+     * @param currentUserId The ID of the user whose followings list is being checked.
+     * @param checkUserId   The ID of the user to check if they are being followed.
+     * @param listener      A callback to return whether the target user is being followed.
+     */
+    public void checkFollowing(String currentUserId, String checkUserId, OnCheckFollowingListener listener) {
+        DocumentReference currentUserDocRef = this.usersCollectionRef.document(currentUserId);
+        DocumentReference targetUserDocRef = this.usersCollectionRef.document(checkUserId);
+
+        currentUserDocRef.get()
+                .addOnSuccessListener(userDocSnapshot -> {
+                    if (!userDocSnapshot.exists() || !userDocSnapshot.contains(DocumentReferences.FOLLOWINGS.getDocRefString())) {
+                        Log.d("DatabaseManager", "User document does not exist or has no followings.");
+                        listener.onCheckFollowingListener(false);
+                        return;
+                    } else {
+                        List<DocumentReference> followings = (List<DocumentReference>) userDocSnapshot.get(DocumentReferences.FOLLOWINGS.getDocRefString());
+                        boolean isFollowing = followings.stream().anyMatch(ref -> ref.getId().equals(checkUserId));
+
+                        Log.d("DatabaseManager", "Is following: " + isFollowing);
+                        listener.onCheckFollowingListener(isFollowing);
+                    }
+                }).addOnFailureListener(e -> {
+                    Log.e("DatabaseManager", "Error checking following status: " + e.getMessage(), e);
+                    listener.onCheckFollowingListener(false);
+                });
     }
 
     /**
@@ -870,7 +900,7 @@ public final class DatabaseManager {
      * Implement this interface to handle the fetched posts.
      */
     public interface OnPostsFetchListener {
-        OnPostsFetchListener onPostsFetched(ArrayList<MoodPost> posts);
+        void onPostsFetched(ArrayList<MoodPost> posts);
     }
 
     /**
@@ -888,6 +918,15 @@ public final class DatabaseManager {
     public interface OnNotificationsFetchListener {
         void onNotificationsFetchListener(ArrayList<MoodPost> posts, ArrayList<HashMap<String, Object>> requests);
     }
+
+    /**
+     * Callback interface for checking if a user is following another user.
+     * Implement this interface to handle the fetched boolean.
+     */
+    public interface OnCheckFollowingListener {
+        void onCheckFollowingListener(boolean following);
+    }
+
 
     /**
      * Callback interface for adding a post.

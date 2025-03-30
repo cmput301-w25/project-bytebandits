@@ -100,14 +100,33 @@ public class ProfileFragment extends Fragment implements FilterDialog.FilterList
         if (!userId.equalsIgnoreCase(loggedInUser)) {
             settingsButton.setVisibility(View.GONE);
             filterButton.setVisibility(View.GONE);
-            followingButton.setVisibility(View.VISIBLE);
-            followingButton.setOnClickListener(v -> {
-                // Should be sending a request to the user, however will currently auto-accept requests
-                DatabaseManager databaseManager = DatabaseManager.getInstance();
-                Log.d("ProfileFragment", "sending follow request");
-                databaseManager.sendFollowRequest(loggedInUser, userId);
-                Toast.makeText(requireContext(), "Follow Request Sent!", Toast.LENGTH_SHORT).show();
-            });
+
+            executor.execute(
+                    () -> {
+                        DatabaseManager.getInstance().checkFollowing(loggedInUser, userId, isFollowing -> {
+                            mainHandler.post(() -> {
+                                if (isFollowing) {
+                                    followingButton.setVisibility(View.VISIBLE);
+                                    followingButton.setImageResource(R.drawable.baseline_group_remove_24);
+                                    followingButton.setOnClickListener(v -> {
+                                        DatabaseManager.getInstance().unfollowUser(loggedInUser, userId);
+                                    });
+                                } else {
+                                    followingButton.setVisibility(View.VISIBLE);
+                                    followingButton.setImageResource(R.drawable.baseline_group_add_24);
+                                    followingButton.setOnClickListener(v -> {
+                                        // Should be sending a request to the user, however will currently auto-accept requests
+                                        DatabaseManager databaseManager = DatabaseManager.getInstance();
+                                        Log.d("ProfileFragment", "sending follow request");
+                                        databaseManager.sendFollowRequest(loggedInUser, userId);
+                                        Toast.makeText(requireContext(), "Follow Request Sent!", Toast.LENGTH_SHORT).show();
+                                    });
+                                }
+                            });
+                        });
+                    }
+            );
+
         } else {
             settingsButton.setVisibility(View.VISIBLE);
             filterButton.setVisibility(View.VISIBLE);
@@ -138,7 +157,7 @@ public class ProfileFragment extends Fragment implements FilterDialog.FilterList
             DatabaseManager.getInstance().getUserPosts(userIdToBeRendered, posts -> {
                 if (posts == null) {
                     Log.e("ProfileFragment", "Error: posts is null");
-                    return null;
+                    return;
                 }
 
                 Log.d("ProfileFragment", "Fetched posts count: " + posts.size());
@@ -173,7 +192,6 @@ public class ProfileFragment extends Fragment implements FilterDialog.FilterList
                         }
                     });
                 });
-                return null;
             });
         });
 

@@ -72,7 +72,6 @@ public class ExploreFragment extends Fragment implements GoogleMap.OnMarkerClick
                             dataList.addAll(posts);
 
                         });
-                        return null;
                     });
         });
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(getActivity());
@@ -204,7 +203,6 @@ public class ExploreFragment extends Fragment implements GoogleMap.OnMarkerClick
                     detailedMoodPostFragment.show(getActivity().getSupportFragmentManager(), "Detailed Mood Post View");
 
                 });
-                return null;
             });
         });
         return false;

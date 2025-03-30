@@ -98,11 +98,11 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:backgroundTint="@color/Background"
-            android:src="@drawable/baseline_add_circle_24"
+            android:src="@drawable/baseline_group_add_24"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-<!--        <ImageView-->
+        <!--        <ImageView-->
 <!--            android:id="@+id/profile_picture"-->
 <!--            android:layout_width="198dp"-->
 <!--            android:layout_height="145dp"-->

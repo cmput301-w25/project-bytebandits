@@ -116,7 +116,6 @@ public class HomepageFragment extends Fragment implements FilterDialog.FilterLis
                         });
                     }
                 });
-                return null;
             });
         });
 

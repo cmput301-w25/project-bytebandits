@@ -93,7 +93,6 @@ public class DatabaseManagerTest {
         dbInstance.getAllPosts(
                 dbPosts -> {
                     assertEquals(2, dbPosts.size());
-                    return null;
                 }
         );
     }
@@ -112,7 +111,6 @@ public class DatabaseManagerTest {
         dbInstance.getUserPosts(testProfile.getUserId(), posts -> {
             MoodPost newlyAddedPost = posts.getLast();
             assertEquals(Emotion.SHAME, newlyAddedPost.getEmotion());
-            return null;
         });
     }
 
@@ -157,7 +155,6 @@ public class DatabaseManagerTest {
         dbInstance.getUserPosts(testProfile.getUserId(), posts -> {
             assertNotNull(posts);
             assertFalse(posts.isEmpty());
-            return null;
         });
     }
 
