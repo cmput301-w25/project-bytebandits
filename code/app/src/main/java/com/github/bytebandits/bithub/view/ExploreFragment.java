@@ -94,7 +94,7 @@ public class ExploreFragment extends Fragment implements GoogleMap.OnMarkerClick
                     dataList.addAll(posts);
 
                 });
-                return null;
+
             });
         });
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(getActivity());
@@ -155,7 +155,7 @@ public class ExploreFragment extends Fragment implements GoogleMap.OnMarkerClick
     @Override
     public boolean onMarkerClick(@NonNull Marker marker) {
         executor.execute(() -> {
-            DatabaseManager.getInstance().getAllPublicPosts(posts -> {
+            DatabaseManager.getInstance().getAllFollowerPosts(SessionManager.getInstance(requireContext()).getUserId(),posts -> {
                 if (posts == null) {
                     Log.e("ExploreFragment", "Error: posts is null");
                 }
@@ -173,7 +173,6 @@ public class ExploreFragment extends Fragment implements GoogleMap.OnMarkerClick
                     detailedMoodPostFragment.show(getActivity().getSupportFragmentManager(), "Detailed Mood Post View");
 
                 });
-                return null;
             });
         });
         return false;
@@ -232,7 +231,7 @@ public class ExploreFragment extends Fragment implements GoogleMap.OnMarkerClick
 
             if (querySnapshot != null) {
                 // Fetch all public posts
-                databaseManager.getAllFollowerPosts( SessionManager.getInstance(requireContext()).getUserId(),posts -> {
+                databaseManager.getAllFollowerPosts(SessionManager.getInstance(requireContext()).getUserId(),posts -> {
                     mainHandler.post(() -> {
                         // Clear existing data and markers
                         dataList.clear();
@@ -250,7 +249,6 @@ public class ExploreFragment extends Fragment implements GoogleMap.OnMarkerClick
                             }
                         }
                     });
-                    return null;
                 });
             }
         });
@@ -346,7 +344,6 @@ public class ExploreFragment extends Fragment implements GoogleMap.OnMarkerClick
                                         "Detailed Mood Post View"
                                 );
                             });
-                            return null;
                         });
                     });
                     return false;
