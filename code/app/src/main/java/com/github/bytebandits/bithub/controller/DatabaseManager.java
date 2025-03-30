@@ -194,52 +194,141 @@ public final class DatabaseManager {
         DocumentReference userDocRef = this.usersCollectionRef.document(userId);
         userDocRef.get().addOnSuccessListener(userDocSnapshot -> {
             if (!userDocSnapshot.exists()) {
-                Log.d("DatabaseManager", "User document does not exist.");
+                listener.onNotificationsFetchListener(new ArrayList<>(), new ArrayList<>());
                 return;
             }
+
             ArrayList<MoodPost> postNotifications = new ArrayList<>();
             ArrayList<HashMap<String, Object>> requestNotifications = new ArrayList<>();
 
-            // Fetch post notifications
-            if (userDocSnapshot.contains(DocumentReferences.NOTIFICATION_POSTS.getDocRefString())) {
-                List<DocumentReference> postRefs =
-                        (List<DocumentReference>) userDocSnapshot.get(DocumentReferences.NOTIFICATION_POSTS.getDocRefString());
+            // Prepare lists of tasks
+            List<Task<DocumentSnapshot>> postTasks = new ArrayList<>();
+            List<Task<DocumentSnapshot>> requestTasks = new ArrayList<>();
 
+            // Fetch post notifications
+            Object postRefsObj = userDocSnapshot.get(DocumentReferences.NOTIFICATION_POSTS.getDocRefString());
+            if (postRefsObj instanceof List) {
+                List<DocumentReference> postRefs = (List<DocumentReference>) postRefsObj;
                 for (DocumentReference postRef : postRefs) {
-                    postRef.get().addOnSuccessListener(postDoc -> {
-                        if (postDoc.exists()) {
-                            MoodPost post = postDoc.toObject(MoodPost.class);
-                            postNotifications.add(post);
-                            Log.d("DatabaseManager", "Post notification fetched: " + post.toString());
-                        }
-                    }).addOnFailureListener(e -> Log.e("DatabaseManager", "Error fetching post: " + e.getMessage(), e));
+                    postTasks.add(postRef.get());
                 }
-            } else {
-                Log.d("DatabaseManager", "No post notifications found.");
             }
 
             // Fetch request notifications
-            if (userDocSnapshot.contains(DocumentReferences.NOTIFICATION_REQS.getDocRefString())) {
-                List<DocumentReference> userRefs =
-                        (List<DocumentReference>) userDocSnapshot.get(DocumentReferences.NOTIFICATION_REQS.getDocRefString());
-                Log.d("DatabaseManager", "Request notifications: " + userRefs);
-
-                for (DocumentReference userRef : userRefs) {
-                    userRef.get().addOnSuccessListener(userDoc -> {
-                        if (userDoc.exists()) {
-                            HashMap<String, Object> user = (HashMap<String, Object>) userDoc.getData();
-                            requestNotifications.add(user);
-                        }
-                    });
+            Object requestRefsObj = userDocSnapshot.get(DocumentReferences.NOTIFICATION_REQS.getDocRefString());
+            if (requestRefsObj instanceof List) {
+                List<DocumentReference> requestRefs = (List<DocumentReference>) requestRefsObj;
+                for (DocumentReference requestRef : requestRefs) {
+                    requestTasks.add(requestRef.get());
                 }
-            } else {
-                Log.d("DatabaseManager", "No request notifications found.");
             }
 
-            listener.onNotificationsFetchListener(postNotifications, requestNotifications);
+            // If no tasks, immediately return
+            if (postTasks.isEmpty() && requestTasks.isEmpty()) {
+                listener.onNotificationsFetchListener(postNotifications, requestNotifications);
+                return;
+            }
+
+            // Create a list to track all tasks
+            List<Task<DocumentSnapshot>> allTasks = new ArrayList<>();
+            allTasks.addAll(postTasks);
+            allTasks.addAll(requestTasks);
+
+            // Wait for all tasks to complete
+            Tasks.whenAll(allTasks).addOnCompleteListener(task -> {
+                // Process post notifications
+                for (Task<DocumentSnapshot> postTask : postTasks) {
+                    if (postTask.isSuccessful()) {
+                        DocumentSnapshot postDoc = postTask.getResult();
+                        if (postDoc.exists()) {
+                            try {
+                                MoodPost post = postDoc.toObject(MoodPost.class);
+
+                                // Handle profile conversion if needed
+                                if (post != null) {
+                                    // If profile is stored as a map or needs special handling
+                                    Object profileObj = postDoc.get("profile");
+                                    if (profileObj instanceof Map) {
+                                        Map<String, Object> profileMap = (Map<String, Object>) profileObj;
+                                        Profile profile = convertMapToProfile(profileMap);
+                                        post.setProfile(profile);
+                                    } else if (profileObj instanceof String) {
+                                        // If it's a string, you might need to parse it or create a default profile
+                                        Profile profile;
+                                        profile = new Profile((String) profileObj);
+                                        post.setProfile(profile);
+                                    }
+
+                                    postNotifications.add(post);
+                                    Log.d("DatabaseManager", "Post notification fetched: " + post.toString());
+                                }
+                            } catch (Exception e) {
+                                Log.e("DatabaseManager", "Error processing post", e);
+                            }
+                        }
+                    } else {
+                        Log.e("DatabaseManager", "Post task failed: " + postTask.getException());
+                    }
+                }
+
+                // Process request notifications
+                for (Task<DocumentSnapshot> requestTask : requestTasks) {
+                    if (requestTask.isSuccessful()) {
+                        DocumentSnapshot userDoc = requestTask.getResult();
+                        if (userDoc.exists()) {
+                            try {
+                                HashMap<String, Object> user = new HashMap<>(userDoc.getData());
+
+                                // Optional: Convert profile if needed
+                                Object profileObj = user.get("profile");
+                                if (profileObj instanceof Map) {
+                                    Map<String, Object> profileMap = (Map<String, Object>) profileObj;
+                                    Profile profile = convertMapToProfile(profileMap);
+                                    user.put("profile", profile);
+                                } else if (profileObj instanceof String) {
+                                    // Create a basic profile if only userId is available
+                                    Profile profile;
+                                    profile = new Profile((String) profileObj);
+                                    user.put("profile", profile);
+                                }
+
+                                requestNotifications.add(user);
+                                Log.d("DatabaseManager", "Request notification fetched: " + user.toString());
+                            } catch (Exception e) {
+                                Log.e("DatabaseManager", "Error processing request", e);
+                            }
+                        }
+                    } else {
+                        Log.e("DatabaseManager", "Request task failed: " + requestTask.getException());
+                    }
+                }
+
+                // Call listener with all fetched notifications
+                listener.onNotificationsFetchListener(postNotifications, requestNotifications);
+            });
         }).addOnFailureListener(e -> {
-            Log.e("DatabaseManager", "Error fetching notifications: " + e.getMessage(), e);
+            Log.e("DatabaseManager", "Error fetching user document: " + e.getMessage(), e);
+            listener.onNotificationsFetchListener(new ArrayList<>(), new ArrayList<>());
         });
+    }
+
+    // Helper method to convert a map to a Profile object
+    private Profile convertMapToProfile(Map<String, Object> profileMap) {
+        Profile profile = new Profile();
+
+        // Safely extract and set profile fields
+        if (profileMap.containsKey("userId")) {
+            profile = new Profile(String.valueOf(profileMap.get("userId")));
+        }
+
+        // Add more fields as needed
+        if (profileMap.containsKey("username")) {
+            profile= new Profile(String.valueOf(profileMap.get("username")));
+        }
+
+        // Add more fields based on your Profile class
+
+        return profile;
     }
 
     /**

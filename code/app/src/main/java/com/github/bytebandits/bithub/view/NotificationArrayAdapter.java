@@ -13,6 +13,8 @@ import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 
 import com.github.bytebandits.bithub.R;
+import com.github.bytebandits.bithub.controller.DatabaseManager;
+import com.github.bytebandits.bithub.controller.SessionManager;
 import com.github.bytebandits.bithub.model.MoodPost;
 import com.github.bytebandits.bithub.model.Notification;
 
@@ -41,6 +43,7 @@ public class NotificationArrayAdapter extends ArrayAdapter<Notification> {
         TextView dateView = view.findViewById(R.id.textDate);
         TextView timeView = view.findViewById(R.id.textTime);
         TextView emotionView = view.findViewById(R.id.emotion_group);
+        TextView actionView = view.findViewById(R.id.action);
         ImageButton buttonA = view.findViewById(R.id.accept);
         ImageButton buttonD = view.findViewById(R.id.decline);
         TextView textA = view.findViewById(R.id.textTime2);
@@ -52,6 +55,25 @@ public class NotificationArrayAdapter extends ArrayAdapter<Notification> {
             buttonD.setVisibility(View.VISIBLE);
             textD.setVisibility(View.VISIBLE);
             textA.setVisibility(View.VISIBLE);
+            emotionView.setVisibility(View.GONE);
+            actionView.setText("has requested to follow you:");
+            buttonA.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    // Handle accept button click
+                    DatabaseManager.getInstance().acceptUserFollow(SessionManager.getInstance(getContext()).getUserId(), notification.getProfile().getUserId());
+                    remove(notification);
+                }
+            });
+            buttonD.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    // Handle decline button click
+                    DatabaseManager.getInstance().rejectUserFollow(SessionManager.getInstance(getContext()).getUserId(), notification.getProfile().getUserId());
+                    remove(notification);
+                }
+            });
+
         }
         else {
             buttonA.setVisibility(View.GONE);
@@ -62,8 +84,8 @@ public class NotificationArrayAdapter extends ArrayAdapter<Notification> {
         nameView.setText(notification.getProfile().getUserId());
         dateView.setText(notification.getFormattedPostedDate());
         timeView.setText(notification.getFormattedPostedTime());
-        emotionView.setText(notification.getPost().getEmotion().getState());
-        emotionView.setTextColor(ContextCompat.getColor(getContext(), notification.getPost().getEmotion().getColor()));
+        //emotionView.setText(notification.getPost().getEmotion().getState());
+        //emotionView.setTextColor(ContextCompat.getColor(getContext(), notification.getPost().getEmotion().getColor()));
 
         return view;
     }
