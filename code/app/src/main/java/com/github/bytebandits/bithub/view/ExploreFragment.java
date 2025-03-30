@@ -25,6 +25,7 @@ import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import com.github.bytebandits.bithub.controller.DatabaseManager;
 import com.github.bytebandits.bithub.R;
+import com.github.bytebandits.bithub.controller.SessionManager;
 import com.github.bytebandits.bithub.model.MoodMarker;
 import com.github.bytebandits.bithub.model.MoodPost;
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -231,7 +232,7 @@ public class ExploreFragment extends Fragment implements GoogleMap.OnMarkerClick
 
             if (querySnapshot != null) {
                 // Fetch all public posts
-                databaseManager.getAllPublicPosts(posts -> {
+                databaseManager.getAllFollowerPosts( SessionManager.getInstance(requireContext()).getUserId(),posts -> {
                     mainHandler.post(() -> {
                         // Clear existing data and markers
                         dataList.clear();
@@ -322,16 +323,18 @@ public class ExploreFragment extends Fragment implements GoogleMap.OnMarkerClick
                 // Update cluster item click listener
                 clusterManager.setOnClusterItemClickListener(moodMarker -> {
                     executor.execute(() -> {
-                        DatabaseManager.getInstance().getAllPublicPosts(posts -> {
+                        DatabaseManager.getInstance().getAllFollowerPosts(SessionManager.getInstance(requireContext()).getUserId(), posts -> {
                             mainHandler.post(() -> {
                                 // Filter posts by distance
                                 List<MoodPost> filteredPosts = new ArrayList<>();
                                 for (MoodPost post : posts) {
-                                    LatLng postLocation = new LatLng(post.getLatitude(), post.getLongitude());
-                                    double distance = calculateDistance(currentUserLocation, postLocation);
+                                    if (post.getLocation()) {
+                                        LatLng postLocation = new LatLng(post.getLatitude(), post.getLongitude());
+                                        double distance = calculateDistance(currentUserLocation, postLocation);
 
-                                    if (distance <= MAX_DISTANCE_KM) {
-                                        filteredPosts.add(post);
+                                        if (distance <= MAX_DISTANCE_KM) {
+                                            filteredPosts.add(post);
+                                        }
                                     }
                                 }
 
