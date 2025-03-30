@@ -20,11 +20,11 @@ import com.github.bytebandits.bithub.controller.DatabaseManager;
 import com.github.bytebandits.bithub.controller.SessionManager;
 import com.github.bytebandits.bithub.model.MoodPost;
 import com.github.bytebandits.bithub.model.Notification;
-import com.github.bytebandits.bithub.model.Profile;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -69,19 +69,12 @@ public class NotificationsFragment extends Fragment {
             DatabaseManager.getInstance().getNotifications(SessionManager.getInstance(requireContext()).getUserId(), (posts, requests) -> {
                 Log.d("NotificationsFragment", "Data");
 
-            });
-
-            DatabaseManager.getInstance().getAllPublicPosts(posts -> {
-                if (posts == null) {
-                    Log.e("NotificationsFragment", "Error: notifications is null");
-                }
-
                 Log.d("NotificationsFragment", "Fetched notifications count: " + posts.size());
 
                 // Process and filter posts
                 List<MoodPost> uniqueUserPosts = getUniqueUserLatestPosts(posts);
 
-                List<Notification> newNotifications = latestPosts(uniqueUserPosts);
+                List<Notification> newNotifications = latestPosts(uniqueUserPosts, requests);
 
                 // Switch to UI thread for UI updates
                 mainHandler.post(() -> {
@@ -98,7 +91,7 @@ public class NotificationsFragment extends Fragment {
 
                     // Initialize views and adapters
                     moodPostList = view.findViewById(R.id.notificationList);
-                    if (dataList.size() > 0) {
+                    if (notifications.size() > 0) {
                         notifAdapter = new NotificationArrayAdapter(getContext(),notifications);
                         moodPostList.setAdapter(notifAdapter);
 
@@ -113,9 +106,10 @@ public class NotificationsFragment extends Fragment {
                                 detailedMoodPostFragment.show(getActivity().getSupportFragmentManager(), "Detailed Mood Post View");
                             }
                         });
+
+
                     }
                 });
-                return null;
             });
         });
 
@@ -135,10 +129,13 @@ public class NotificationsFragment extends Fragment {
 
                 // Process and filter posts
                 Log.d("NotificationsFragment", "Prior to unique user latest post call: " + allPosts.size());
+                List<Notification> newNotifications = latestPosts(allPosts, new ArrayList<>());
                 List<MoodPost> uniqueUserPosts = getUniqueUserLatestPosts(allPosts);
 
                 dataList.clear();
                 dataList.addAll(uniqueUserPosts);
+                notifications.clear();
+                notifications.addAll(newNotifications);
 
                 if (notifAdapter != null) {
                     notifAdapter.notifyDataSetChanged();
@@ -151,8 +148,14 @@ public class NotificationsFragment extends Fragment {
         return view;
     }
 
-    private List<Notification> latestPosts(List<MoodPost> uniqueUserPosts) {
+    private List<Notification> latestPosts(List<MoodPost> uniqueUserPosts, ArrayList<HashMap<String, Object>> requests) {
+
         List<Notification> notifications = new ArrayList<>();
+        for (HashMap<String, Object> request : requests) {
+            Notification notification = new Notification();
+            notification.setRequest(request);
+            notifications.add(notification);
+        }
         for (MoodPost post : uniqueUserPosts) {
             Notification notification = new Notification();
             notification.setMoodPost(post);
