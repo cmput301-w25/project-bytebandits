@@ -344,6 +344,23 @@ public final class DatabaseManager {
         userDocRef.update(DocumentReferences.NOTIFICATION_POSTS.getDocRefString(), FieldValue.arrayRemove(postDocRef));
     }
 
+    public void clearAllNotifications(String userId) {
+        DocumentReference userDocRef = this.usersCollectionRef.document(userId);
+
+        // Clear both post and request notifications
+        Map<String, Object> updates = new HashMap<>();
+        updates.put(DocumentReferences.NOTIFICATION_POSTS.getDocRefString(), new ArrayList<>());
+        updates.put(DocumentReferences.NOTIFICATION_REQS.getDocRefString(), new ArrayList<>());
+
+        userDocRef.update(updates)
+                .addOnSuccessListener(aVoid -> {
+                    Log.d("DatabaseManager", "All notifications cleared successfully");
+                })
+                .addOnFailureListener(e -> {
+                    Log.e("DatabaseManager", "Error clearing notifications", e);
+                });
+    }
+
 
     /**
      * Sends a follow request to a specific user.
