@@ -84,8 +84,8 @@ public class NotificationArrayAdapter extends ArrayAdapter<Notification> {
         nameView.setText(notification.getProfile().getUserId());
         dateView.setText(notification.getFormattedPostedDate());
         timeView.setText(notification.getFormattedPostedTime());
-        emotionView.setText(notification.getPost().getEmotion().getState());
-        emotionView.setTextColor(ContextCompat.getColor(getContext(), notification.getPost().getEmotion().getColor()));
+        //emotionView.setText(notification.getPost().getEmotion().getState());
+        //emotionView.setTextColor(ContextCompat.getColor(getContext(), notification.getPost().getEmotion().getColor()));
 
         return view;
     }

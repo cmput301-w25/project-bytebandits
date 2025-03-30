@@ -21,10 +21,6 @@ import com.github.bytebandits.bithub.controller.DatabaseManager;
 import com.github.bytebandits.bithub.controller.SessionManager;
 import com.github.bytebandits.bithub.model.MoodPost;
 import com.github.bytebandits.bithub.model.Notification;
-<<<<<<< HEAD
-=======
-import com.github.bytebandits.bithub.model.Profile;
->>>>>>> c307e62 (Notification model added)
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
@@ -39,10 +35,6 @@ import java.util.concurrent.Executors;
 
 public class NotificationsFragment extends Fragment {
     private ArrayList<MoodPost> dataList;
-<<<<<<< HEAD
-=======
-
->>>>>>> c307e62 (Notification model added)
     private ArrayList<Notification> notifications;
     private ListView moodPostList;
     private NotificationArrayAdapter notifAdapter;
