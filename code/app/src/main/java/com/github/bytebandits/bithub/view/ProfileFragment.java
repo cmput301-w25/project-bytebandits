@@ -100,14 +100,25 @@ public class ProfileFragment extends Fragment implements FilterDialog.FilterList
         if (!userId.equalsIgnoreCase(loggedInUser)) {
             settingsButton.setVisibility(View.GONE);
             filterButton.setVisibility(View.GONE);
-            followingButton.setVisibility(View.VISIBLE);
-            followingButton.setOnClickListener(v -> {
-                // Should be sending a request to the user, however will currently auto-accept requests
-                DatabaseManager databaseManager = DatabaseManager.getInstance();
-                Log.d("ProfileFragment", "sending follow request");
-                databaseManager.sendFollowRequest(loggedInUser, userId);
-                Toast.makeText(requireContext(), "Follow Request Sent!", Toast.LENGTH_SHORT).show();
-            });
+
+            // if you dont follow the user do this...
+
+                followingButton.setVisibility(View.VISIBLE);
+                followingButton.setImageResource(R.drawable.baseline_group_add_24);
+                followingButton.setOnClickListener(v -> {
+                    // Should be sending a request to the user, however will currently auto-accept requests
+                    DatabaseManager databaseManager = DatabaseManager.getInstance();
+                    Log.d("ProfileFragment", "sending follow request");
+                    databaseManager.sendFollowRequest(loggedInUser, userId);
+                    Toast.makeText(requireContext(), "Follow Request Sent!", Toast.LENGTH_SHORT).show();
+                });
+
+            // else (you already follow this user) do this...
+
+                // followingButton.setImageResource(R.drawable.baseline_group_remove_24);
+                // followingButton.setOnClickListener(v -> {
+                //  });
+
         } else {
             settingsButton.setVisibility(View.VISIBLE);
             filterButton.setVisibility(View.VISIBLE);
