@@ -101,7 +101,6 @@ public class NotificationsFragment extends Fragment {
                         });
                     }
                 });
-                return null;
             });
         });
 
