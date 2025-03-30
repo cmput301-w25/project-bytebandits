@@ -3,6 +3,7 @@ package com.github.bytebandits.bithub.model;
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.UUID;
 
 public class Notification implements Serializable {
@@ -75,5 +76,12 @@ public class Notification implements Serializable {
         this.followRequest = false;
         this.notificationID = UUID.randomUUID().toString();
         this.profile = post.getProfile();
+    }
+
+    public void setRequest(HashMap<String, Object> request) {
+        this.followRequest = true;
+        this.dateTime = new Date();
+        this.notificationID = UUID.randomUUID().toString();
+        this.profile = new Profile(request.get("userId").toString());
     }
 }

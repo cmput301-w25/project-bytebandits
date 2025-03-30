@@ -397,10 +397,7 @@ public class ExploreFragment extends Fragment implements GoogleMap.OnMarkerClick
             LatLng postLocation = new LatLng(post.getLatitude(), post.getLongitude());
             double distance = calculateDistance(currentUserLocation, postLocation);
 
-            displayStrings.add(String.format("@%s (%.2f km)",
-                    post.getProfile().getUserId(),
-                    distance
-            ));
+            displayStrings.add(String.format("@%s - %s", post.getProfile().getUserId(), post.getEmotion().getState()));
         }
 
         ListView listView = new ListView(requireContext());
