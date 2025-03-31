@@ -80,12 +80,13 @@ public class NotificationArrayAdapter extends ArrayAdapter<Notification> {
             buttonD.setVisibility(View.GONE);
             textD.setVisibility(View.GONE);
             textA.setVisibility(View.GONE);
+            emotionView.setText(notification.getPost().getEmotion().getState());
+            emotionView.setTextColor(ContextCompat.getColor(getContext(), notification.getPost().getEmotion().getColor()));
         }
         nameView.setText(notification.getProfile().getUserId());
         dateView.setText(notification.getFormattedPostedDate());
         timeView.setText(notification.getFormattedPostedTime());
-        emotionView.setText(notification.getPost().getEmotion().getState());
-        emotionView.setTextColor(ContextCompat.getColor(getContext(), notification.getPost().getEmotion().getColor()));
+
 
         return view;
     }
