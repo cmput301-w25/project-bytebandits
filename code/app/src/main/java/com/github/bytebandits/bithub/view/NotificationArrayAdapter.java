@@ -59,7 +59,7 @@ public class NotificationArrayAdapter extends ArrayAdapter<Notification> {
             textD.setVisibility(View.VISIBLE);
             textA.setVisibility(View.VISIBLE);
             emotionView.setVisibility(View.GONE);
-            actionView.setText("has requested to follow uou:");
+            actionView.setText("has requested to follow you:");
             buttonA.setOnClickListener(v -> {
                 DatabaseManager.getInstance().acceptUserFollow(SessionManager.getInstance(getContext()).getUserId(), notification.getProfile().getUserId());
                 buttonA.setVisibility(View.GONE);
