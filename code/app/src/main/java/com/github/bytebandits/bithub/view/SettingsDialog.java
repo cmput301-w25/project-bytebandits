@@ -4,6 +4,7 @@ import android.app.AlertDialog;
 
 import android.content.Context;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 
@@ -13,6 +14,7 @@ import android.widget.CompoundButton;
 import android.widget.Toast;
 
 import com.github.bytebandits.bithub.R;
+import com.github.bytebandits.bithub.controller.DatabaseManager;
 import com.github.bytebandits.bithub.controller.SessionManager;
 import com.github.bytebandits.bithub.model.Profile;
 
@@ -60,10 +62,14 @@ public class SettingsDialog {
 
         // Set checkbox state based on user's current location service setting
         userProfile = SessionManager.getInstance(context).getProfile();
-
+        if (userProfile != null) {
+            // Set checkbox state based on user's current location service setting
+            locationServices.setChecked(userProfile.getLocationServices());
+        }
         locationServices.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                SessionManager sessionManagerIns = SessionManager.getInstance(context);
                 if (isChecked) {
                     // Location Services Enabled
                     userProfile.enableLocationServices();
@@ -73,7 +79,10 @@ public class SettingsDialog {
                     userProfile.disableLocationServices();
                     Toast.makeText(context, "Location Services Disabled", Toast.LENGTH_SHORT).show();
                 }
-                SessionManager.getInstance(context).saveProfile(userProfile);
+                sessionManagerIns.saveProfile(userProfile);
+                DatabaseManager.getInstance().getUsersCollectionRef().document(sessionManagerIns.getUserId()).update(
+                        "profile", userProfile.toJson()
+                );
             }
         });
 
