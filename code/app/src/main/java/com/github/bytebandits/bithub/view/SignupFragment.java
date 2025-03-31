@@ -36,7 +36,6 @@ public class SignupFragment extends Fragment {
     TextView accountExists;
     FloatingActionButton back;
     TextInputEditText userText;
-    TextInputEditText emailText;
     TextInputEditText pswrdText;
     TextInputEditText pswrdContext;
 
@@ -52,7 +51,6 @@ public class SignupFragment extends Fragment {
         accountExists = view.findViewById(R.id.accountExists);
         back = view.findViewById(R.id.backActionButton);
         userText = view.findViewById(R.id.UserInputText);
-        emailText = view.findViewById(R.id.EmailInputText);
         pswrdText = view.findViewById(R.id.PswrdInputText);
         pswrdContext = view.findViewById(R.id.PswrdConInputText);
 
@@ -68,10 +66,9 @@ public class SignupFragment extends Fragment {
      * switches to login fragment if everything is correct
      */
     private void authenticate() {
-        if (!(isEmptyText(userText) || isEmptyText(emailText) || isEmptyText(emailText) || isEmptyText(pswrdContext))) {
+        if (!(isEmptyText(userText) || isEmptyText(pswrdContext))) {
             String userId = userText.getText().toString();
             String password = pswrdText.getText().toString();
-            String email = emailText.getText().toString();
 
             // Run DB check in background thread
             executor.execute(() -> {
@@ -81,12 +78,12 @@ public class SignupFragment extends Fragment {
                     // Switch to UI thread to handle results
                     mainHandler.post(() -> {
                         Log.d("SignupFragment", "User exists: " + userExists);
-                        handleAuthenticationResult(userExists, userId, email, password);
+                        handleAuthenticationResult(userExists, userId, password);
                     });
                 });
             });
         } else {
-            AlertDialog dialog = createDialog("No null/empty strings allowed!");
+            AlertDialog dialog = createDialog(getString(R.string.startup_null));
             dialog.show();
         }
 
@@ -95,26 +92,22 @@ public class SignupFragment extends Fragment {
     /**
      * Handles the authentication result after checking the database.
      */
-    private void handleAuthenticationResult(boolean userExists, String userId, String email, String password) {
-        boolean userIdReqsValid = !userId.contains("@");
+    private void handleAuthenticationResult(boolean userExists, String userId, String password) {
         boolean pswrdMatch = password.equals(pswrdContext.getText().toString());
 
-        if (!userExists && userIdReqsValid && pswrdMatch) {
+        if (!userExists && pswrdMatch) {
             Log.d("SignupFragment", "Credentials are valid. Creating user...");
 
             HashMap<String, Object> userDetails = new HashMap<>();
             userDetails.put("userId", userId);
-            userDetails.put("email", email);
             userDetails.put("password", password);
             userDetails.put("profile", new Profile(userId).toJson());
 
             DatabaseManager.getInstance().addUser(userId, userDetails, Optional.empty());
 
             ((StartupActivity) requireActivity()).loginFragment();
-        } else if (!userIdReqsValid) {
-            createDialog("Username cannot have '@' within it").show();
         } else {
-            createDialog("Invalid information! Username or email may already exist.").show();
+            createDialog(getString(R.string.startup_invalid)).show();
         }
     }
 
@@ -141,7 +134,6 @@ public class SignupFragment extends Fragment {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
                 userText.setText("");
-                emailText.setText("");
                 pswrdText.setText("");
                 pswrdContext.setText("");
             }

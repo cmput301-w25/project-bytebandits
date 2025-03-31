@@ -39,7 +39,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="64dp"
-        android:layout_marginTop="100dp"
+        android:layout_marginTop="150dp"
         android:layout_marginEnd="64dp"
         android:textColorHint="@color/Accent1"
         app:hintTextColor="@color/Accent1"
@@ -63,32 +63,6 @@
     </com.google.android.material.textfield.TextInputLayout>
 
     <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/EmailInputLayout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="64dp"
-        android:layout_marginEnd="64dp"
-        android:textColorHint="@color/Accent1"
-        app:hintTextColor="@color/Accent1"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/UserInputLayout">
-
-        <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/EmailInputText"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:fontFamily="@font/stix_two_text_bold"
-            android:hint="@string/signup_email"
-            android:singleLine="true"
-            android:textColor="#A592A9"
-            android:textColorHighlight="@color/Accent1"
-            android:textColorHint="@color/Accent1"
-            android:textColorLink="@color/Accent1"
-            android:textSize="16sp" />
-    </com.google.android.material.textfield.TextInputLayout>
-
-    <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/PswrdInputLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -98,7 +72,7 @@
         app:hintTextColor="@color/Accent1"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/EmailInputLayout">
+        app:layout_constraintTop_toBottomOf="@+id/UserInputLayout">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/PswrdInputText"
