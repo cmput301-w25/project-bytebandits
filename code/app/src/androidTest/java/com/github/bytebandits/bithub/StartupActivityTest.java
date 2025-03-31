@@ -7,7 +7,6 @@ import androidx.test.filters.LargeTest;
 import androidx.test.platform.app.InstrumentationRegistry;
 
 import org.junit.After;
-import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
@@ -132,9 +131,6 @@ public class StartupActivityTest {
         String expectedSignupUserText = context.getResources().getString(R.string.signup_user);
         onView(withId(R.id.UserInputText)).check(matches(withHint(expectedSignupUserText)));
 
-        String expectedSignupEmailText = context.getResources().getString(R.string.signup_email);
-        onView(withId(R.id.EmailInputText)).check(matches(withHint(expectedSignupEmailText)));
-
         String expectedSignupPswrdText = context.getResources().getString(R.string.signup_password);
         onView(withId(R.id.PswrdInputText)).check(matches(withHint(expectedSignupPswrdText)));
 
@@ -170,7 +166,6 @@ public class StartupActivityTest {
 
         onView(withId(R.id.registerBtn)).perform(click());
         onView(withId(R.id.UserInputText)).perform(typeText("usernameTest"));
-        onView(withId(R.id.EmailInputText)).perform(typeText("email@test.com"));
         onView(withId(R.id.PswrdInputText)).perform(typeText("abc123"));
         onView(withId(R.id.PswrdConInputText)).perform(typeText("abc123"));
         onView(withId(R.id.registerBtn)).perform(click());
@@ -188,11 +183,10 @@ public class StartupActivityTest {
 
         onView(withId(R.id.registerBtn)).perform(click());
         onView(withId(R.id.UserInputText)).perform(typeText("usernameTest"));
-        onView(withId(R.id.EmailInputText)).perform(typeText("email@test.com"));
         onView(withId(R.id.PswrdInputText)).perform(typeText("abc123"));
         onView(withId(R.id.PswrdConInputText)).perform(typeText("123abc"));
         onView(withId(R.id.registerBtn)).perform(click());
-        onView(withText("Invalid information! Username or email may already exist.")).inRoot(isDialog()).check(matches(isDisplayed()));
+        onView(withText(R.string.startup_invalid)).inRoot(isDialog()).check(matches(isDisplayed()));
     }
 
     /**
@@ -203,7 +197,6 @@ public class StartupActivityTest {
 
         onView(withId(R.id.registerBtn)).perform(click());
         onView(withId(R.id.UserInputText)).perform(typeText("usernameTest"));
-        onView(withId(R.id.EmailInputText)).perform(typeText("email@test.com"));
         onView(withId(R.id.PswrdInputText)).perform(typeText("abc123"));
         onView(withId(R.id.PswrdConInputText)).perform(typeText("abc123"));
         onView(withId(R.id.registerBtn)).perform(click());
@@ -213,11 +206,10 @@ public class StartupActivityTest {
 
         onView(withId(R.id.registerBtn)).perform(click());
         onView(withId(R.id.UserInputText)).perform(typeText("usernameTest"));
-        onView(withId(R.id.EmailInputText)).perform(typeText("email@test.com"));
         onView(withId(R.id.PswrdInputText)).perform(typeText("abc123"));
         onView(withId(R.id.PswrdConInputText)).perform(typeText("abc123"));
         onView(withId(R.id.registerBtn)).perform(click());
-        onView(withText("Invalid information! Username or email may already exist."))
+        onView(withText(R.string.startup_invalid))
                 .inRoot(isDialog()).check(matches(isDisplayed()));
     }
 
@@ -228,7 +220,7 @@ public class StartupActivityTest {
     public void signupFragmentTestNullEmptyInput(){
         onView(withId(R.id.registerBtn)).perform(click());
         onView(withId(R.id.registerBtn)).perform(click());
-        onView(withText("No null/empty strings allowed!"))
+        onView(withText(R.string.startup_null))
                 .inRoot(isDialog()).check(matches(isDisplayed()));
     }
 
@@ -244,8 +236,8 @@ public class StartupActivityTest {
         String expectedLoginTitle = context.getResources().getString(R.string.login_title);
         onView(withId(R.id.loginText)).check(matches(withText(expectedLoginTitle)));
 
-        String expectedLoginUserEmailText = context.getResources().getString(R.string.login_user_email);
-        onView(withId(R.id.UserEmailInputText)).check(matches(withHint(expectedLoginUserEmailText)));
+        String expectedLoginUserEmailText = context.getResources().getString(R.string.login_user);
+        onView(withId(R.id.UserLoginInputText)).check(matches(withHint(expectedLoginUserEmailText)));
 
         String expectedLoginPasswordText = context.getResources().getString(R.string.login_password);
         onView(withId(R.id.PswrdInputText)).check(matches(withHint(expectedLoginPasswordText)));
@@ -267,13 +259,12 @@ public class StartupActivityTest {
         // register a user
         onView(withId(R.id.registerBtn)).perform(click());
         onView(withId(R.id.UserInputText)).perform(typeText("usernameTest"));
-        onView(withId(R.id.EmailInputText)).perform(typeText("email@test.com"));
         onView(withId(R.id.PswrdInputText)).perform(typeText("abc123"));
         onView(withId(R.id.PswrdConInputText)).perform(typeText("abc123"));
         onView(withId(R.id.registerBtn)).perform(click());
 
         // login
-        onView(withId(R.id.UserEmailInputText)).perform(typeText("usernameTest"));
+        onView(withId(R.id.UserLoginInputText)).perform(typeText("usernameTest"));
         onView(withId(R.id.PswrdInputText)).perform(typeText("abc123"));
         onView(withId(R.id.loginBtn)).perform(click());
 
@@ -290,10 +281,10 @@ public class StartupActivityTest {
     @Test
     public void loginFragmentTestInvalidUserInfo(){
         onView(withId(R.id.loginBtn)).perform(click());
-        onView(withId(R.id.UserEmailInputText)).perform(typeText("usernameTest"));
+        onView(withId(R.id.UserLoginInputText)).perform(typeText("usernameTest"));
         onView(withId(R.id.PswrdInputText)).perform(typeText("abc123"));
         onView(withId(R.id.loginBtn)).perform(click());
-        onView(withText("Invalid information!"))
+        onView(withText(R.string.startup_invalid))
                 .inRoot(isDialog()).check(matches(isDisplayed()));
     }
 
