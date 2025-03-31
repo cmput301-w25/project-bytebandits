@@ -41,6 +41,7 @@ public class DetailedMoodPostFragment extends DialogFragment {
         // Get views and retrieve data needed
         View view = LayoutInflater.from(getContext()).inflate(R.layout.detailed_mood_post_fragment, null);
         TextView viewSocialStatus = view.findViewById(R.id.detailedViewSocialSituation);
+        ImageView viewSocialIcon = view.findViewById(R.id.detailedViewSocialIcon);
         TextView viewName = view.findViewById(R.id.detailedViewName);
         TextView viewDate = view.findViewById(R.id.detailedViewDate);
         TextView viewTime = view.findViewById(R.id.detailedViewTime);
@@ -59,6 +60,7 @@ public class DetailedMoodPostFragment extends DialogFragment {
         // Set the text views to mood post data
         if (moodPost.getSocialSituation() == null) {
             viewSocialStatus.setText(null);
+            viewSocialIcon.setVisibility(View.INVISIBLE);
         } else {
             viewSocialStatus.setText(moodPost.getSocialSituation().name());
         }
@@ -66,7 +68,13 @@ public class DetailedMoodPostFragment extends DialogFragment {
         viewDate.setText(moodPost.getFormattedPostedDate());
         viewTime.setText(moodPost.getFormattedPostedTime());
         viewEmotion.setText(moodPost.getEmotion().getState());
-        viewDescription.setText(moodPost.getDescription());
+        if (moodPost.getDescription() == null) {
+            viewDescription.setText("No Description...");
+            viewDescription.setAlpha(0.5F);
+        }
+        else {
+            viewDescription.setText(moodPost.getDescription());
+        }
         viewMoodIcon.setImageResource(moodPost.getEmotion().getLogoID());
         if (moodPost.getImage() != null) {
             byte[] imageArray = Base64.decode(moodPost.getImage(), Base64.DEFAULT);
