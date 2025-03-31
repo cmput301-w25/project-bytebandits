@@ -1,17 +1,14 @@
 package com.github.bytebandits.bithub;
 
 import static org.mockito.Mockito.*;
-import static androidx.test.InstrumentationRegistry.getContext;
 import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.action.ViewActions.clearText;
 import static androidx.test.espresso.action.ViewActions.click;
 import static androidx.test.espresso.assertion.ViewAssertions.doesNotExist;
 import static androidx.test.espresso.assertion.ViewAssertions.matches;
 import static androidx.test.espresso.matcher.ViewMatchers.hasErrorText;
-import static androidx.test.espresso.matcher.ViewMatchers.isChecked;
 import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
-import static androidx.test.espresso.matcher.ViewMatchers.withSpinnerText;
 import static androidx.test.espresso.matcher.ViewMatchers.withText;
 
 import android.content.Context;
@@ -43,8 +40,10 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.jupiter.api.MethodOrderer;
+import org.junit.jupiter.api.Order;
+import org.junit.jupiter.api.TestMethodOrder;
 import org.junit.runner.RunWith;
-import org.mockito.Mockito;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
@@ -55,6 +54,7 @@ import java.util.Objects;
 
 @RunWith(AndroidJUnit4.class)
 @LargeTest
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class MainActivityTest {
 
     private DatabaseManager dbInstance;
@@ -68,24 +68,24 @@ public class MainActivityTest {
         DatabaseManager dbInstance = DatabaseManager.getInstance(true);
         CollectionReference usersCollectionRef = dbInstance.getUsersCollectionRef();
 
+        DocumentReference userDocRef1 = usersCollectionRef.document("testUser1");
+        DocumentReference userDocRef2 = usersCollectionRef.document("testUser2");
+
         // Add Users
         HashMap<String, Object> user1 = new HashMap<>();
         user1.put("userId", "testUser1");
         user1.put("profile", "{\"userID\":\"testUser1\",\"locationServices\":true,\"image\":null}");
-        user1.put("followerRef", "/users/testUser2");
         user1.put("password", "1");
 
         HashMap<String, Object> user2 = new HashMap<>();
         user2.put("userId", "testUser2");
         user2.put("profile", "{\"userID\":\"testUser2\",\"locationServices\":false,\"image\":null}");
-        user2.put("followingRef", "/users/testUser1");
         user2.put("password", "2");
 
-        usersCollectionRef
-                .document("testUser1").set(user1);
-        usersCollectionRef
-                .document("testUser2").set(user2);
+        userDocRef1.set(user1);
+        userDocRef2.set(user2);
 
+        dbInstance.acceptUserFollow("testUser2", "testUser1");
         // Idk why but for some reason adding a mood post in the set up makes things not
         // break ¯\_(ツ)_/¯
         Profile randProfile = new Profile("test");
@@ -93,15 +93,18 @@ public class MainActivityTest {
                 false, null, null, null, false),
                 randProfile.getUserId(), null);
 
-        SessionManager sessionManager = SessionManager.getInstance(ApplicationProvider.getApplicationContext());
-        sessionManager.createLoginSession("testUser2");
+        SessionManager.getInstance(ApplicationProvider.getApplicationContext()).createLoginSession("testUser2");
         mockSessionManager = mock(SessionManager.class);
 
-        // Mock the static getInstance() method
-        when(mockSessionManager.getInstance(Mockito.<Context>any())).thenReturn(mockSessionManager);
+        // Force SessionManager to return the mock instance
+        SessionManager.setTestInstance(mockSessionManager);
+        mockSessionManager.saveProfile(new Profile("testUser2"));
+        // Define behavior for mockSessionManager
         when(mockSessionManager.getUserId()).thenReturn("testUser2");
+        when(mockSessionManager.getProfile()).thenReturn(new Profile("testUser2"));
+        when(mockSessionManager.isLoggedIn()).thenReturn(true);
         try {
-            Thread.sleep(3000);
+            Thread.sleep(5000);
         } catch (InterruptedException e) {
             // Caught exception
         }
@@ -115,7 +118,6 @@ public class MainActivityTest {
         testProfile = new Profile("testUser1");
         testProfile2 = new Profile("testUser2");
         testProfile2.enableLocationServices();
-        sessionManager.saveProfile(testProfile2);
 
 
         // Add Posts
@@ -131,12 +133,7 @@ public class MainActivityTest {
         moodPosts[0].addComment(new Comment(testProfile2, "test comment"));
 
         for (MoodPost post : moodPosts) {
-            if (Objects.equals(post.getProfile().getUserId(), testProfile.getUserId())) {
-                dbInstance.addPost(post, testProfile.getUserId(), null);
-            }
-            else {
-                dbInstance.addPost(post, testProfile2.getUserId(), null);
-            }
+            dbInstance.addPost(post, testProfile.getUserId(), null);
         }
 
         // Delay so that movies added in seedDatabase() have a chance to update on
@@ -197,6 +194,7 @@ public class MainActivityTest {
      */
 
     @Test
+    @Order(1)
     public void appShouldDisplayExistingMoodPostsOnLaunch() {
         // Check that the initial data is loaded
         onView(withText("Happiness")).check(matches(isDisplayed()));
@@ -226,6 +224,7 @@ public class MainActivityTest {
     }
 
     @Test
+    @Order(2)
     public void addMoodPost() {
         // Click on button to open add mood post dialog
         onView(withId(R.id.create)).perform(click());
@@ -252,6 +251,7 @@ public class MainActivityTest {
     }
 
     @Test
+    @Order(3)
     public void addMoodPostMinData() {
         // Click on button to open add mood post dialog
         onView(withId(R.id.create)).perform(click());
@@ -265,6 +265,7 @@ public class MainActivityTest {
     }
 
     @Test
+    @Order(4)
     public void addMoodPostCancel() {
         // Click on button to open add mood post dialog
         onView(withId(R.id.create)).perform(click());
@@ -280,6 +281,7 @@ public class MainActivityTest {
     }
 
     @Test
+    @Order(5)
     public void editMoodPostInvalidPost() {
         // Click on buttons to open edit mood post
         onView(withText("Sadness")).perform(click());
@@ -457,6 +459,7 @@ public class MainActivityTest {
 //     }
 
     @Test
+    @Order(6)
     public void viewOtherUsersComment() {
         // Click on buttons to open the comments
         onView(withText("Happiness")).perform(click());
@@ -478,6 +481,7 @@ public class MainActivityTest {
     }
 
     @Test
+    @Order(7)
     public void addComment() {
         // Click on buttons to open the comments
         onView(withText("Sadness")).perform(click());
@@ -505,6 +509,7 @@ public class MainActivityTest {
     }
 
     @Test
+    @Order(8)
     public void testOpenFilterDialogInProfilePage() {
         // Click on profile on navbar
         onView(withId(R.id.profile)).perform(click());
@@ -518,6 +523,7 @@ public class MainActivityTest {
     }
 
     @Test
+    @Order(9)
     public void testOpenFilterDialogInHomePage() {
         // Click on home on navbar
         onView(withId(R.id.home)).perform(click());
@@ -531,6 +537,7 @@ public class MainActivityTest {
     }
 
     @Test
+    @Order(10)
     public void testFilterByMood() {
         // Click on profile on navbar
         onView(withId(R.id.profile)).perform(click());
@@ -552,6 +559,7 @@ public class MainActivityTest {
     }
 
     @Test
+    @Order(11)
     public void testFilterByLastWeek() {
         // Click on profile on navbar
         onView(withId(R.id.profile)).perform(click());
@@ -576,6 +584,7 @@ public class MainActivityTest {
     }
 
     @Test
+    @Order(12)
     public void testSearchFilter() {
         // Click on profile on navbar
         onView(withId(R.id.profile)).perform(click());

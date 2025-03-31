@@ -63,11 +63,19 @@ public class NotificationArrayAdapter extends ArrayAdapter<Notification> {
             buttonA.setOnClickListener(v -> {
                 // Handle accept button click
                 DatabaseManager.getInstance().acceptUserFollow(SessionManager.getInstance(getContext()).getUserId(), notification.getProfile().getUserId());
+                buttonA.setVisibility(View.GONE);
+                buttonD.setVisibility(View.GONE);
+                textD.setVisibility(View.GONE);
+                textA.setVisibility(View.GONE);
                 remove(notification);
             });
             buttonD.setOnClickListener(v -> {
                 // Handle decline button click
                 DatabaseManager.getInstance().rejectUserFollow(SessionManager.getInstance(getContext()).getUserId(), notification.getProfile().getUserId());
+                buttonA.setVisibility(View.GONE);
+                buttonD.setVisibility(View.GONE);
+                textD.setVisibility(View.GONE);
+                textA.setVisibility(View.GONE);
                 remove(notification);
             });
 

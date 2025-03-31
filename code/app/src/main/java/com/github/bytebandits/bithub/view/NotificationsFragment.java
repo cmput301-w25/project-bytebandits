@@ -232,6 +232,7 @@ public class NotificationsFragment extends Fragment {
         for (MoodPost post : posts) {
             Notification notification = new Notification();
             notification.setMoodPost(post);
+            notification.followRequest(false);
             notifications.add(notification);
         }
         return notifications;
