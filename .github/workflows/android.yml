@@ -12,34 +12,59 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
+    - name: Create Google Services JSON File
+      run: touch code/app/google-services.json
+
+    - name: Populate Google Services JSON File
+      env:
+        GOOGLE_SERVICES_JSON: ${{ secrets.GOOGLE_SERVICES_JSON }}
+      run: echo $GOOGLE_SERVICES_JSON > code/app/google-services.json
+
     - name: set up JDK 21
       uses: actions/setup-java@v4
       with:
-        java-version: '21'
-        distribution: 'temurin'
-        cache: gradle
+          java-version: '21'
+          distribution: 'temurin'
+          cache: gradle
 
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
-      working-directory: ./code
+      working-directory: code
 
     - name: Build with Gradle
       run: ./gradlew build
-      working-directory: ./code
-    
+      working-directory: code
+
   unit-tests:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
+      - name: Create Google Services JSON File
+        run: touch code/app/google-services.json
+
+      - name: Populate Google Services JSON File
+        env:
+          GOOGLE_SERVICES_JSON: ${{ secrets.GOOGLE_SERVICES_JSON }}
+        run: echo $GOOGLE_SERVICES_JSON > code/app/google-services.json
+
       - name: Run tests
-        working-directory: ./code
+        working-directory: code
         run: ./gradlew test
   
   instrumented-tests:
     runs-on: ubuntu-latest
     steps:
       - name: checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v4 
+
+      - name: Create Google Services JSON File
+        run: touch code/app/google-services.json
+
+      - name: Populate Google Services JSON File
+        env:
+          GOOGLE_SERVICES_JSON: ${{ secrets.GOOGLE_SERVICES_JSON }}
+        run: echo $GOOGLE_SERVICES_JSON > code/app/google-services.json
 
       - name: Enable KVM  
         run: |
@@ -55,11 +80,11 @@ jobs:
       
       - name: Start Emulator
         run: firebase emulators:start --only firestore &
-        working-directory: ./code
+        working-directory: code
 
       - name: run tests
         uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: 29
           script: ./gradlew connectedCheck
-          working-directory: ./code
+          working-directory: code

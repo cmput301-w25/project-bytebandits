@@ -5,121 +5,31 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/background"
-    tools:context=".ProfileFragment">
+    android:focusableInTouchMode="false"
+    tools:context=".view.ProfileFragment">
 
     <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/constraintLayoutProfile"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:focusable="auto"
+        android:focusableInTouchMode="true">
 
         <TextView
-            android:id="@+id/textView2"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Mood History"
-            android:textColor="@color/gold"
-            android:textSize="20sp"
-            app:layout_constraintBottom_toBottomOf="@+id/divider"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent" />
-
-        <View
-            android:id="@+id/divider"
-            android:layout_width="488dp"
-            android:layout_height="1dp"
-            android:layout_marginStart="1dp"
-            android:layout_marginEnd="1dp"
-            android:background="?android:attr/listDivider"
-            app:layout_constraintBottom_toTopOf="@+id/searchView2"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.0"
-            app:layout_constraintStart_toStartOf="parent" />
-
-        <View
-            android:id="@+id/divider2"
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:layout_marginBottom="1dp"
-            android:background="?android:attr/listDivider"
-            app:layout_constraintBottom_toTopOf="@+id/mood_post_list_history"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent" />
-
-        <ImageButton
-            android:id="@+id/sort_button"
-            android:layout_width="39dp"
-            android:layout_height="42dp"
-            android:layout_weight="1"
-            android:backgroundTint="@color/background"
-            android:src="@drawable/baseline_keyboard_double_arrow_down_24"
-            app:tint="@color/white"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/searchView2"
-            app:layout_constraintTop_toBottomOf="@+id/divider" />
-
-        <SearchView
-            android:id="@+id/searchView2"
-            android:layout_width="364dp"
-            android:layout_height="41dp"
-            android:layout_marginBottom="4dp"
-            app:layout_constraintBottom_toTopOf="@+id/mood_post_list_history"
-            app:layout_constraintEnd_toStartOf="@+id/sort_button"
-            app:layout_constraintHorizontal_bias="1.0"
-            app:layout_constraintStart_toStartOf="parent">
-
-        </SearchView>
-
-        <ListView
-            android:id="@+id/mood_post_list_history"
-            android:layout_width="422dp"
-            android:layout_height="400dp"
-            android:layout_marginStart="1dp"
-            android:layout_marginEnd="1dp"
-            android:layout_marginBottom="1dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.538"
-            app:layout_constraintStart_toStartOf="parent" />
-
-        <TextView
-            android:id="@+id/textView4"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="168dp"
-            android:layout_marginTop="88dp"
-            android:layout_marginEnd="185dp"
+            android:id="@+id/username_textview"
+            android:layout_width="211dp"
+            android:layout_height="57dp"
+            android:layout_marginTop="100dp"
+            android:layout_marginBottom="45dp"
+            android:fontFamily="@font/stix_two_text_italic"
+            android:gravity="center"
             android:text="John_Doe"
-            android:textColor="@color/gold"
-            android:textSize="34sp"
+            android:textColor="@color/white"
+            android:textSize="40sp"
+            app:layout_constraintBottom_toTopOf="@+id/textView2"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.413"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
-
-        <TextView
-            android:id="@+id/textView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="111dp"
-            android:layout_marginEnd="60dp"
-            android:layout_marginBottom="60dp"
-            android:text="Followers"
-            android:textColor="@color/gold"
-            app:layout_constraintBottom_toTopOf="@+id/textView2"
-            app:layout_constraintEnd_toStartOf="@+id/textView3"
-            app:layout_constraintStart_toStartOf="parent" />
-
-        <TextView
-            android:id="@+id/textView3"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="67dp"
-            android:layout_marginEnd="111dp"
-            android:layout_marginBottom="84dp"
-            android:text="Folllowing"
-            android:textColor="@color/gold"
-            app:layout_constraintBottom_toTopOf="@+id/divider"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/textView" />
 
         <ImageButton
             android:id="@+id/settings_button"
@@ -133,36 +43,82 @@
 
         <ImageButton
             android:id="@+id/filter_button"
-            android:layout_width="wrap_content"
+            android:layout_width="54dp"
             android:layout_height="wrap_content"
             android:layout_marginEnd="2dp"
             android:backgroundTint="@color/background"
             android:src="@drawable/baseline_filter_alt_24"
-            app:tint="@color/white"
             app:layout_constraintEnd_toStartOf="@+id/settings_button"
+            app:layout_constraintTop_toTopOf="parent"
+            app:tint="@color/white" />
+
+        <TextView
+            android:id="@+id/textView2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="2dp"
+            android:fontFamily="@font/dm_sans_extralight"
+            android:text="Mood History"
+            android:textColor="@color/white"
+            android:textSize="20sp"
+            app:layout_constraintBottom_toTopOf="@+id/divider4"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.498"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/username_textview" />
+
+        <View
+            android:id="@+id/divider4"
+            android:layout_width="204dp"
+            android:layout_height="2dp"
+            android:layout_marginBottom="10dp"
+            android:background="?android:attr/listDivider"
+            android:backgroundTint="@color/white"
+            android:foregroundTint="@color/white"
+            app:layout_constraintBottom_toTopOf="@+id/mood_post_list_history"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.497"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/textView2" />
+
+        <ImageButton
+            android:id="@+id/follow_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:backgroundTint="@color/Background"
+            android:src="@drawable/baseline_group_add_24"
+            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <TextView
-            android:id="@+id/followers_count"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="96dp"
-            android:text="127"
-            android:textColor="@color/gold"
-            app:layout_constraintBottom_toTopOf="@+id/textView"
+        <ListView
+            android:id="@+id/mood_post_list_history"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:scrollbarSize="3dp"
+            android:scrollbarStyle="outsideOverlay"
+            android:scrollbars="vertical"
+            android:scrollingCache="true"
+            android:smoothScrollbar="true"
+            android:nestedScrollingEnabled="true"
+            android:divider="@android:color/transparent"
+            android:dividerHeight="12dp"
+            android:padding="10dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textView4"
-            app:layout_constraintVertical_bias="1.0" />
+            app:layout_constraintTop_toBottomOf="@+id/divider4" />
 
-        <TextView
-            android:id="@+id/following_count"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="104dp"
-            android:text="170"
-            android:textColor="@color/gold"
-            app:layout_constraintBottom_toTopOf="@+id/textView3"
-            app:layout_constraintEnd_toEndOf="parent" />
+        <!--        <ImageView-->
+<!--            android:id="@+id/profile_picture"-->
+<!--            android:layout_width="198dp"-->
+<!--            android:layout_height="145dp"-->
+<!--            android:layout_marginTop="75dp"-->
+<!--            android:layout_marginBottom="71dp"-->
+<!--            android:src="@drawable/profile_picture"-->
+<!--            app:layout_constraintBottom_toTopOf="@+id/textView2"-->
+<!--            app:layout_constraintStart_toStartOf="parent"-->
+<!--            app:layout_constraintTop_toTopOf="parent" />-->
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

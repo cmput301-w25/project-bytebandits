@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center_horizontal">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="380dp"
+        android:layout_height="72dp"
+        android:background="@drawable/notification_background"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
+
+        <ImageButton
+            android:id="@+id/accept"
+            android:layout_width="35dp"
+            android:layout_height="35dp"
+            android:layout_marginEnd="32dp"
+            android:layout_marginBottom="12dp"
+            android:backgroundTint="#00FFFFFF"
+            android:contentDescription="Accept"
+            android:cropToPadding="false"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/decline"
+            app:srcCompat="@drawable/check"
+            app:tint="@color/white" />
+
+        <ImageButton
+            android:id="@+id/decline"
+            android:layout_width="35dp"
+            android:layout_height="35dp"
+            android:layout_marginEnd="24dp"
+            android:layout_marginBottom="12dp"
+            android:backgroundTint="#00FFFFFF"
+            android:contentDescription="TODO"
+            android:cropToPadding="false"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:srcCompat="@drawable/baseline_close_24_notif"
+            app:tint="@color/white" />
+
+        <TextView
+            android:id="@+id/textTime2"
+            android:layout_width="35dp"
+            android:layout_height="15dp"
+            android:layout_marginEnd="24dp"
+            android:fontFamily="@font/dm_sans_extralight"
+            android:text="Decline"
+            android:textAlignment="center"
+            android:textColor="@color/white"
+            android:textSize="8sp"
+            app:layout_constraintBottom_toTopOf="@+id/decline"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+        <TextView
+            android:id="@+id/textTime5"
+            android:layout_width="35dp"
+            android:layout_height="15dp"
+            android:layout_marginEnd="32dp"
+            android:fontFamily="@font/dm_sans_extralight"
+            android:text="Accept"
+            android:textAlignment="center"
+            android:textColor="@color/white"
+            android:textSize="8sp"
+            app:layout_constraintBottom_toTopOf="@+id/accept"
+            app:layout_constraintEnd_toStartOf="@+id/textTime2" />
+
+        <TextView
+            android:id="@+id/textDate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="40dp"
+            android:layout_marginTop="4dp"
+            android:alpha="0.25"
+            android:fontFamily="@font/dm_sans_extralight"
+            android:letterSpacing="0.25"
+            android:text="Jan. 11, 2025"
+            android:textColor="@color/white"
+            android:textSize="12sp"
+            app:layout_constraintEnd_toStartOf="@+id/textTime"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/textTime"
+            android:layout_width="80dp"
+            android:layout_height="18dp"
+            android:layout_marginTop="4dp"
+            android:alpha="0.25"
+            android:fontFamily="@font/dm_sans_extralight"
+            android:letterSpacing="0.25"
+            android:text="10:59AM"
+            android:textColor="@color/white"
+            android:textSize="12sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/emotion_group"
+            android:layout_width="wrap_content"
+            android:layout_height="24dp"
+            android:layout_marginStart="4dp"
+            android:layout_marginBottom="16dp"
+            android:fontFamily="@font/stix_two_text_bold"
+            android:text="Sad"
+            android:textColor="@color/blue"
+            android:textSize="16sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toEndOf="@+id/action"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="1.0" />
+
+        <TextView
+            android:id="@+id/textUserName"
+            android:layout_width="wrap_content"
+            android:layout_height="24dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginBottom="16dp"
+            android:fontFamily="@font/stix_two_text_bold"
+            android:text="John Doe"
+            android:textColor="@color/Accent2"
+            android:textSize="16sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <TextView
+            android:id="@+id/action"
+            android:layout_width="wrap_content"
+            android:layout_height="24dp"
+            android:layout_marginStart="4dp"
+            android:layout_marginBottom="16dp"
+            android:fontFamily="@font/stix_two_text_regular"
+            android:text="has been feeling"
+            android:textColor="@color/Accent1"
+            android:textSize="16sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/textUserName" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</LinearLayout>

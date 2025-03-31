@@ -11,7 +11,15 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
+import com.github.bytebandits.bithub.controller.SessionManager;
 import com.github.bytebandits.bithub.databinding.ActivityMainBinding;
+import com.github.bytebandits.bithub.model.MoodPost;
+import com.github.bytebandits.bithub.model.Profile;
+import com.github.bytebandits.bithub.view.ExploreFragment;
+import com.github.bytebandits.bithub.view.HomepageFragment;
+import com.github.bytebandits.bithub.view.NotificationsFragment;
+import com.github.bytebandits.bithub.view.PostMoodFragment;
+import com.github.bytebandits.bithub.view.ProfileFragment;
 
 /**
  * MainActivity serves as the primary hub of the Bithub application after user
@@ -61,7 +69,8 @@ public class MainActivity extends AppCompatActivity {
             } else if (item.getItemId() == R.id.notifications) {
                 replaceFragment(new NotificationsFragment());
             } else if (item.getItemId() == R.id.profile) {
-                replaceFragment(new ProfileFragment());
+                Profile userProfile = SessionManager.getInstance(this).getProfile(); // get currently logged in profile
+                replaceFragment(ProfileFragment.newInstance(userProfile));
             }
             return true;
         });
@@ -78,7 +87,7 @@ public class MainActivity extends AppCompatActivity {
      *
      * @param fragment The fragment to be displayed.
      */
-    void replaceFragment(Fragment fragment) {
+    public void replaceFragment(Fragment fragment) {
         FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
         fragmentTransaction.replace(R.id.frameLayout, fragment);

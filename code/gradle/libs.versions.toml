@@ -1,5 +1,7 @@
 [versions]
-agp = "8.8.0"
+agp = "8.9.0"
+androidMapsUtils = "3.11.2"
+firebaseBom = "33.10.0"
 gson = "2.12.1"
 junit = "4.13.2"
 junitVersion = "1.2.1"
@@ -9,9 +11,18 @@ material = "1.10.0"
 activity = "1.10.0"
 constraintlayout = "2.1.4"
 firebaseFirestore = "25.1.2"
+mockitoAndroid = "5.10.0"
+mockitoCore = "5.7.0"
+playServicesLocation = "21.1.0"
+playServicesMaps = "19.1.0"
 robolectric = "4.10"
+secretsGradlePlugin = "2.0.1"
+playServicesLocationVersion = "21.3.0"
+rules = "1.6.1"
 
 [libraries]
+android-maps-utils = { module = "com.google.maps.android:android-maps-utils", version.ref = "androidMapsUtils" }
+firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "firebaseBom" }
 gson = { module = "com.google.code.gson:gson", version.ref = "gson" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 ext-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
@@ -21,7 +32,14 @@ material = { group = "com.google.android.material", name = "material", version.r
 activity = { group = "androidx.activity", name = "activity", version.ref = "activity" }
 constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayout", version.ref = "constraintlayout" }
 firebase-firestore = { group = "com.google.firebase", name = "firebase-firestore", version.ref = "firebaseFirestore" }
+mockito-android = { module = "org.mockito:mockito-android", version.ref = "mockitoAndroid" }
+mockito-core = { module = "org.mockito:mockito-core", version.ref = "mockitoCore" }
+play-services-location = { module = "com.google.android.gms:play-services-location", version.ref = "playServicesLocation" }
+play-services-maps = { module = "com.google.android.gms:play-services-maps", version.ref = "playServicesMaps" }
 robolectric = { module = "org.robolectric:robolectric", version.ref = "robolectric" }
+secrets-gradle-plugin = { module = "com.google.android.libraries.mapsplatform.secrets-gradle-plugin:secrets-gradle-plugin", version.ref = "secretsGradlePlugin" }
+gms-play-services-location = { group = "com.google.android.gms", name = "play-services-location", version.ref = "playServicesLocationVersion" }
+rules = { group = "androidx.test", name = "rules", version.ref = "rules" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

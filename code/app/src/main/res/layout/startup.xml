@@ -1,17 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@color/Primary1">
 
     <TextView
         android:id="@+id/appTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="64dp"
+        android:layout_marginTop="275dp"
+        android:fontFamily="@font/stix_two_text_bold"
         android:text="@string/app_name"
-        android:textSize="48sp"
+        android:textColor="@color/Accent1"
+        android:textSize="60sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -20,8 +23,10 @@
         android:id="@+id/flavourText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:fontFamily="@font/stix_two_text_medium"
         android:text="@string/startup_title_flavour"
-        android:textSize="12sp"
+        android:textColor="#647375"
+        android:textSize="16sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/appTitle" />
@@ -32,7 +37,11 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="64dp"
         android:layout_marginEnd="64dp"
+        android:backgroundTint="@color/Accent1"
+        android:fontFamily="@font/stix_two_text_bold"
         android:text="@string/startup_login"
+        android:textColor="@color/Background"
+        android:textSize="20sp"
         app:layout_constraintBottom_toTopOf="@+id/registerBtn"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
@@ -43,10 +52,58 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="64dp"
         android:layout_marginEnd="64dp"
-        android:layout_marginBottom="24dp"
+        android:layout_marginBottom="120dp"
+        android:backgroundTint="@color/Accent1"
+        android:fontFamily="@font/stix_two_text_bold"
         android:text="@string/startup_signup"
+        android:textColor="@color/Background"
+        android:textSize="20sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
+
+    <ImageView
+        android:id="@+id/imageView16"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="75dp"
+        android:elevation="-5dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/appTitle"
+        app:srcCompat="@drawable/anger_logo" />
+
+    <ImageView
+        android:id="@+id/imageView19"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="75dp"
+        android:elevation="-5dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/appTitle"
+        app:srcCompat="@drawable/fear_logo" />
+
+    <ImageView
+        android:id="@+id/imageView17"
+        android:layout_width="61dp"
+        android:layout_height="61dp"
+        android:layout_marginStart="48dp"
+        android:layout_marginTop="-25dp"
+        android:elevation="-5dp"
+        android:rotation="90"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/imageView16"
+        app:srcCompat="@drawable/confusion_logo" />
+
+    <ImageView
+        android:id="@+id/imageView6"
+        android:layout_width="64dp"
+        android:layout_height="66dp"
+        android:layout_marginTop="-25dp"
+        android:layout_marginEnd="48dp"
+        android:elevation="-5dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/imageView19"
+        app:srcCompat="@drawable/disgust_logo" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

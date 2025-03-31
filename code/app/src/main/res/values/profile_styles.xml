@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="profile_SearchView">
+        <item name="android:editTextColor">#FFFFFF</item>
+        <item name="android:textColorHint">#6B5858</item>
+    </style>
+</resources>

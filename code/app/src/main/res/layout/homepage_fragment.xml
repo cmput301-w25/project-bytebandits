@@ -1,13 +1,38 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/HomepageLayoutRoot"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
+
+    <include
+        layout="@layout/homepage_top_bar"
+        android:id="@+id/homepageTopBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="15dp" />
 
     <ListView
         android:id="@+id/homepageMoodPostList"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_below="@id/homepageTopBar"
         android:divider="@android:color/transparent"
-        android:dividerHeight="12dp"></ListView>
-</LinearLayout>
+        android:dividerHeight="12dp"
+        android:padding="10dp"/>
+
+    <TextView
+        android:id="@+id/homepageEmptyListMessage"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:layout_margin="24dp"
+        android:alpha="0.25"
+        android:fontFamily="@font/dm_sans_extralight"
+        android:gravity="center"
+        android:text="There are no posts to show... \n\nTry following someone to see their posts here or post your own mood!"
+        android:textColor="@color/white"
+        android:textSize="20sp"
+        android:textStyle="italic" />
+
+</RelativeLayout>
