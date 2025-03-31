@@ -62,10 +62,19 @@ public class NotificationArrayAdapter extends ArrayAdapter<Notification> {
             actionView.setText("has requested to follow uou:");
             buttonA.setOnClickListener(v -> {
                 DatabaseManager.getInstance().acceptUserFollow(SessionManager.getInstance(getContext()).getUserId(), notification.getProfile().getUserId());
+                buttonA.setVisibility(View.GONE);
+                buttonD.setVisibility(View.GONE);
+                textD.setVisibility(View.GONE);
+                textA.setVisibility(View.GONE);
                 remove(notification);
+
             });
             buttonD.setOnClickListener(v -> {
                 DatabaseManager.getInstance().rejectUserFollow(SessionManager.getInstance(getContext()).getUserId(), notification.getProfile().getUserId());
+                buttonA.setVisibility(View.GONE);
+                buttonD.setVisibility(View.GONE);
+                textD.setVisibility(View.GONE);
+                textA.setVisibility(View.GONE);
                 remove(notification);
             });
 
@@ -75,6 +84,8 @@ public class NotificationArrayAdapter extends ArrayAdapter<Notification> {
             buttonD.setVisibility(View.GONE);
             textD.setVisibility(View.GONE);
             textA.setVisibility(View.GONE);
+            emotionView.setVisibility(View.VISIBLE);
+            actionView.setText("has been feeling");
             emotionView.setText(notification.getPost().getEmotion().getState());
             emotionView.setTextColor(ContextCompat.getColor(getContext(), notification.getPost().getEmotion().getColor()));
         }
@@ -84,5 +95,7 @@ public class NotificationArrayAdapter extends ArrayAdapter<Notification> {
 
         return view;
     }
+
+
 }
 

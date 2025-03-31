@@ -151,6 +151,7 @@ public class NotificationsFragment extends Fragment {
                         DetailedMoodPostFragment.newInstance(notification.getPost());
                 detailedMoodPostFragment.show(getParentFragmentManager(), "Detailed Mood Post View");
             }
+
         });
     }
 
@@ -233,6 +234,7 @@ public class NotificationsFragment extends Fragment {
         for (MoodPost post : posts) {
             Notification notification = new Notification();
             notification.setMoodPost(post);
+            notification.followRequest(false);
             notifications.add(notification);
         }
         return notifications;
