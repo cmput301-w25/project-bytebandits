@@ -17,6 +17,7 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        buildConfigField("String", "SHA1_FINGERPRINT", "\"91:34:7C:16:A1:6A:51:07:B4:0D:1F:DB:66:43:9B:C5:3C:56:F7:49\"")
 
     }
 
