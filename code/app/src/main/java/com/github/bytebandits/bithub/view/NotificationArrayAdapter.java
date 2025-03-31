@@ -1,5 +1,7 @@
 package com.github.bytebandits.bithub.view;
 
+import static androidx.core.content.ContentProviderCompat.requireContext;
+
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,6 +15,9 @@ import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 
 import com.github.bytebandits.bithub.R;
+import com.github.bytebandits.bithub.controller.DatabaseManager;
+import com.github.bytebandits.bithub.controller.SessionManager;
+import com.github.bytebandits.bithub.model.Emotion;
 import com.github.bytebandits.bithub.model.MoodPost;
 import com.github.bytebandits.bithub.model.Notification;
 
@@ -43,6 +48,7 @@ public class NotificationArrayAdapter extends ArrayAdapter<Notification> {
         TextView emotionView = view.findViewById(R.id.emotion_group);
         ImageButton buttonA = view.findViewById(R.id.accept);
         ImageButton buttonD = view.findViewById(R.id.decline);
+        TextView actionView = view.findViewById(R.id.action);
         TextView textA = view.findViewById(R.id.textTime2);
         TextView textD = view.findViewById(R.id.textTime5);
 
@@ -52,6 +58,17 @@ public class NotificationArrayAdapter extends ArrayAdapter<Notification> {
             buttonD.setVisibility(View.VISIBLE);
             textD.setVisibility(View.VISIBLE);
             textA.setVisibility(View.VISIBLE);
+            emotionView.setVisibility(View.GONE);
+            actionView.setText("has requested to follow uou:");
+            buttonA.setOnClickListener(v -> {
+                DatabaseManager.getInstance().acceptUserFollow(SessionManager.getInstance(getContext()).getUserId(), notification.getProfile().getUserId());
+                remove(notification);
+            });
+            buttonD.setOnClickListener(v -> {
+                DatabaseManager.getInstance().rejectUserFollow(SessionManager.getInstance(getContext()).getUserId(), notification.getProfile().getUserId());
+                remove(notification);
+            });
+
         }
         else {
             buttonA.setVisibility(View.GONE);
