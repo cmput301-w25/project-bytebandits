@@ -115,17 +115,17 @@ public class PostMoodFragment extends Fragment {
         Emotion[] emotions = Emotion.values();
         ArrayAdapter<Emotion> emotionAdapter = new ArrayAdapter<>(
                 getActivity(),
-                android.R.layout.simple_spinner_item,
+                R.layout.spinner_list,
                 emotions);
         ArrayAdapter<Object> socialSituationAdapter = new ArrayAdapter<>(
                 getActivity(),
-                android.R.layout.simple_spinner_item,
+                R.layout.spinner_list,
                 socialSituations);
 
         // Specify the layout to use when the list of choices appears and apply the
         // adapters
-        socialSituationAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        emotionAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        socialSituationAdapter.setDropDownViewResource(R.layout.spinner_list);
+        emotionAdapter.setDropDownViewResource(R.layout.spinner_list);
         editEmotion.setAdapter(emotionAdapter);
         editSocialSituation.setAdapter(socialSituationAdapter);
 

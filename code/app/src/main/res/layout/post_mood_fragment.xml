@@ -5,11 +5,110 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <View
+        android:id="@+id/detailedViewLine7"
+        android:layout_width="0dp"
+        android:layout_height="1dp"
+        android:layout_marginStart="24dp"
+        android:layout_marginEnd="24dp"
+        android:layout_marginBottom="10dp"
+        android:alpha="0.25"
+        android:background="@color/Accent1"
+        app:layout_constraintBottom_toTopOf="@+id/postMoodConfirmButton"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <View
+        android:id="@+id/detailedViewLine2"
+        android:layout_width="0dp"
+        android:layout_height="1dp"
+        android:layout_marginStart="24dp"
+        android:layout_marginEnd="24dp"
+        android:alpha="0.25"
+        android:background="@color/Accent1"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView4" />
+
+    <View
+        android:id="@+id/detailedViewLine3"
+        android:layout_width="0dp"
+        android:layout_height="1dp"
+        android:layout_marginStart="24dp"
+        android:layout_marginEnd="24dp"
+        android:alpha="0.25"
+        android:background="@color/Accent1"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/postMoodVisibility" />
+
+    <View
+        android:id="@+id/detailedViewLine4"
+        android:layout_width="0dp"
+        android:layout_height="1dp"
+        android:layout_marginStart="24dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginEnd="24dp"
+        android:alpha="0.25"
+        android:background="@color/Accent1"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/postMoodEmotion" />
+
+    <View
+        android:id="@+id/detailedViewLine5"
+        android:layout_width="0dp"
+        android:layout_height="1dp"
+        android:layout_marginStart="24dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginEnd="24dp"
+        android:alpha="0.25"
+        android:background="@color/Accent1"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/postMoodSocialSituation" />
+
+    <View
+        android:id="@+id/detailedViewLine6"
+        android:layout_width="0dp"
+        android:layout_height="2dp"
+        android:layout_marginStart="24dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginEnd="24dp"
+        android:alpha="0.25"
+        android:background="@color/Accent1"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/postMoodDescription" />
+
+    <TextView
+        android:id="@+id/textView4"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="24dp"
+        android:layout_marginTop="24dp"
+        android:layout_marginEnd="24dp"
+        android:fontFamily="@font/stix_two_text_bold"
+        android:text="Tell Us What's Been Going On?"
+        android:textAlignment="center"
+        android:textColor="@color/Accent1"
+        android:textSize="34sp"
+        android:textStyle="italic"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
     <Button
         android:id="@+id/postMoodCancelButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="25dp"
+        android:layout_marginBottom="14dp"
         android:text="Cancel"
         android:textColor="@color/white"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -21,7 +120,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="75dp"
-        android:layout_marginBottom="25dp"
+        android:layout_marginBottom="14dp"
         android:text="Confirm"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
@@ -30,94 +129,167 @@
         android:id="@+id/postMoodUploadImageButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="100dp"
+        android:layout_marginTop="10dp"
         android:text="Upload"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/postMoodImage"
-        app:layout_constraintTop_toBottomOf="@+id/postMoodDescription" />
+        app:layout_constraintEnd_toStartOf="@+id/postMoodImage"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView3" />
 
     <Button
         android:id="@+id/postMoodDeleteImageButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="100dp"
+        android:layout_marginBottom="50dp"
         android:text="Delete"
         app:layout_constraintBottom_toTopOf="@+id/postMoodConfirmButton"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/postMoodImage" />
+        app:layout_constraintEnd_toStartOf="@+id/postMoodImage"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="30dp"
+        android:fontFamily="@font/stix_two_text_bold"
+        android:text="Image"
+        android:textColor="@color/Accent1"
+        android:textSize="24sp"
+        app:layout_constraintEnd_toStartOf="@+id/postMoodImage"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/detailedViewLine6" />
+
+    <TextView
+        android:id="@+id/textView5"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="34dp"
+        android:fontFamily="@font/stix_two_text_bold"
+        android:text="Description"
+        android:textColor="@color/Accent1"
+        android:textSize="24sp"
+        app:layout_constraintBottom_toTopOf="@+id/detailedViewLine6"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/detailedViewLine5" />
+
+    <TextView
+        android:id="@+id/textView6"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="32dp"
+        android:fontFamily="@font/stix_two_text_bold"
+        android:text="Social Status"
+        android:textColor="@color/Accent1"
+        android:textSize="24sp"
+        app:layout_constraintBottom_toTopOf="@+id/detailedViewLine5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/detailedViewLine4" />
+
+    <TextView
+        android:id="@+id/textView7"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="34dp"
+        android:fontFamily="@font/stix_two_text_bold"
+        android:text="Mood"
+        android:textColor="@color/Accent1"
+        android:textSize="24sp"
+        app:layout_constraintBottom_toTopOf="@+id/detailedViewLine4"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/detailedViewLine3" />
+
+    <TextView
+        android:id="@+id/textView3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:alpha="0.5"
+        android:fontFamily="@font/dm_sans"
+        android:text="(Optional, \nMax 64KB)"
+        android:textColor="@color/Accent1"
+        android:textSize="14sp"
+        app:layout_constraintEnd_toStartOf="@+id/postMoodImage"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView" />
 
     <ImageView
         android:id="@+id/postMoodImage"
         android:layout_width="250dp"
         android:layout_height="250dp"
-        android:layout_marginStart="25dp"
-        android:layout_marginBottom="25dp"
-        android:background="@color/Accent1"
-        app:layout_constraintBottom_toTopOf="@+id/postMoodConfirmButton"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent"
-        tools:srcCompat="@tools:sample/backgrounds/scenic" />
+        android:layout_marginEnd="24dp"
+        android:layout_marginBottom="10dp"
+        android:background="@color/Primary1"
+        app:layout_constraintBottom_toTopOf="@+id/detailedViewLine7"
+        app:layout_constraintEnd_toEndOf="parent" />
 
     <Spinner
         android:id="@+id/postMoodEmotion"
-        android:layout_width="match_parent"
+        android:layout_width="150dp"
         android:layout_height="50dp"
-        android:layout_marginTop="21dp"
-        android:background="@color/Accent1"
+        android:layout_marginTop="10dp"
+        android:layout_marginEnd="24dp"
+        android:background="@color/Primary1"
+        android:textColor="@color/Accent2"
+        android:textColorHint="@color/Accent2"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/postMoodVisibility" />
 
     <EditText
         android:id="@+id/postMoodDescription"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="0dp"
-        android:layout_marginTop="21dp"
+        android:layout_marginStart="24dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginEnd="24dp"
         android:layout_marginBottom="21dp"
-        android:background="@color/Accent1"
+        android:background="@color/Primary1"
         android:ems="10"
         android:gravity="top"
-        android:hint="(Optional Description)"
+        android:hint="(Optional, Max 200 character)"
         android:inputType="text|textMultiLine"
-        android:textColor="@color/black"
+        android:padding="8dp"
+        android:textAlignment="textEnd"
+        android:textColor="@color/Accent2"
+
+        android:textColorHint="#806C5E6F"
+        android:textSize="16sp"
         app:layout_constraintBottom_toTopOf="@+id/postMoodImage"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/postMoodSocialSituation" />
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toEndOf="@+id/textView5"
+        app:layout_constraintTop_toBottomOf="@+id/detailedViewLine5" />
 
     <Spinner
         android:id="@+id/postMoodSocialSituation"
-        android:layout_width="match_parent"
+        android:layout_width="150dp"
         android:layout_height="50dp"
-        android:layout_marginTop="21dp"
-        android:background="@color/Accent1"
+        android:layout_marginTop="10dp"
+        android:layout_marginEnd="24dp"
+        android:background="@color/Primary1"
+        android:textColor="@color/Accent2"
+        android:textColorHint="@color/Accent2"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/postMoodEmotion" />
+        app:layout_constraintTop_toBottomOf="@+id/detailedViewLine4" />
 
     <CheckBox
         android:id="@+id/postMoodLocation"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="21dp"
+        android:fontFamily="@font/dm_sans"
         android:text="Location?"
         android:textColor="@color/Accent1"
         app:layout_constraintEnd_toStartOf="@+id/postMoodVisibility"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@+id/textView4" />
 
     <CheckBox
         android:id="@+id/postMoodVisibility"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="21dp"
+        android:fontFamily="@font/dm_sans"
         android:text="Private?"
         android:textColor="@color/Accent1"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/postMoodLocation"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@+id/textView4" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
