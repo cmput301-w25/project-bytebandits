@@ -69,32 +69,32 @@ public class MainActivityTest {
         user1.put("userId", "testUser1");
         user1.put("profile", "{\"userID\":\"testUser1\",\"locationServices\":true,\"image\":null}");
         user1.put("password", "1");
-        user1.put("email", "testemail1@gmail.com");
 
         HashMap<String, Object> user2 = new HashMap<>();
         user2.put("userId", "testUser2");
         user2.put("profile", "{\"userID\":\"testUser2\",\"locationServices\":false,\"image\":null}");
         user2.put("password", "2");
-        user2.put("email", "testemail2@gmail.com");
 
-        DocumentReference user1DocRef = usersCollectionRef
-                .document((String) Objects.requireNonNull(user1.get("userId")));
-        DocumentReference user2DocRef = usersCollectionRef
-                .document((String) Objects.requireNonNull(user2.get("userId")));
-
-        user1DocRef.set(user1);
-        user2DocRef.set(user2);
-
+        usersCollectionRef
+                .document("testUser1").set(user1);
+        usersCollectionRef
+                .document("testUser2").set(user2);
         // Idk why but for some reason adding a mood post in the set up makes things not
         // break ¯\_(ツ)_/¯
-        Profile randProfile = new Profile("ツ");
+        Profile randProfile = new Profile("test");
         dbInstance.addPost(new MoodPost(Emotion.SURPRISE, randProfile,
                 false, null, null, null, false),
                 randProfile.getUserId(), null);
+
+        try {
+            Thread.sleep(3000);
+        } catch (InterruptedException e) {
+            // Caught exception
+        }
     }
 
     @Before
-    public void seedDatabase() throws InterruptedException {
+    public void seedDatabase() {
         this.dbInstance = DatabaseManager.getInstance(true);
         testContext = ApplicationProvider.getApplicationContext();
         SessionManager sessionManager = SessionManager.getInstance(testContext);

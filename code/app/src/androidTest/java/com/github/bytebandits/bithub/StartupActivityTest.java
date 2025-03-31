@@ -7,6 +7,7 @@ import androidx.test.filters.LargeTest;
 import androidx.test.platform.app.InstrumentationRegistry;
 
 import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
@@ -287,8 +288,8 @@ public class StartupActivityTest {
                 .inRoot(isDialog()).check(matches(isDisplayed()));
     }
 
-    @After
-    public void tearDown() {
+    @AfterClass
+    public static void tearDown() {
         Context context = ApplicationProvider.getApplicationContext();
         SessionManager.getInstance(context).logoutUser();
         String projectId = "byte-bandits-project";
