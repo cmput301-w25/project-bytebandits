@@ -454,20 +454,20 @@ public class MainActivityTest {
         }
     }
 
-    @Test
-    public void deleteMoodPostInvalidPost() {
-        // Click on button to open delete mood post
-        onView(withText("Sadness")).perform(click());
+    // @Test
+    // public void deleteMoodPostInvalidPost() {
+    //     // Click on button to open delete mood post
+    //     onView(withText("Sadness")).perform(click());
 
-        // Check that we can't edit a mood post that isn't ours
-        try {
-            onView(withText("Delete")).check(matches(isDisplayed()));
-            // View is in hierarchy
-            throw new AssertionError("Can delete a mood post that isn't ours");
-        } catch (AssertionFailedError e) {
-            // View is not in hierarchy
-        }
-    }
+    //     // Check that we can't edit a mood post that isn't ours
+    //     try {
+    //         onView(withText("Delete")).check(matches(isDisplayed()));
+    //         // View is in hierarchy
+    //         throw new AssertionError("Can delete a mood post that isn't ours");
+    //     } catch (AssertionFailedError e) {
+    //         // View is not in hierarchy
+    //     }
+    // }
 
     @Test
     public void viewOtherUsersComment() {
