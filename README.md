@@ -13,7 +13,6 @@
 
 ## Project Description
 
-[Brief description of the project in your own words]
 BitHub is a social app that lets users share their emotions in real time by posting mood updates.
 Users can choose from a list of emotions, add a short description, and indicate if they’re with a group feeling the same way.
 They can also search for and follow other users, comment on moods, and engage in conversations.
@@ -28,9 +27,9 @@ The app features a dynamic mood map feed, giving users a real-time view of emoti
 
 ## Setup Instructions
 
-1. [Step 1]
-2. [Step 2]
-3. [Step 3]
+1. Download `google-services.json` and put it in the `code/app/` directory.
+2. Add API key to `secrets.properties` in the `code/app/`.
+    - MAPS_API_KEY=AIzaSyC_KGgid8HfeN2ruATSSA63Do6K_lI7trc
 
 ## Documentation
 
