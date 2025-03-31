@@ -15,7 +15,6 @@ import androidx.core.content.ContextCompat;
 import com.github.bytebandits.bithub.R;
 import com.github.bytebandits.bithub.controller.DatabaseManager;
 import com.github.bytebandits.bithub.controller.SessionManager;
-import com.github.bytebandits.bithub.model.MoodPost;
 import com.github.bytebandits.bithub.model.Notification;
 
 import java.util.ArrayList;

@@ -49,7 +49,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Objects;
-import java.util.Optional;
 
 @RunWith(AndroidJUnit4.class)
 @LargeTest
@@ -91,7 +90,7 @@ public class MainActivityTest {
         Profile randProfile = new Profile("ツ");
         dbInstance.addPost(new MoodPost(Emotion.SURPRISE, randProfile,
                 false, null, null, null, false),
-                randProfile.getUserId(), Optional.empty());
+                randProfile.getUserId(), null);
     }
 
     @Before
@@ -118,10 +117,10 @@ public class MainActivityTest {
 
         for (MoodPost post : moodPosts) {
             if (Objects.equals(post.getProfile().getUserId(), testProfile.getUserId())) {
-                dbInstance.addPost(post, testProfile.getUserId(), Optional.empty());
+                dbInstance.addPost(post, testProfile.getUserId(), null);
             }
             else {
-                dbInstance.addPost(post, testProfile2.getUserId(), Optional.empty());
+                dbInstance.addPost(post, testProfile2.getUserId(), null);
             }
         }
 
@@ -622,12 +621,12 @@ public class MainActivityTest {
         // Delete the posts of testUser1 and testUser2
         dbInstance.getUserPosts("testUser1", posts -> {
             for (int i = 0; i < posts.size(); i++) {
-                dbInstance.deletePost(posts.get(i).getPostID(), "testUser1", Optional.empty());
+                dbInstance.deletePost(posts.get(i).getPostID(), "testUser1", null);
             }
         });
         dbInstance.getUserPosts("testUser2", posts -> {
             for (int i = 0; i < posts.size(); i++) {
-                dbInstance.deletePost(posts.get(i).getPostID(), "testUser2", Optional.empty());
+                dbInstance.deletePost(posts.get(i).getPostID(), "testUser2", null);
             }
         });
     }

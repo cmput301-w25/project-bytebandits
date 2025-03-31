@@ -1,6 +1,6 @@
 package com.github.bytebandits.bithub.model;
 
-import android.util.Log;
+import android.annotation.SuppressLint;
 
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
@@ -136,7 +136,7 @@ public class MoodPost implements Serializable {
      *      Returns a formatted String object representing the mood post's date posted
      */
     public String getFormattedPostedDate() {
-        SimpleDateFormat dateFormatter = new SimpleDateFormat("MMM. dd, yyyy");
+        @SuppressLint("SimpleDateFormat") SimpleDateFormat dateFormatter = new SimpleDateFormat("MMM. dd, yyyy");
         return dateFormatter.format(getPostedDateTime());
     }
 
@@ -146,7 +146,7 @@ public class MoodPost implements Serializable {
      *      Returns a formatted String object representing the mood post's time posted
      */
     public String getFormattedPostedTime() {
-        SimpleDateFormat timeFormatter = new SimpleDateFormat("h:mma");
+        @SuppressLint("SimpleDateFormat") SimpleDateFormat timeFormatter = new SimpleDateFormat("h:mma");
         return timeFormatter.format(getPostedDateTime());
     }
 

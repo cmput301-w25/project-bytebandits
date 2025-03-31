@@ -23,7 +23,6 @@ import com.github.bytebandits.bithub.R;
 import com.github.bytebandits.bithub.model.Profile;
 
 import java.util.Objects;
-import java.util.Optional;
 
 public class DetailedMoodPostFragment extends DialogFragment {
     public static DetailedMoodPostFragment newInstance(MoodPost moodPost) {
@@ -71,8 +70,7 @@ public class DetailedMoodPostFragment extends DialogFragment {
         if (moodPost.getDescription() == null) {
             viewDescription.setText("No Description...");
             viewDescription.setAlpha(0.5F);
-        }
-        else {
+        } else {
             viewDescription.setText(moodPost.getDescription());
         }
         viewMoodIcon.setImageResource(moodPost.getEmotion().getLogoID());
@@ -104,7 +102,8 @@ public class DetailedMoodPostFragment extends DialogFragment {
                         .setMessage(
                                 "Are you sure you want to delete this post?")
                         .setPositiveButton("Yes", (confirmDialog, which) -> {
-                            DatabaseManager.getInstance().deletePost(moodPost.getPostID(), moodPost.getProfile().getUserId(),
+                            DatabaseManager.getInstance().deletePost(moodPost.getPostID(),
+                                    moodPost.getProfile().getUserId(),
                                     Optional.empty());
                             dialog.dismiss();
                             confirmDialog.cancel();
@@ -121,8 +120,7 @@ public class DetailedMoodPostFragment extends DialogFragment {
             });
         } else {
             viewProfileButton.setOnClickListener(v -> {
-                 ((MainActivity)
-                 requireActivity()).replaceFragment(ProfileFragment.newInstance(moodPost.getProfile()));
+                ((MainActivity) requireActivity()).replaceFragment(ProfileFragment.newInstance(moodPost.getProfile()));
                 dialog.dismiss();
             });
             deleteButton.setVisibility(View.GONE);

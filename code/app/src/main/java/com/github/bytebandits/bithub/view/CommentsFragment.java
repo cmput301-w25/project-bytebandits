@@ -21,7 +21,6 @@ import com.github.bytebandits.bithub.model.Profile;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Optional;
 
 public class CommentsFragment extends DialogFragment implements
         AddCommentFragment.AddCommentDialogListener,
@@ -46,7 +45,7 @@ public class CommentsFragment extends DialogFragment implements
         dataList.add(new Comment(profile, commentText));
         HashMap<String, Object> updateFields = new HashMap<>();
         updateFields.put("comments", dataList);
-        DatabaseManager.getInstance().updatePost(moodPost.getPostID(), updateFields, Optional.empty());
+        DatabaseManager.getInstance().updatePost(moodPost.getPostID(), updateFields, null);
         commentAdapter.notifyDataSetChanged();
     }
 
@@ -56,7 +55,7 @@ public class CommentsFragment extends DialogFragment implements
         dataList.remove(position);
         HashMap<String, Object> updateFields = new HashMap<>();
         updateFields.put("comments", dataList);
-        DatabaseManager.getInstance().updatePost(moodPost.getPostID(), updateFields, Optional.empty());
+        DatabaseManager.getInstance().updatePost(moodPost.getPostID(), updateFields, null);
         commentAdapter.notifyDataSetChanged();
     }
 

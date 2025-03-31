@@ -45,7 +45,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Objects;
-import java.util.Optional;
 
 
 @RunWith(AndroidJUnit4.class)
@@ -60,7 +59,7 @@ public class StartupActivityTest {
         user1.put("password", "testing");
 
         String userId = (String) user1.get("userId");
-        dbInstance.addUser(userId, user1, Optional.empty());
+        dbInstance.addUser(userId, user1, null);
 
         SessionManager sessionManager = SessionManager.getInstance(ApplicationProvider.getApplicationContext());
         sessionManager.logoutUser();

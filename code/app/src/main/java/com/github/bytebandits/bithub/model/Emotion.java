@@ -17,9 +17,9 @@ public enum Emotion {
     SHAME("Shame", "feeling of humiliation and guilt", R.drawable.shame_logo),
     SURPRISE("Surprise", "state of shock from a sudden event", R.drawable.surprise_logo);
 
-    private String state;
-    private String description;
-    private int logoID; // ID to reference the mood logo
+    private final String state;
+    private final String description;
+    private final int logoID; // ID to reference the mood logo
 
     /**
      * Enumerator constructor to initialize the different emotions
