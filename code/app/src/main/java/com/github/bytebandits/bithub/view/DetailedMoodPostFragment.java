@@ -90,9 +90,21 @@ public class DetailedMoodPostFragment extends DialogFragment {
         if (Objects.equals(moodPost.getProfile().getUserId(), profile.getUserId())) {
             viewProfileButton.setVisibility(View.GONE);
             deleteButton.setOnClickListener(v -> {
-                DatabaseManager.getInstance().deletePost(moodPost.getPostID(), moodPost.getProfile().getUserId(),
-                        Optional.empty());
-                dialog.dismiss();
+                // Get confirmation for delete
+                new AlertDialog.Builder(getContext())
+                        .setTitle("Confirm Delete")
+                        .setMessage(
+                                "Are you sure you want to delete this post?")
+                        .setPositiveButton("Yes", (confirmDialog, which) -> {
+                            DatabaseManager.getInstance().deletePost(moodPost.getPostID(), moodPost.getProfile().getUserId(),
+                                    Optional.empty());
+                            dialog.dismiss();
+                            confirmDialog.cancel();
+                        })
+                        .setNegativeButton("No", (confirmDialog, which) -> {
+                            confirmDialog.cancel();
+                        })
+                        .show();
             });
 
             editButton.setOnClickListener(v -> {

@@ -1,5 +1,6 @@
 package com.github.bytebandits.bithub.view;
 
+import android.app.AlertDialog;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,12 +13,14 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.github.bytebandits.bithub.R;
+import com.github.bytebandits.bithub.controller.DatabaseManager;
 import com.github.bytebandits.bithub.controller.SessionManager;
 import com.github.bytebandits.bithub.model.Comment;
 import com.github.bytebandits.bithub.model.MoodPost;
 
 import java.util.ArrayList;
 import java.util.Objects;
+import java.util.Optional;
 
 public class CommentArrayAdapter extends ArrayAdapter<Comment> {
     private DeleteCommentListener listener;
@@ -67,7 +70,19 @@ public class CommentArrayAdapter extends ArrayAdapter<Comment> {
             deleteButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    listener.deleteComment(position);
+                    // Get confirmation for delete
+                    new AlertDialog.Builder(getContext())
+                            .setTitle("Confirm Delete")
+                            .setMessage(
+                                    "Are you sure you want to delete this comment?")
+                            .setPositiveButton("Yes", (confirmDialog, which) -> {
+                                listener.deleteComment(position);
+                                confirmDialog.cancel();
+                            })
+                            .setNegativeButton("No", (confirmDialog, which) -> {
+                                confirmDialog.cancel();
+                            })
+                            .show();
                 }
             });
         }
