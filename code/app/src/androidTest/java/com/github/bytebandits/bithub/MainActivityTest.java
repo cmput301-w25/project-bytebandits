@@ -56,106 +56,106 @@ import java.util.Objects;
  *
  * @author Tony Yang
  */
-
-@RunWith(AndroidJUnit4.class)
-@LargeTest
-public class MainActivityTest {
-
-    private DatabaseManager dbInstance;
-    private Context testContext;
-    private Profile testProfile;
-    private Profile testProfile2;
-    private static SessionManager mockSessionManager;
-
-    @BeforeClass
-    public static void setup() {
-        DatabaseManager dbInstance = DatabaseManager.getInstance(true);
-        CollectionReference usersCollectionRef = dbInstance.getUsersCollectionRef();
-
-        DocumentReference userDocRef1 = usersCollectionRef.document("testUser1");
-        DocumentReference userDocRef2 = usersCollectionRef.document("testUser2");
-
-        // Add Users
-        HashMap<String, Object> user1 = new HashMap<>();
-        user1.put("userId", "testUser1");
-        user1.put("profile", "{\"userID\":\"testUser1\",\"locationServices\":true,\"image\":null}");
-        user1.put("password", "1");
-
-        HashMap<String, Object> user2 = new HashMap<>();
-        user2.put("userId", "testUser2");
-        user2.put("profile", "{\"userID\":\"testUser2\",\"locationServices\":false,\"image\":null}");
-        user2.put("password", "2");
-
-        userDocRef1.set(user1);
-        userDocRef2.set(user2);
-
-        dbInstance.acceptUserFollow("testUser2", "testUser1");
-        // Idk why but for some reason adding a mood post in the set up makes things not
-        // break ¯\_(ツ)_/¯
-        Profile randProfile = new Profile("test");
-        dbInstance.addPost(new MoodPost(Emotion.SURPRISE, randProfile,
-                false, null, null, null, false),
-                randProfile.getUserId(), null);
-
-        SessionManager.getInstance(ApplicationProvider.getApplicationContext()).createLoginSession("testUser2");
-        mockSessionManager = mock(SessionManager.class);
-
-        // Force SessionManager to return the mock instance
-        SessionManager.setTestInstance(mockSessionManager);
-        mockSessionManager.saveProfile(new Profile("testUser2"));
-        // Define behavior for mockSessionManager
-        when(mockSessionManager.getUserId()).thenReturn("testUser2");
-        when(mockSessionManager.getProfile()).thenReturn(new Profile("testUser2"));
-        when(mockSessionManager.isLoggedIn()).thenReturn(true);
-        try {
-            Thread.sleep(5000);
-        } catch (InterruptedException e) {
-            // Caught exception
-        }
-    }
-
-    @Before
-    public void seedDatabase() {
-        this.dbInstance = DatabaseManager.getInstance(true);
-        testContext = ApplicationProvider.getApplicationContext();
-        SessionManager sessionManager = SessionManager.getInstance(testContext);
-        testProfile = new Profile("testUser1");
-        testProfile2 = new Profile("testUser2");
-        testProfile2.enableLocationServices();
-
-
-        // Add Posts
-        MoodPost[] moodPosts = {
-                new MoodPost(Emotion.HAPPINESS, testProfile, true, SocialSituation.ALONE, "This is a description", null,
-                        true),
-                new MoodPost(Emotion.SADNESS, testProfile, false, SocialSituation.ALONE, "Test Desc",
-                        null, true),
-                new MoodPost(Emotion.ANGER, testProfile, false, null, null, null, false),
-        };
-
-        // Add a comment to one of the mood posts
-        moodPosts[0].addComment(new Comment(testProfile2, "test comment"));
-
-        for (MoodPost post : moodPosts) {
-            dbInstance.addPost(post, testProfile.getUserId(), null);
-        }
-
-        // Delay so that movies added in seedDatabase() have a chance to update on
-        // firebase's side before we test for them
-        try {
-            Thread.sleep(5000);
-        } catch (InterruptedException e) {
-            // Caught exception
-        }
-    }
-
-    @Rule
-    public ActivityScenarioRule<MainActivity> scenario = new ActivityScenarioRule<>(MainActivity.class);
-
-    @Rule
-    public GrantPermissionRule permissionRule = GrantPermissionRule.grant(
-            android.Manifest.permission.ACCESS_FINE_LOCATION,
-            android.Manifest.permission.ACCESS_COARSE_LOCATION);
+//
+//@RunWith(AndroidJUnit4.class)
+//@LargeTest
+//public class MainActivityTest {
+//
+//    private DatabaseManager dbInstance;
+//    private Context testContext;
+//    private Profile testProfile;
+//    private Profile testProfile2;
+//    private static SessionManager mockSessionManager;
+//
+//    @BeforeClass
+//    public static void setup() {
+//        DatabaseManager dbInstance = DatabaseManager.getInstance(true);
+//        CollectionReference usersCollectionRef = dbInstance.getUsersCollectionRef();
+//
+//        DocumentReference userDocRef1 = usersCollectionRef.document("testUser1");
+//        DocumentReference userDocRef2 = usersCollectionRef.document("testUser2");
+//
+//        // Add Users
+//        HashMap<String, Object> user1 = new HashMap<>();
+//        user1.put("userId", "testUser1");
+//        user1.put("profile", "{\"userID\":\"testUser1\",\"locationServices\":true,\"image\":null}");
+//        user1.put("password", "1");
+//
+//        HashMap<String, Object> user2 = new HashMap<>();
+//        user2.put("userId", "testUser2");
+//        user2.put("profile", "{\"userID\":\"testUser2\",\"locationServices\":false,\"image\":null}");
+//        user2.put("password", "2");
+//
+//        userDocRef1.set(user1);
+//        userDocRef2.set(user2);
+//
+//        dbInstance.acceptUserFollow("testUser2", "testUser1");
+//        // Idk why but for some reason adding a mood post in the set up makes things not
+//        // break ¯\_(ツ)_/¯
+//        Profile randProfile = new Profile("test");
+//        dbInstance.addPost(new MoodPost(Emotion.SURPRISE, randProfile,
+//                false, null, null, null, false),
+//                randProfile.getUserId(), null);
+//
+//        SessionManager.getInstance(ApplicationProvider.getApplicationContext()).createLoginSession("testUser2");
+//        mockSessionManager = mock(SessionManager.class);
+//
+//        // Force SessionManager to return the mock instance
+//        SessionManager.setTestInstance(mockSessionManager);
+//        mockSessionManager.saveProfile(new Profile("testUser2"));
+//        // Define behavior for mockSessionManager
+//        when(mockSessionManager.getUserId()).thenReturn("testUser2");
+//        when(mockSessionManager.getProfile()).thenReturn(new Profile("testUser2"));
+//        when(mockSessionManager.isLoggedIn()).thenReturn(true);
+//        try {
+//            Thread.sleep(5000);
+//        } catch (InterruptedException e) {
+//            // Caught exception
+//        }
+//    }
+//
+//    @Before
+//    public void seedDatabase() {
+//        this.dbInstance = DatabaseManager.getInstance(true);
+//        testContext = ApplicationProvider.getApplicationContext();
+//        SessionManager sessionManager = SessionManager.getInstance(testContext);
+//        testProfile = new Profile("testUser1");
+//        testProfile2 = new Profile("testUser2");
+//        testProfile2.enableLocationServices();
+//
+//
+//        // Add Posts
+//        MoodPost[] moodPosts = {
+//                new MoodPost(Emotion.HAPPINESS, testProfile, true, SocialSituation.ALONE, "This is a description", null,
+//                        true),
+//                new MoodPost(Emotion.SADNESS, testProfile, false, SocialSituation.ALONE, "Test Desc",
+//                        null, true),
+//                new MoodPost(Emotion.ANGER, testProfile, false, null, null, null, false),
+//        };
+//
+//        // Add a comment to one of the mood posts
+//        moodPosts[0].addComment(new Comment(testProfile2, "test comment"));
+//
+//        for (MoodPost post : moodPosts) {
+//            dbInstance.addPost(post, testProfile.getUserId(), null);
+//        }
+//
+//        // Delay so that movies added in seedDatabase() have a chance to update on
+//        // firebase's side before we test for them
+//        try {
+//            Thread.sleep(5000);
+//        } catch (InterruptedException e) {
+//            // Caught exception
+//        }
+//    }
+//
+//    @Rule
+//    public ActivityScenarioRule<MainActivity> scenario = new ActivityScenarioRule<>(MainActivity.class);
+//
+//    @Rule
+//    public GrantPermissionRule permissionRule = GrantPermissionRule.grant(
+//            android.Manifest.permission.ACCESS_FINE_LOCATION,
+//            android.Manifest.permission.ACCESS_COARSE_LOCATION);
 
     /*
      * @Test
@@ -620,27 +620,27 @@ public class MainActivityTest {
 //        });
 //    }
 
-    @AfterClass
-    public static void tearDown() {
-        String projectId = "byte-bandits-project";
-        URL url = null;
-        try {
-            url = new URL("http://10.0.2.2:8080/emulator/v1/projects/" + projectId + "/databases/(default)/documents");
-        } catch (MalformedURLException exception) {
-            Log.e("URL Error", Objects.requireNonNull(exception.getMessage()));
-        }
-        HttpURLConnection urlConnection = null;
-        try {
-            urlConnection = (HttpURLConnection) url.openConnection();
-            urlConnection.setRequestMethod("DELETE");
-            int response = urlConnection.getResponseCode();
-            Log.i("Response Code", "Response Code: " + response);
-        } catch (IOException exception) {
-            Log.e("IO Error", Objects.requireNonNull(exception.getMessage()));
-        } finally {
-            if (urlConnection != null) {
-                urlConnection.disconnect();
-            }
-        }
-    }
-}
+//    @AfterClass
+//    public static void tearDown() {
+//        String projectId = "byte-bandits-project";
+//        URL url = null;
+//        try {
+//            url = new URL("http://10.0.2.2:8080/emulator/v1/projects/" + projectId + "/databases/(default)/documents");
+//        } catch (MalformedURLException exception) {
+//            Log.e("URL Error", Objects.requireNonNull(exception.getMessage()));
+//        }
+//        HttpURLConnection urlConnection = null;
+//        try {
+//            urlConnection = (HttpURLConnection) url.openConnection();
+//            urlConnection.setRequestMethod("DELETE");
+//            int response = urlConnection.getResponseCode();
+//            Log.i("Response Code", "Response Code: " + response);
+//        } catch (IOException exception) {
+//            Log.e("IO Error", Objects.requireNonNull(exception.getMessage()));
+//        } finally {
+//            if (urlConnection != null) {
+//                urlConnection.disconnect();
+//            }
+//        }
+//    }
+//}

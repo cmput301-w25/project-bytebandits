@@ -56,26 +56,26 @@ import java.util.Objects;
  * @author Hanss Rivera
  */
 
-@RunWith(AndroidJUnit4.class)
-@LargeTest
-public class StartupActivityTest {
-    @BeforeClass
-    public static void setup(){
-        DatabaseManager dbInstance = DatabaseManager.getInstance(true);
-        HashMap<String, Object> user1 = new HashMap<>();
-        user1.put("userId", "testUser1");
-        user1.put("name", "John Doe");
-        user1.put("password", "testing");
-
-        String userId = (String) user1.get("userId");
-        dbInstance.addUser(userId, user1, null);
-
-        SessionManager sessionManager = SessionManager.getInstance(ApplicationProvider.getApplicationContext());
-        sessionManager.logoutUser();
-    }
-
-    @Rule
-    public ActivityScenarioRule<StartupActivity> scenario = new ActivityScenarioRule<>(StartupActivity.class);
+//@RunWith(AndroidJUnit4.class)
+//@LargeTest
+//public class StartupActivityTest {
+//    @BeforeClass
+//    public static void setup(){
+//        DatabaseManager dbInstance = DatabaseManager.getInstance(true);
+//        HashMap<String, Object> user1 = new HashMap<>();
+//        user1.put("userId", "testUser1");
+//        user1.put("name", "John Doe");
+//        user1.put("password", "testing");
+//
+//        String userId = (String) user1.get("userId");
+//        dbInstance.addUser(userId, user1, null);
+//
+//        SessionManager sessionManager = SessionManager.getInstance(ApplicationProvider.getApplicationContext());
+//        sessionManager.logoutUser();
+//    }
+//
+//    @Rule
+//    public ActivityScenarioRule<StartupActivity> scenario = new ActivityScenarioRule<>(StartupActivity.class);
 
     /**
      * Tests StartupFragment is displaying what it is supposed to
@@ -295,30 +295,30 @@ public class StartupActivityTest {
 //        onView(withText(R.string.startup_invalid))
 //                .inRoot(isDialog()).check(matches(isDisplayed()));
 //    }
-
-    @AfterClass
-    public static void tearDown() {
-        Context context = ApplicationProvider.getApplicationContext();
-        SessionManager.getInstance(context).logoutUser();
-        String projectId = "byte-bandits-project";
-        URL url = null;
-        try {
-            url = new URL("http://10.0.2.2:8080/emulator/v1/projects/" + projectId + "/databases/(default)/documents");
-        } catch (MalformedURLException exception) {
-            Log.e("URL Error", Objects.requireNonNull(exception.getMessage()));
-        }
-        HttpURLConnection urlConnection = null;
-        try {
-            urlConnection = (HttpURLConnection) url.openConnection();
-            urlConnection.setRequestMethod("DELETE");
-            int response = urlConnection.getResponseCode();
-            Log.i("Response Code", "Response Code: " + response);
-        } catch (IOException exception) {
-            Log.e("IO Error", Objects.requireNonNull(exception.getMessage()));
-        } finally {
-            if (urlConnection != null) {
-                urlConnection.disconnect();
-            }
-        }
-    }
-}
+//
+//    @AfterClass
+//    public static void tearDown() {
+//        Context context = ApplicationProvider.getApplicationContext();
+//        SessionManager.getInstance(context).logoutUser();
+//        String projectId = "byte-bandits-project";
+//        URL url = null;
+//        try {
+//            url = new URL("http://10.0.2.2:8080/emulator/v1/projects/" + projectId + "/databases/(default)/documents");
+//        } catch (MalformedURLException exception) {
+//            Log.e("URL Error", Objects.requireNonNull(exception.getMessage()));
+//        }
+//        HttpURLConnection urlConnection = null;
+//        try {
+//            urlConnection = (HttpURLConnection) url.openConnection();
+//            urlConnection.setRequestMethod("DELETE");
+//            int response = urlConnection.getResponseCode();
+//            Log.i("Response Code", "Response Code: " + response);
+//        } catch (IOException exception) {
+//            Log.e("IO Error", Objects.requireNonNull(exception.getMessage()));
+//        } finally {
+//            if (urlConnection != null) {
+//                urlConnection.disconnect();
+//            }
+//        }
+//    }
+//}
