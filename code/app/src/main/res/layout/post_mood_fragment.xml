@@ -243,7 +243,7 @@
         android:layout_marginBottom="21dp"
         android:background="@color/Primary1"
         android:ems="10"
-        android:gravity="top"
+        android:gravity="end"
         android:hint="(Optional, Max 200 character)"
         android:inputType="text|textMultiLine"
         android:padding="8dp"

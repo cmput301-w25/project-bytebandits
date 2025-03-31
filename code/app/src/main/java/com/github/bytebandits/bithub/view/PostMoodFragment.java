@@ -53,7 +53,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Optional;
 
 public class PostMoodFragment extends Fragment {
     private FusedLocationProviderClient fusedLocationClient;
@@ -272,14 +271,14 @@ public class PostMoodFragment extends Fragment {
                     MoodPost moodPost = new MoodPost(selectedEmotion, sessionManager.getProfile(),
                             selectedLocation, selectedSocialSituation, selectedDescription,
                             selectedImageBase64String, selectedPrivate);
-                    databaseManager.addPost(moodPost, sessionManager.getProfile().getUserId(), Optional.empty());
+                    databaseManager.addPost(moodPost, sessionManager.getProfile().getUserId(), null);
                     // for some reason setting the longitude and latitude then adding post doesn't
                     // work so im updating the values after adding the post
                     if (selectedLocation) {
                         HashMap<String, Object> updateFields = new HashMap<>();
                         updateFields.put("longitude", currentLongitude);
                         updateFields.put("latitude", currentLatitude);
-                        databaseManager.updatePost(moodPost.getPostID(), updateFields, Optional.empty());
+                        databaseManager.updatePost(moodPost.getPostID(), updateFields, null);
                     }
                 } else {
                     HashMap<String, Object> updateFields = new HashMap<>();
@@ -295,7 +294,7 @@ public class PostMoodFragment extends Fragment {
                         updateFields.put("longitude", currentLongitude);
                         updateFields.put("latitude", currentLatitude);
                     }
-                    databaseManager.updatePost(postToEdit.getPostID(), updateFields, Optional.empty());
+                    databaseManager.updatePost(postToEdit.getPostID(), updateFields, null);
                 }
                 // Go back to homepage fragment
                 ((MainActivity) requireActivity()).replaceFragment(new HomepageFragment());

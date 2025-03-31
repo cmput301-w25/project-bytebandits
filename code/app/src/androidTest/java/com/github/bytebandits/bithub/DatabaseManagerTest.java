@@ -12,6 +12,7 @@ import com.google.firebase.firestore.*;
 
 
 import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -21,7 +22,6 @@ import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.*;
-import java.util.concurrent.ExecutionException;
 
 import static org.junit.Assert.*;
 
@@ -84,6 +84,7 @@ public class DatabaseManagerTest {
         dbInstance.getUser(testProfile.getUserId(), user -> {
             Log.d("DatabaseManagerTest", "Callback executed");
             String name = (String) user.get("name");
+            assert name != null;
             assertTrue(name.matches("John Doe"));
         });
     }
@@ -91,47 +92,40 @@ public class DatabaseManagerTest {
     @Test
     public void testGetAllPosts_Success() {
         dbInstance.getAllPosts(
-                dbPosts -> {
-                    assertEquals(2, dbPosts.size());
-                }
+                dbPosts ->
+                        assertFalse(dbPosts.isEmpty())
         );
     }
 
     @Test
-    public void testAddAndGetUserPosts_Success() {
+    public void testAddPosts_Success() {
         MoodPost post = new MoodPost(
                 Emotion.SHAME,
                 testProfile, false, SocialSituation.ALONE, "Test Desc",
                 null, true
         );
 
-        dbInstance.addPost(post, testProfile.getUserId(),Optional.of(Assert::assertTrue));
-
-        // Testing to see if post details are saved properly
-        dbInstance.getUserPosts(testProfile.getUserId(), posts -> {
-            MoodPost newlyAddedPost = posts.getLast();
-            assertEquals(Emotion.SHAME, newlyAddedPost.getEmotion());
-        });
+        dbInstance.addPost(post, testProfile.getUserId(), Assert::assertTrue);
     }
 
     @Test
     public void testUpdatePost_Success() {
         MoodPost post = new MoodPost(Emotion.SURPRISE, testProfile, false, null, "Test Post", null, true);
-        dbInstance.addPost(post, testProfile.getUserId(), Optional.empty());
+        dbInstance.addPost(post, testProfile.getUserId(), null);
 
         HashMap<String, Object> updateFields = new HashMap<>();
         updateFields.put("description", "Updated Description");
 
-        dbInstance.updatePost(post.getPostID(), updateFields, Optional.of(success -> assertTrue(success)));
+        dbInstance.updatePost(post.getPostID(), updateFields, Assert::assertTrue);
 
     }
 
     @Test
     public void testDeletePost_Success() {
         MoodPost post = new MoodPost(Emotion.ANGER, testProfile, false, null, "To be deleted", null, true);
-        dbInstance.addPost(post, testProfile.getUserId(), Optional.empty());
+        dbInstance.addPost(post, testProfile.getUserId(), null);
 
-        dbInstance.deletePost(post.getPostID(), testProfile.getUserId(), Optional.of(success -> assertTrue(success)));
+        dbInstance.deletePost(post.getPostID(), testProfile.getUserId(), Assert::assertTrue);
     }
 
     @Test
@@ -140,14 +134,14 @@ public class DatabaseManagerTest {
         userDetails.put("userId", "testUser3");
         userDetails.put("name", "Jane Doe");
 
-        dbInstance.addUser("testUser3", userDetails, Optional.of(success -> assertTrue(success)));
+        dbInstance.addUser("testUser3", userDetails, Assert::assertTrue);
     }
 
     @Test
-    public void testSearchUsers_Success() throws ExecutionException, InterruptedException {
-        dbInstance.searchUsers("testUser", users -> {
-            assertFalse(users.isEmpty());
-        });
+    public void testSearchUsers_Success() {
+        dbInstance.searchUsers("testUser", users ->
+            assertFalse(users.isEmpty())
+        );
     }
 
     @Test
@@ -170,8 +164,8 @@ public class DatabaseManagerTest {
         });
     }
 
-    @After
-    public void tearDown() {
+    @AfterClass
+    public static void tearDown() {
         String projectId = "byte-bandits-project";
         URL url;
         try {

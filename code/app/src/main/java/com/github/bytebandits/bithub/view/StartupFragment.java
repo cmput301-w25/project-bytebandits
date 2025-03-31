@@ -26,13 +26,13 @@ public class StartupFragment extends Fragment {
         Button login = view.findViewById(R.id.loginBtn);
         Button signup = view.findViewById(R.id.registerBtn);
 
-        login.setOnClickListener(v -> {
-            ((StartupActivity) requireActivity()).loginFragment();
-        });
+        login.setOnClickListener(v ->
+            ((StartupActivity) requireActivity()).loginFragment()
+        );
 
-        signup.setOnClickListener(v -> {
-            ((StartupActivity) requireActivity()).signupFragment();
-        });
+        signup.setOnClickListener(v ->
+            ((StartupActivity) requireActivity()).signupFragment()
+        );
 
         return view;
     }

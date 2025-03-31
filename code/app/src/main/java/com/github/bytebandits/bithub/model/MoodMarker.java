@@ -1,9 +1,11 @@
 package com.github.bytebandits.bithub.model;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.google.android.gms.maps.model.LatLng;
 import com.google.maps.android.clustering.ClusterItem;
+
 public class MoodMarker implements ClusterItem{
     private final LatLng position;
     private final String title;

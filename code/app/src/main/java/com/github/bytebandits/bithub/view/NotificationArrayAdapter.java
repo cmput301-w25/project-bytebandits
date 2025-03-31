@@ -15,7 +15,6 @@ import androidx.core.content.ContextCompat;
 import com.github.bytebandits.bithub.R;
 import com.github.bytebandits.bithub.controller.DatabaseManager;
 import com.github.bytebandits.bithub.controller.SessionManager;
-import com.github.bytebandits.bithub.model.MoodPost;
 import com.github.bytebandits.bithub.model.Notification;
 
 import java.util.ArrayList;
@@ -39,6 +38,10 @@ public class NotificationArrayAdapter extends ArrayAdapter<Notification> {
         }
 
         Notification notification = getItem(position);
+        if (notification == null) {
+            return view;
+        }
+
         TextView nameView = view.findViewById(R.id.textUserName);
         TextView dateView = view.findViewById(R.id.textDate);
         TextView timeView = view.findViewById(R.id.textTime);
@@ -56,22 +59,24 @@ public class NotificationArrayAdapter extends ArrayAdapter<Notification> {
             textD.setVisibility(View.VISIBLE);
             textA.setVisibility(View.VISIBLE);
             emotionView.setVisibility(View.GONE);
-            actionView.setText("has requested to follow you:");
-            buttonA.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    // Handle accept button click
-                    DatabaseManager.getInstance().acceptUserFollow(SessionManager.getInstance(getContext()).getUserId(), notification.getProfile().getUserId());
-                    remove(notification);
-                }
+            actionView.setText(R.string.notification_request);
+            buttonA.setOnClickListener(v -> {
+                // Handle accept button click
+                DatabaseManager.getInstance().acceptUserFollow(SessionManager.getInstance(getContext()).getUserId(), notification.getProfile().getUserId());
+                buttonA.setVisibility(View.GONE);
+                buttonD.setVisibility(View.GONE);
+                textD.setVisibility(View.GONE);
+                textA.setVisibility(View.GONE);
+                remove(notification);
             });
-            buttonD.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    // Handle decline button click
-                    DatabaseManager.getInstance().rejectUserFollow(SessionManager.getInstance(getContext()).getUserId(), notification.getProfile().getUserId());
-                    remove(notification);
-                }
+            buttonD.setOnClickListener(v -> {
+                // Handle decline button click
+                DatabaseManager.getInstance().rejectUserFollow(SessionManager.getInstance(getContext()).getUserId(), notification.getProfile().getUserId());
+                buttonA.setVisibility(View.GONE);
+                buttonD.setVisibility(View.GONE);
+                textD.setVisibility(View.GONE);
+                textA.setVisibility(View.GONE);
+                remove(notification);
             });
 
         }

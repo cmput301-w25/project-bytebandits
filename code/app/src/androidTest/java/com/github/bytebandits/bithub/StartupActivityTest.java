@@ -7,6 +7,7 @@ import androidx.test.filters.LargeTest;
 import androidx.test.platform.app.InstrumentationRegistry;
 
 import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
@@ -45,7 +46,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Objects;
-import java.util.Optional;
 
 
 @RunWith(AndroidJUnit4.class)
@@ -60,7 +60,7 @@ public class StartupActivityTest {
         user1.put("password", "testing");
 
         String userId = (String) user1.get("userId");
-        dbInstance.addUser(userId, user1, Optional.empty());
+        dbInstance.addUser(userId, user1, null);
 
         SessionManager sessionManager = SessionManager.getInstance(ApplicationProvider.getApplicationContext());
         sessionManager.logoutUser();
@@ -288,8 +288,8 @@ public class StartupActivityTest {
                 .inRoot(isDialog()).check(matches(isDisplayed()));
     }
 
-    @After
-    public void tearDown() {
+    @AfterClass
+    public static void tearDown() {
         Context context = ApplicationProvider.getApplicationContext();
         SessionManager.getInstance(context).logoutUser();
         String projectId = "byte-bandits-project";

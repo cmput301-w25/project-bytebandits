@@ -24,7 +24,6 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.textfield.TextInputEditText;
 
 import java.util.HashMap;
-import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -103,7 +102,7 @@ public class SignupFragment extends Fragment {
             userDetails.put("password", password);
             userDetails.put("profile", new Profile(userId).toJson());
 
-            DatabaseManager.getInstance().addUser(userId, userDetails, Optional.empty());
+            DatabaseManager.getInstance().addUser(userId, userDetails, null);
 
             ((StartupActivity) requireActivity()).loginFragment();
         } else {

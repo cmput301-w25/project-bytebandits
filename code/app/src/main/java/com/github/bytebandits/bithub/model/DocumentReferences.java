@@ -7,7 +7,7 @@ public enum DocumentReferences {
     NOTIFICATION_REQS("notificationRefs.requests"),
     POSTS("postRefs");
 
-    private String docRefString;
+    private final String docRefString;
 
     DocumentReferences(String docRefString){
         this.docRefString = docRefString;
