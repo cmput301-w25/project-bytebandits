@@ -26,33 +26,48 @@ public class myClusterRenderer extends DefaultClusterRenderer<MoodMarker> {
         this.context = context;
     }
 
+    /**
+     * Determines if a cluster should be rendered as a cluster.
+     * @param cluster cluster to examine for rendering
+     * @return true if the cluster should be rendered as a cluster, false otherwise
+     */
     @Override
     protected boolean shouldRenderAsCluster(Cluster<MoodMarker> cluster) {
-        // Cluster items if more than 1 item overlaps (which is the default behavior).
-        // Return true when cluster size is at least 2.
+        // Cluster items if more than 1 item overlaps.
         return cluster.getSize() > 1;
     }
 
+    /**
+     * Called before a cluster item is rendered.
+     * @param item          item to be rendered
+     * @param markerOptions the markerOptions representing the provided item
+     */
     @Override
     protected void onBeforeClusterItemRendered(MoodMarker item, MarkerOptions markerOptions) {
-        // Create your custom bitmap based on the MoodMarker's properties
+        // Create your custom bitmap.
         Bitmap markerBitmap = createCustomMarkerBitmap(item);
         markerOptions.icon(BitmapDescriptorFactory.fromBitmap(markerBitmap))
                 .title(item.getUserId());
     }
 
-    // Optional: If you want a custom cluster marker (when there are 2+ items), override onBeforeClusterRendered.
+    /**
+     * Called before a cluster is rendered.
+     * @param cluster       cluster to be rendered
+     * @param markerOptions markerOptions representing the provided cluster
+     */
     @Override
     protected void onBeforeClusterRendered(Cluster<MoodMarker> cluster, MarkerOptions markerOptions) {
-        // For example, you can call the default or create a custom bitmap using cluster.getSize()
-        // Here we call the default implementation:
         super.onBeforeClusterRendered(cluster, markerOptions);
     }
 
-    // This method encapsulates your drawing logic. Adjust parameters as needed.
+    /**
+     * Creates a custom marker bitmap.
+     * @param moodMarker moodMarker to be rendered
+     * @return custom marker bitmap
+     */
     private Bitmap createCustomMarkerBitmap(MoodMarker moodMarker) {
 
-        // You can redefine these dimensions to suit your needs.
+        // Dimensions for the marker.
         int desiredWidth = 240;
         int desiredHeight = 240;
 
@@ -69,11 +84,11 @@ public class myClusterRenderer extends DefaultClusterRenderer<MoodMarker> {
         float padding = 20f;
         canvas.drawRoundRect(padding, padding, desiredWidth - padding, desiredHeight - padding, cornerRadius, cornerRadius, rectPaint);
 
-        // Draw the emotion drawable. (Assuming moodMarker holds the resource ID.)
+        // Draw the emotion drawable
         Drawable drawable = ContextCompat.getDrawable(context, moodMarker.getEmotion().getLogoID());
         if (drawable != null) {
             float drawablePadding = 30f;
-            // Adjust bounds for the drawable (leaving space for text if needed)
+            // Adjust bounds for the drawable
             drawable.setBounds((int) (padding + drawablePadding),
                     (int) (padding + drawablePadding),
                     (int) (desiredWidth - padding - drawablePadding),
@@ -100,7 +115,7 @@ public class myClusterRenderer extends DefaultClusterRenderer<MoodMarker> {
 
         float xPos = canvas.getWidth() / 2f;
         float yPos = textBackgroundTop + textBackgroundHeight / 2f - ((textPaint.descent() + textPaint.ascent()) / 2f);
-        String userId = "@" + moodMarker.getUserId();  // Assume your MoodMarker stores a String userId.
+        String userId = "@" + moodMarker.getUserId();
         canvas.drawText(userId, xPos, yPos, textPaint);
 
         return bitmap;

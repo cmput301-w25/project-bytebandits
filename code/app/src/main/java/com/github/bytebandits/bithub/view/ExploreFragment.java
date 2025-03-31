@@ -42,6 +42,9 @@ import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+/**
+ * Represents the explore fragment
+ */
 public class ExploreFragment extends Fragment implements GoogleMap.OnMarkerClickListener, OnMapReadyCallback {
     private GoogleMap googleMap;
     private FusedLocationProviderClient fusedLocationClient;
@@ -54,6 +57,17 @@ public class ExploreFragment extends Fragment implements GoogleMap.OnMarkerClick
 
     private ClusterManager<MoodMarker> clusterManager;
 
+    /**
+     *
+     * @param inflater The LayoutInflater object that can be used to inflate
+     * any views in the fragment,
+     * @param container If non-null, this is the parent view that the fragment's
+     * UI should be attached to.  The fragment should not add the view itself,
+     * but this can be used to generate the LayoutParams of the view.
+     * @param savedInstanceState If non-null, this fragment is being re-constructed
+     * from a previous saved state as given here.
+     *
+     */
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -115,6 +129,12 @@ public class ExploreFragment extends Fragment implements GoogleMap.OnMarkerClick
         return null;
     }
 
+    /**
+     * Finds the exact MoodPost matching the marker's location
+     * @param moodMarker The marker that was clicked
+     * @param posts List of posts to search through
+     * @return The exact MoodPost matching the marker's locations
+     */
     private MoodPost findExactPost(MoodMarker moodMarker, List<MoodPost> posts) {
         if (posts == null || posts.isEmpty()) {
             return null;
@@ -128,6 +148,9 @@ public class ExploreFragment extends Fragment implements GoogleMap.OnMarkerClick
         return null;
     }
 
+    /**
+     * Called when the fragment is no longer in use
+     */
     @Override
     public void onDestroy() {
         super.onDestroy();
@@ -137,6 +160,11 @@ public class ExploreFragment extends Fragment implements GoogleMap.OnMarkerClick
         }
     }
 
+    /**
+     * Handles marker clicks
+     * @param marker The marker that was clicked
+     * @return True if the click was handled, false otherwise
+     */
     @Override
     public boolean onMarkerClick(@NonNull Marker marker) {
         executor.execute(() -> {
@@ -162,6 +190,16 @@ public class ExploreFragment extends Fragment implements GoogleMap.OnMarkerClick
         });
         return false;
     }
+
+    /**
+     * Handles permission requests
+     * @param requestCode The request code passed in {@link #requestPermissions(String[], int)}.
+     * @param permissions The requested permissions. Never null.
+     * @param grantResults The grant results for the corresponding permissions
+     *     which is either {@link android.content.pm.PackageManager#PERMISSION_GRANTED}
+     *     or {@link android.content.pm.PackageManager#PERMISSION_DENIED}. Never null.
+     *
+     */
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
                                            @NonNull int[] grantResults) {
@@ -190,6 +228,12 @@ public class ExploreFragment extends Fragment implements GoogleMap.OnMarkerClick
             super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         }
     }
+
+    /**
+     * Gets the display strings for the mood posts
+     * @param moodPosts List of mood posts
+     * @return List of display strings
+     */
     private List getDisplayStrings(List moodPosts) {
         List displayStrings = new ArrayList<MoodPost>();
         for (Object post : moodPosts) {
@@ -204,6 +248,9 @@ public class ExploreFragment extends Fragment implements GoogleMap.OnMarkerClick
     private LatLng currentUserLocation;
     private static final double MAX_DISTANCE_KM = 5.0; // 5 km radius
 
+    /**
+     * Sets up the posts real-time listener
+     */
     private void setupPostsRealTimeListener() {
         DatabaseManager databaseManager = DatabaseManager.getInstance();
         CollectionReference postsRef = databaseManager.getPostsCollectionRef();
@@ -239,6 +286,10 @@ public class ExploreFragment extends Fragment implements GoogleMap.OnMarkerClick
         });
     }
 
+    /**
+     * Filters posts by distance
+     * @param posts List of posts
+     */
     private void filterPostsByDistance(List<MoodPost> posts) {
         if (currentUserLocation == null) return;
 
@@ -255,6 +306,12 @@ public class ExploreFragment extends Fragment implements GoogleMap.OnMarkerClick
         }
     }
 
+    /**
+     * Calculates the distance between two points
+     * @param point1 Latlng point
+     * @param point2 Latlng point
+     * @return Distance between the two points
+     */
     private double calculateDistance(LatLng point1, LatLng point2) {
         float[] results = new float[1];
         Location.distanceBetween(
@@ -266,6 +323,10 @@ public class ExploreFragment extends Fragment implements GoogleMap.OnMarkerClick
         return results[0] / 1000.0;
     }
 
+    /**
+     * Sets up the map
+     * @param map GoogleMap
+     */
     @Override
     public void onMapReady(GoogleMap map) {
         googleMap = map;
@@ -344,6 +405,9 @@ public class ExploreFragment extends Fragment implements GoogleMap.OnMarkerClick
         });
     }
 
+    /**
+     * Renders map markers
+     */
     private void renderMapMarkers() {
         if (clusterManager == null || googleMap == null) return;
 
@@ -371,6 +435,10 @@ public class ExploreFragment extends Fragment implements GoogleMap.OnMarkerClick
         clusterManager.cluster();
     }
 
+    /**
+     * Shows a dialog with a list of mood posts
+     * @param moodPosts List of mood posts
+     */
     private void showMoodPostsListDialog(final List<MoodPost> moodPosts) {
         AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
         builder.setTitle("Nearby Mood Posts");

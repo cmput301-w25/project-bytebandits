@@ -6,6 +6,9 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.UUID;
 
+/**
+ * Represents a notification
+ */
 public class Notification implements Serializable {
     private String notificationID;
     private MoodPost post;
@@ -15,6 +18,14 @@ public class Notification implements Serializable {
 
     public Notification() {}
 
+    /**
+     * Constructor for notifications
+     *
+     * @param message message
+     * @param post post
+     * @param notificationType notificationType
+     * @param profile profile
+     */
     public Notification(String message, MoodPost post, boolean notificationType, Profile profile) {
         this.notificationID = UUID.randomUUID().toString();
         this.post = post;
@@ -22,30 +33,58 @@ public class Notification implements Serializable {
         this.profile = profile;
     }
 
+    /**
+     * Constructor for notifications
+     * @return notificationID String
+     */
     public String getNotificationID() {
         return notificationID;
     }
 
+    /**
+     * Constructor for notifications
+     * @return followRequest boolean
+     */
     public boolean getNotificationType() {
         return followRequest;
     }
 
+    /**
+     * Constructor for notifications
+     * @param notificationType notificationType
+     */
     public void followRequest(boolean notificationType) {
         this.followRequest = notificationType;
     }
 
+    /**
+     * Constructor for notifications
+     * @return post MoodPost
+     */
     public MoodPost getPost() {
         return post;
     }
 
+    /**
+     * Constructor for notifications
+     * @return profile Profile
+     */
     public Profile getProfile() {
         return profile;
     }
 
+    /**
+     * Constructor for notifications
+     * @return dateTime Date
+     */
     public Date getDateTime() {
         return dateTime;
     }
 
+    /**
+     * Constructor for notifications
+     * @param dateTime Date
+     */
     public void setDateTime(Date dateTime) {
         this.dateTime = dateTime;
     }
@@ -70,6 +109,10 @@ public class Notification implements Serializable {
         return timeFormatter.format(getDateTime());
     }
 
+    /**
+     * Sets the mood post
+     * @param post MoodPost
+     */
     public void setMoodPost(MoodPost post) {
         this.post = post;
         this.dateTime = new Date();
@@ -78,6 +121,10 @@ public class Notification implements Serializable {
         this.profile = post.getProfile();
     }
 
+    /**
+     * Sets the request
+     * @param request HashMap<String, Object>
+     */
     public void setRequest(HashMap<String, Object> request) {
         this.followRequest = true;
         this.dateTime = new Date();
