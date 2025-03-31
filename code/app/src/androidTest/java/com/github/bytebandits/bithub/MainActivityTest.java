@@ -44,6 +44,7 @@ import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mockito;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
@@ -97,7 +98,7 @@ public class MainActivityTest {
         mockSessionManager = mock(SessionManager.class);
 
         // Mock the static getInstance() method
-        when(SessionManager.getInstance(any(Context.class))).thenReturn(mockSessionManager);
+        when(mockSessionManager.getInstance(Mockito.<Context>any())).thenReturn(mockSessionManager);
         when(mockSessionManager.getUserId()).thenReturn("testUser2");
         try {
             Thread.sleep(3000);
