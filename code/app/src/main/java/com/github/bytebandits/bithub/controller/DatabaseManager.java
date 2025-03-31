@@ -94,7 +94,7 @@ public final class DatabaseManager {
      *                 }
      *                 });
      */
-    public void getUser(String userId, OnUserFetchListener listener) {
+    public void getUser(@NotNull String userId, OnUserFetchListener listener) {
         usersCollectionRef.document(userId).get().addOnCompleteListener(task -> {
             if (task.isSuccessful() && task.getResult() != null) {
                 HashMap<String, Object> user = (HashMap<String, Object>) task.getResult().getData();
@@ -113,7 +113,7 @@ public final class DatabaseManager {
      * @param listener    An optional listener to handle success or failure
      *                    callbacks.
      */
-    public void addUser(String userId, HashMap<String, Object> userDetails, @Nullable OnUserAddListener listener) {
+    public void addUser(@NotNull String userId, HashMap<String, Object> userDetails, @Nullable OnUserAddListener listener) {
         usersCollectionRef.document(userId).set(userDetails)
                 .addOnSuccessListener(unused -> {
                     defaultSuccessHandler("User added successfully");
@@ -180,7 +180,7 @@ public final class DatabaseManager {
      *                        notification.
      * @param type            Determine whether it is a post notification or follow notification.
      */
-    public void sendNotification(String recipientUserId, DocumentReference docRef, DocumentReferences type) {
+    public void sendNotification(@NotNull String recipientUserId, DocumentReference docRef, DocumentReferences type) {
         DocumentReference recipientDocRef = this.usersCollectionRef.document(recipientUserId);
         recipientDocRef.update(type.getDocRefString(), FieldValue.arrayUnion(docRef));
     }
@@ -193,7 +193,7 @@ public final class DatabaseManager {
      *
      */
     @SuppressWarnings("unchecked")
-    public void getNotifications(String userId, OnNotificationsFetchListener listener) {
+    public void getNotifications(@NotNull String userId, OnNotificationsFetchListener listener) {
         DocumentReference userDocRef = this.usersCollectionRef.document(userId);
         userDocRef.get().addOnSuccessListener(userDocSnapshot -> {
             ArrayList<MoodPost> postNotifications = new ArrayList<>();
@@ -285,7 +285,7 @@ public final class DatabaseManager {
         });
     }
 
-    public void clearAllNotifications(String userId) {
+    public void clearAllNotifications(@NotNull String userId) {
         DocumentReference userDocRef = this.usersCollectionRef.document(userId);
 
         // Clear both post and request notifications
@@ -310,7 +310,7 @@ public final class DatabaseManager {
      * @param requestedUserId The ID of the user that the request is for.
      *
      */
-    public void sendFollowRequest(String currentUserId, String requestedUserId) {
+    public void sendFollowRequest(@NotNull String currentUserId, @NotNull String requestedUserId) {
         DocumentReference currentDocRef = this.usersCollectionRef.document(currentUserId);
         this.sendNotification(requestedUserId, currentDocRef, DocumentReferences.NOTIFICATION_REQS);
     }
@@ -321,7 +321,7 @@ public final class DatabaseManager {
      * @param currentUserId   The ID of the current user.
      * @param requestedUserId The ID of the user requesting to follow.
      */
-    public void acceptUserFollow(String currentUserId, String requestedUserId) {
+    public void acceptUserFollow(@NotNull String currentUserId, @NotNull String requestedUserId) {
         DocumentReference requestedUserDocRef = this.usersCollectionRef.document(requestedUserId);
         DocumentReference currentUserDocRef = this.usersCollectionRef.document(currentUserId);
 
@@ -342,7 +342,7 @@ public final class DatabaseManager {
      * @param currentUserId   The ID of the current user.
      * @param requestedUserId The ID of the user whose request is being rejected.
      */
-    public void rejectUserFollow(String currentUserId, String requestedUserId) {
+    public void rejectUserFollow(@NotNull String currentUserId, @NotNull String requestedUserId) {
         DocumentReference requestedUserDocRef = this.usersCollectionRef.document(requestedUserId);
         DocumentReference currentUserDocRef = this.usersCollectionRef.document(currentUserId);
 
@@ -356,7 +356,7 @@ public final class DatabaseManager {
      * @param currentUserId The ID of the current user.
      * @param targetUserId  The ID of the user that will be unfollowed.
      */
-    public void unfollowUser(String currentUserId, String targetUserId) {
+    public void unfollowUser(@NotNull String currentUserId, @NotNull String targetUserId) {
         DocumentReference currentUserDocRef = this.usersCollectionRef.document(currentUserId);
         DocumentReference targetUserDocRef = this.usersCollectionRef.document(targetUserId);
 
@@ -375,7 +375,7 @@ public final class DatabaseManager {
      * @param listener      A callback to return whether the target user is being followed.
      */
     @SuppressWarnings("unchecked")
-    public void checkFollowing(String currentUserId, String checkUserId, OnCheckFollowingListener listener) {
+    public void checkFollowing(@NotNull String currentUserId, @NotNull String checkUserId, OnCheckFollowingListener listener) {
         DocumentReference currentUserDocRef = this.usersCollectionRef.document(currentUserId);
 
         currentUserDocRef.get()
@@ -405,7 +405,7 @@ public final class DatabaseManager {
      * @param listener A listener to handle the list of fetched followers.
      */
     @SuppressWarnings("unchecked")
-    public void getFollowers(String userId, OnFollowersFetchListener listener) {
+    public void getFollowers(@NotNull String userId, OnFollowersFetchListener listener) {
         DocumentReference currentUserDocRef = this.usersCollectionRef.document(userId);
         ArrayList<Profile> followers = new ArrayList<>();
 
@@ -564,7 +564,7 @@ public final class DatabaseManager {
      *
      */
     @SuppressWarnings("unchecked")
-    public void getAllFollowerPosts(String userId, OnPostsFetchListener listener) {
+    public void getAllFollowerPosts(@NotNull String userId, OnPostsFetchListener listener) {
         DocumentReference userDocRef = this.usersCollectionRef.document(userId);
         userDocRef.get().addOnSuccessListener(userDocSnapshot -> {
             if (!userDocSnapshot.exists() || !userDocSnapshot.contains(DocumentReferences.FOLLOWINGS.getDocRefString())) {
@@ -657,7 +657,7 @@ public final class DatabaseManager {
      *
      */
     @SuppressWarnings("unchecked")
-    public void getUserPublicPosts(String userId, OnPostsFetchListener listener) {
+    public void getUserPublicPosts(@NotNull String userId, OnPostsFetchListener listener) {
         Query userQuery = this.usersCollectionRef.whereEqualTo("userId", userId);
 
         userQuery.get().addOnCompleteListener(task -> {
