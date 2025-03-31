@@ -19,16 +19,37 @@ import com.github.bytebandits.bithub.model.Notification;
 
 import java.util.ArrayList;
 
+/**
+ * Represents the notification array adapter
+ */
 public class NotificationArrayAdapter extends ArrayAdapter<Notification> {
+    /**
+     * Constructor for NotificationArrayAdapter
+     * @param context The context of the activity
+     * @param moodPosts The list of mood posts to display
+     */
     public NotificationArrayAdapter(Context context, ArrayList<Notification> moodPosts) {
         super(context, 0, moodPosts);
     }
 
+    /**
+     * Gets the view for the notification
+     * @param position The position of the item within the adapter's data set of the item whose view
+     *        we want.
+     * @param convertView The old view to reuse, if possible. Note: You should check that this view
+     *        is non-null and of an appropriate type before using. If it is not possible to convert
+     *        this view to display the correct data, this method can create a new view.
+     *        Heterogeneous lists can specify their number of view types, so that this View is
+     *        always of the right type (see {@link #getViewTypeCount()} and
+     *        {@link #getItemViewType(int)}).
+     * @param parent The parent that this view will eventually be attached to
+     * @return A View corresponding to the data at the specified position.
+     */
     @NonNull
     @Override
     public View getView(int position, @Nullable View convertView, @NonNull ViewGroup
             parent) {
-        // Check if there is a view in convertView we can reuse, if not create a new view
+
         View view;
         if (convertView == null) {
             view = LayoutInflater.from(getContext()).inflate(R.layout.notification_content,
@@ -52,8 +73,9 @@ public class NotificationArrayAdapter extends ArrayAdapter<Notification> {
         TextView textA = view.findViewById(R.id.textTime2);
         TextView textD = view.findViewById(R.id.textTime5);
 
-        // Set the text views of the view based on the movie object
+        // Set the text views of the view based on the notification type.
         if (notification.getNotificationType()){
+            // Set the text views of the request notification view.
             buttonA.setVisibility(View.VISIBLE);
             buttonD.setVisibility(View.VISIBLE);
             textD.setVisibility(View.VISIBLE);
@@ -81,6 +103,7 @@ public class NotificationArrayAdapter extends ArrayAdapter<Notification> {
 
         }
         else {
+            // Set the text views of the regular notification view.
             buttonA.setVisibility(View.GONE);
             buttonD.setVisibility(View.GONE);
             textD.setVisibility(View.GONE);

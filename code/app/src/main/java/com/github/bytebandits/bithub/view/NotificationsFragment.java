@@ -8,7 +8,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListView;
 
@@ -22,18 +21,17 @@ import com.github.bytebandits.bithub.controller.SessionManager;
 import com.github.bytebandits.bithub.model.DocumentReferences;
 import com.github.bytebandits.bithub.model.MoodPost;
 import com.github.bytebandits.bithub.model.Notification;
-import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+/**
+ * Represents the notifications fragment
+ */
 public class NotificationsFragment extends Fragment {
     private ArrayList<MoodPost> dataList;
     private ArrayList<Notification> notifications;
@@ -44,6 +42,18 @@ public class NotificationsFragment extends Fragment {
     private SessionManager sessionManager;
     private boolean isNotificationCleared = false;
 
+    /**
+     * Creates a new instance of the fragment
+     * @param inflater The LayoutInflater object that can be used to inflate
+     * any views in the fragment,
+     * @param container If non-null, this is the parent view that the fragment's
+     * UI should be attached to.  The fragment should not add the view itself,
+     * but this can be used to generate the LayoutParams of the view.
+     * @param savedInstanceState If non-null, this fragment is being re-constructed
+     * from a previous saved state as given here.
+     *
+     * @return Return the View for the fragment's UI, or null.
+     */
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -67,6 +77,9 @@ public class NotificationsFragment extends Fragment {
         return view;
     }
 
+    /**
+     * Clears all notifications
+     */
     private void clearAllNotifications() {
         String userId = sessionManager.getUserId();
 
@@ -88,6 +101,9 @@ public class NotificationsFragment extends Fragment {
         Log.d("NotificationsFragment", "All notifications cleared");
     }
 
+    /**
+     * Fetches notifications from the database
+     */
     private void fetchNotifications() {
         // Skip fetching if notifications were just cleared
         if (isNotificationCleared) {
@@ -129,13 +145,16 @@ public class NotificationsFragment extends Fragment {
         });
     }
 
+    /**
+     * Sets up the ListView and adapter
+     */
     private void setupListView() {
         if (getView() == null) return;
 
         moodPostList = getView().findViewById(R.id.notificationList);
 
         if (notifications.isEmpty()) {
-            // Optional: Show empty state
+            // Empty state
             return;
         }
 
@@ -153,6 +172,9 @@ public class NotificationsFragment extends Fragment {
         });
     }
 
+    /**
+     * Sets up a snapshot listener for real-time updates
+     */
     private void setupSnapshotListener() {
         DatabaseManager.getInstance().getUsersCollectionRef()
                 .document(SessionManager.getInstance(requireContext()).getUserId())
@@ -219,8 +241,12 @@ public class NotificationsFragment extends Fragment {
                 });
     }
 
-
-
+    /**
+     * Latest posts
+     * @param posts List of posts
+     * @param requests List of requests
+     * @return List of notifications
+     */
     private List<Notification> latestPosts(List<MoodPost> posts, ArrayList<HashMap<String, Object>> requests) {
 
         List<Notification> notifications = new ArrayList<>();
@@ -232,43 +258,9 @@ public class NotificationsFragment extends Fragment {
         for (MoodPost post : posts) {
             Notification notification = new Notification();
             notification.setMoodPost(post);
-            notification.followRequest(false);
             notifications.add(notification);
         }
         return notifications;
     }
 
-    private List<Notification> latestPosts(List<MoodPost> uniqueUserPosts) {
-        List<Notification> notifications = new ArrayList<>();
-        for (MoodPost post : uniqueUserPosts) {
-            Notification notification = new Notification();
-            notification.setMoodPost(post);
-            notifications.add(notification);
-        }
-        return notifications;
-    }
-
-    private List<MoodPost> getUniqueUserLatestPosts(List<MoodPost> posts) {
-
-        String userId = sessionManager.getUserId();
-        // Use a LinkedHashMap to maintain order and uniqueness
-        Map<String, MoodPost> uniqueUserPosts = new LinkedHashMap<>();
-
-        // Sort posts by date in descending order (most recent first)
-        List<MoodPost> sortedPosts = new ArrayList<>(posts);
-        sortedPosts.sort((p1, p2) -> p2.getPostedDateTime().compareTo(p1.getPostedDateTime()));
-
-        // Iterate through sorted posts and keep only the first (latest) post for each user
-        for (MoodPost post : sortedPosts) {
-            String postUserId = post.getProfile().getUserId();
-
-            // Only add if this user's post is not already in the map
-            if (!uniqueUserPosts.containsKey(postUserId) && !postUserId.equals(userId)) {
-                uniqueUserPosts.put(postUserId, post);
-            }
-        }
-
-        // Return the list of unique user posts
-        return new ArrayList<>(uniqueUserPosts.values());
-    }
 }
