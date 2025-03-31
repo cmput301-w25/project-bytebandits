@@ -18,6 +18,11 @@ import com.google.maps.android.clustering.Cluster;
 import com.google.maps.android.clustering.ClusterManager;
 import com.google.maps.android.clustering.view.DefaultClusterRenderer;
 
+/**
+ * Determines whether moods should be bunched in one area on the map
+ *
+ * @author Soham Limbachia
+ */
 public class myClusterRenderer extends DefaultClusterRenderer<MoodMarker> {
     private final Context context;
     public myClusterRenderer(Context context, GoogleMap map,

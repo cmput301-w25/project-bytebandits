@@ -31,6 +31,8 @@ import java.util.concurrent.Executors;
 
 /**
  * Represents the notifications fragment
+ *
+ * @author Soham Limbachia
  */
 public class NotificationsFragment extends Fragment {
     private ArrayList<MoodPost> dataList;

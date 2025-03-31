@@ -25,6 +25,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Fragment that displays the login page
+ *
+ * @author Hanss Rivera
  */
 public class LoginFragment extends Fragment {
 

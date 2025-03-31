@@ -16,6 +16,11 @@ import com.github.bytebandits.bithub.R;
 
 import java.util.ArrayList;
 
+/**
+ * Represents the mood post array adapter used on the homepage
+ *
+ * @author Tony Yang
+ */
 public class MoodPostArrayAdapter extends ArrayAdapter<MoodPost> {
     public MoodPostArrayAdapter(Context context, ArrayList<MoodPost> moodPosts) {
         super(context, 0, moodPosts);

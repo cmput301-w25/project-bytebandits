@@ -17,6 +17,8 @@ import java.util.ArrayList;
 
 /**
  * Adapter that binds profile data and renders it to some layout and view
+ *
+ * @author Hanss Rivera
  */
 public class ProfileSearchAdapter extends ArrayAdapter<Profile> {
 

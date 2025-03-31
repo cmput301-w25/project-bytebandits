@@ -25,6 +25,11 @@ import java.util.*;
 
 import static org.junit.Assert.*;
 
+/**
+ * DatabaseManager tests
+ *
+ * @author Michael Tran
+ */
 public class DatabaseManagerTest {
     private DatabaseManager dbInstance;
     private Profile testProfile;

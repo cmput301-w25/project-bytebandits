@@ -21,6 +21,8 @@ import java.util.ArrayList;
 
 /**
  * Represents the notification array adapter
+ *
+ * @author Soham Limbachia
  */
 public class NotificationArrayAdapter extends ArrayAdapter<Notification> {
     /**

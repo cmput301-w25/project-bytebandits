@@ -8,6 +8,8 @@ import java.util.UUID;
 
 /**
  * Represents a notification
+ *
+ * @author Soham Limbachia
  */
 public class Notification implements Serializable {
     private String notificationID;

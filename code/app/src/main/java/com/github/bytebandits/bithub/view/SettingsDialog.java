@@ -23,6 +23,8 @@ import com.github.bytebandits.bithub.model.Profile;
  * It is responsible for:
  * - Displaying a custom settings dialog using an AlertDialog.
  * - Providing a logout button to clear user data and redirect to the startup screen.
+ *
+ * @author Zaid Al-Qadiri
  */
 
 public class SettingsDialog {

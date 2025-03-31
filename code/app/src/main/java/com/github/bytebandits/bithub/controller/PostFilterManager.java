@@ -7,6 +7,7 @@ import java.util.List;
 
 /**
  * Manages filtering of mood posts based on specific criteria.
+ * @author Zaid Al-Qadiri
  */
 public class PostFilterManager {
     /**

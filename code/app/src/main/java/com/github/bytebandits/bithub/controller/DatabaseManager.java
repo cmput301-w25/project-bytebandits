@@ -17,6 +17,11 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.inject.Singleton;
 
+
+/**
+ * DatabaseManager class that involves all actions for posts and gets from the Firebase Firestore.
+ * @author Michael Tran, Rasheed Othman
+ */
 public final class DatabaseManager {
     private final FirebaseFirestore firestoreDb;
     private final CollectionReference usersCollectionRef;

@@ -22,6 +22,11 @@ import java.util.ArrayList;
 import java.util.Objects;
 import java.util.Optional;
 
+/**
+ * Represents the comment array adapter
+ *
+ * @author Tony Yang
+ */
 public class CommentArrayAdapter extends ArrayAdapter<Comment> {
     private DeleteCommentListener listener;
 

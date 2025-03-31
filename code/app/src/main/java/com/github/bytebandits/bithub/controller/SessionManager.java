@@ -8,6 +8,12 @@ import com.github.bytebandits.bithub.model.Profile;
 import com.github.bytebandits.bithub.view.StartupActivity;
 import com.google.gson.Gson;
 
+/**
+ * SessionManager class that allows for all components of the application to be able to determine
+ * who the current user signed in is.
+ *
+ * @author Michael Tran
+ */
 public class SessionManager {
     private static final String PREF_NAME = "UserSession";
     private static final String KEY_PROFILE = "profile";

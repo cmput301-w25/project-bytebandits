@@ -29,6 +29,8 @@ import java.util.concurrent.Executors;
 
 /**
  * Fragment that displays the signup page
+ *
+ * @author Hanss Rivera
  */
 public class SignupFragment extends Fragment {
     Button signup;

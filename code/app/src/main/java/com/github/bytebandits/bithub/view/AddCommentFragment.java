@@ -17,6 +17,11 @@ import androidx.fragment.app.Fragment;
 import com.github.bytebandits.bithub.R;
 import com.github.bytebandits.bithub.model.MoodPost;
 
+/**
+ * Fragment to allow the user to insert a comment into a mood post
+ *
+ * @author Tony Yang
+ */
 public class AddCommentFragment extends DialogFragment {
     public static AddCommentFragment newInstance(MoodPost moodPost) {
         // Use Bundle to get info between fragments

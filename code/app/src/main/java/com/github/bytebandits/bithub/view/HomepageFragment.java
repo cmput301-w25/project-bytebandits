@@ -44,6 +44,8 @@ import java.util.concurrent.Executors;
  * Fragment representing the homepage.
  * This fragment displays a list of mood posts and provides filtering
  * functionality.
+ *
+ * @author Zaid Al-Qadiri, Tony Yang, Michael Tran (Database Integration)
  */
 public class HomepageFragment extends Fragment implements FilterDialog.FilterListener {
     private ArrayList<MoodPost> dataList;

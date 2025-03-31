@@ -7,6 +7,7 @@ import com.google.maps.android.clustering.ClusterItem;
 
 /**
  * Represents a mood marker
+ * @author Soham Limbachia
  */
 public class MoodMarker implements ClusterItem{
     private final LatLng position;

@@ -47,7 +47,11 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.Objects;
 
-
+/**
+ * Startup Activity Tests
+ *
+ * @author Hanss Rivera
+ */
 @RunWith(AndroidJUnit4.class)
 @LargeTest
 public class StartupActivityTest {

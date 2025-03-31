@@ -1,5 +1,10 @@
 package com.github.bytebandits.bithub.model;
 
+/**
+ * DocumentReferences enum used to have consistent values for the database functions
+ *
+ * @author Michael Tran
+ */
 public enum DocumentReferences {
     FOLLOWERS("followerRefs"),
     FOLLOWINGS("followingRefs"),

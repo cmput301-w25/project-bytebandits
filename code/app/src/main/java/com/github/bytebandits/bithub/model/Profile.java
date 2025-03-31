@@ -18,6 +18,8 @@ import java.io.Serializable;
  * - Location service preferences.
  * - The user's profile image.
  * Provides methods to access and modify these attributes.
+ *
+ * @author Zaid Al-Qadiri
  */
 
 public class Profile implements Serializable {

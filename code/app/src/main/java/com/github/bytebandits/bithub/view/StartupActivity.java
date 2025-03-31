@@ -18,6 +18,8 @@ import com.github.bytebandits.bithub.controller.SessionManager;
 /**
  * The Startup activity, entry point of the application. Governs anything
  * related to starting up/authenticating your BitHub account.
+ *
+ * @author Hanss Rivera
  */
 public class StartupActivity extends AppCompatActivity {
     @Override

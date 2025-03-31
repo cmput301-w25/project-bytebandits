@@ -16,6 +16,8 @@ import com.github.bytebandits.bithub.R;
 /**
  * Fragment that displays the entry point of the application, can login or
  * register.
+ *
+ * @author Hanss Rivera
  */
 public class StartupFragment extends Fragment {
     @Nullable

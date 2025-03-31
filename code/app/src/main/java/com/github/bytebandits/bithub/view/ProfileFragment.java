@@ -39,6 +39,8 @@ import java.util.concurrent.Executors;
  * It is responsible for:
  * - Displaying the profile layout.
  * - Providing access to the settings dialog via a settings button.
+ *
+ * @author Zaid Al-Qadiri
  */
 
 public class ProfileFragment extends Fragment implements FilterDialog.FilterListener {

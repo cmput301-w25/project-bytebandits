@@ -22,6 +22,11 @@ import com.github.bytebandits.bithub.model.Profile;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+/**
+ * The CommentsFragment to add the dialog to insert a comment
+ *
+ * @author Tony Yang
+ */
 public class CommentsFragment extends DialogFragment implements
         AddCommentFragment.AddCommentDialogListener,
         CommentArrayAdapter.DeleteCommentListener {

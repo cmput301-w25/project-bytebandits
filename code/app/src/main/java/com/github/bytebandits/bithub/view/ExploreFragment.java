@@ -44,6 +44,8 @@ import java.util.concurrent.Executors;
 
 /**
  * Represents the explore fragment
+ *
+ * @author Soham Limbachia
  */
 public class ExploreFragment extends Fragment implements GoogleMap.OnMarkerClickListener, OnMapReadyCallback {
     private GoogleMap googleMap;

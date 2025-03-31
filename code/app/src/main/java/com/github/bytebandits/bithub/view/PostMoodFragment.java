@@ -54,6 +54,11 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
+/**
+ * The dialog window to allow the user to post their mood
+ *
+ * @author Tony Yang
+ */
 public class PostMoodFragment extends Fragment {
     private FusedLocationProviderClient fusedLocationClient;
     private static final int REQUEST_LOCATION_PERMISSION = 1001;

@@ -14,6 +14,8 @@ import com.github.bytebandits.bithub.R;
 
 /**
  * A dialog for filtering mood posts based on selected emotions or a search query.
+ *
+ * @author Zaid Al-Qadiri
  */
 public class FilterDialog {
     private Context context;

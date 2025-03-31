@@ -24,6 +24,11 @@ import com.github.bytebandits.bithub.model.Profile;
 
 import java.util.Objects;
 
+/**
+ * Detailed view of a specific mood post, giving more details other than the list view
+ *
+ * @author Tony Yang
+ */
 public class DetailedMoodPostFragment extends DialogFragment {
     public static DetailedMoodPostFragment newInstance(MoodPost moodPost) {
         // Use Bundle to get info between fragments
