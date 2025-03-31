@@ -624,13 +624,11 @@ public class MainActivityTest {
             for (int i = 0; i < posts.size(); i++) {
                 dbInstance.deletePost(posts.get(i).getPostID(), "testUser1", Optional.empty());
             }
-            return null;
         });
         dbInstance.getUserPosts("testUser2", posts -> {
             for (int i = 0; i < posts.size(); i++) {
                 dbInstance.deletePost(posts.get(i).getPostID(), "testUser2", Optional.empty());
             }
-            return null;
         });
     }
 
