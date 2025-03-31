@@ -17,6 +17,7 @@ import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 import com.github.bytebandits.bithub.controller.DatabaseManager;
 import com.github.bytebandits.bithub.R;
+import com.github.bytebandits.bithub.controller.PostFilterManager;
 import com.github.bytebandits.bithub.controller.SessionManager;
 import com.github.bytebandits.bithub.model.MoodMarker;
 import com.github.bytebandits.bithub.model.MoodPost;
@@ -35,6 +36,8 @@ import com.google.maps.android.clustering.ClusterManager;
 
 import android.Manifest;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ListView;
 
 import java.util.ArrayList;
@@ -45,7 +48,7 @@ import java.util.concurrent.Executors;
 /**
  * Represents the explore fragment
  */
-public class ExploreFragment extends Fragment implements GoogleMap.OnMarkerClickListener, OnMapReadyCallback {
+public class ExploreFragment extends Fragment implements GoogleMap.OnMarkerClickListener, OnMapReadyCallback, FilterDialog.FilterListener{
     private GoogleMap googleMap;
     private FusedLocationProviderClient fusedLocationClient;
     private ArrayList<MoodPost> dataList;
@@ -54,9 +57,84 @@ public class ExploreFragment extends Fragment implements GoogleMap.OnMarkerClick
     private static final int REQUEST_LOCATION_PERMISSION = 1001;
 
     private ListenerRegistration postsListener;
+    private ArrayList<MoodPost> filteredDataList; // Separate list for filtering
 
     private ClusterManager<MoodMarker> clusterManager;
+    /**
+     * Updates the filteredDataList based on the search query.
+     *
+     * @param query The search query to filter mood posts by description.
+     */
+    public void onSearchQueryChanged(String query) {
+        filteredDataList.clear();
 
+        if (query.isEmpty()) {
+            filteredDataList.addAll(dataList);
+        } else {
+            for (MoodPost post : dataList) {
+                if (post.getDescription() != null
+                        && post.getDescription().toLowerCase().contains(query.toLowerCase())) {
+                    filteredDataList.add(post);
+                }
+            }
+        }
+    }
+
+    /**
+     * Filters the mood posts based on the selected mood.
+     * @param mood The selected mood as a string.
+     */
+    public void onFilterSelected(String mood) {
+        filteredDataList.clear(); // Clear current filtered list
+
+        if (mood.equals("last_week")) {
+            filteredDataList.addAll(filterPostsFromLastWeek(dataList));
+        } else {
+            List<MoodPost> filteredPosts = PostFilterManager.filterPostsByMood(dataList, mood);
+            filteredDataList.addAll(filteredPosts);
+        }
+
+        // Ensure markers are updated after filtering
+        if (googleMap != null && clusterManager != null) {
+            // Reapply distance filtering if needed
+            if (currentUserLocation != null) {
+                filterPostsByDistance(filteredDataList);
+            }
+
+            // Render markers with the new filtered list
+            renderMapMarkers();
+
+            // Refresh cluster manager
+            clusterManager.cluster();
+        }
+    }
+
+    /**
+     * Opens the filter dialog, allowing the user to filter mood posts.
+     */
+    private void openFilterDialog() {
+        FilterDialog filterDialog = new FilterDialog(requireContext(), this);
+        filterDialog.showFilterDialog();
+    }
+    /**
+     * Filters mood posts from the last seven days.
+     *
+     * @param posts The list of mood posts to filter.
+     * @return A list of mood posts from the last week.
+     */
+    private List<MoodPost> filterPostsFromLastWeek(List<MoodPost> posts) {
+        List<MoodPost> filteredPosts = new ArrayList<>();
+        long currentTime = System.currentTimeMillis();
+        long oneWeekInMillis = 7 * 24 * 60 * 60 * 1000; // 7 days in milliseconds
+
+        for (MoodPost post : posts) {
+            long postTime = post.getPostedDateTime().getTime();
+            if ((currentTime - postTime) <= oneWeekInMillis) {
+                filteredPosts.add(post);
+            }
+        }
+        return filteredPosts;
+    }
     /**
      *
      * @param inflater The LayoutInflater object that can be used to inflate
@@ -72,10 +150,13 @@ public class ExploreFragment extends Fragment implements GoogleMap.OnMarkerClick
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_explore, container, false);
+        ImageButton filterButton = view.findViewById(R.id.filter_button_homepage);
+        filterButton.setOnClickListener(v -> openFilterDialog());
 
         // Initialize dataList to avoid NullPointerException
         if (dataList == null) {
             dataList = new ArrayList<>();
+            filteredDataList = new ArrayList<>();
             Log.d("ExploreFragment", "dataList initialized as empty list");
         } else {
             Log.d("ExploreFragment", "dataList already initialized with size: " + dataList.size());
@@ -92,6 +173,10 @@ public class ExploreFragment extends Fragment implements GoogleMap.OnMarkerClick
                 mainHandler.post(() -> {
                     dataList.clear();
                     dataList.addAll(posts);
+
+                    // Reset filteredDataList to show all posts initially
+                    filteredDataList.clear();
+                    filteredDataList.addAll(dataList);
 
                 });
             });
@@ -227,22 +312,6 @@ public class ExploreFragment extends Fragment implements GoogleMap.OnMarkerClick
         } else {
             super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         }
-    }
-
-    /**
-     * Gets the display strings for the mood posts
-     * @param moodPosts List of mood posts
-     * @return List of display strings
-     */
-    private List getDisplayStrings(List moodPosts) {
-        List displayStrings = new ArrayList<MoodPost>();
-        for (Object post : moodPosts) {
-// For example, display the userID and perhaps a snippet of content.
-            if (post instanceof MoodPost) {
-                displayStrings.add("@" + ((MoodPost) post).getProfile().getUserId());
-            }
-        }
-        return displayStrings;
     }
 
     private LatLng currentUserLocation;
@@ -396,7 +465,7 @@ public class ExploreFragment extends Fragment implements GoogleMap.OnMarkerClick
                 });
 
                 // Render markers within 5km
-                filterPostsByDistance(dataList);
+                filterPostsByDistance(filteredDataList);
                 renderMapMarkers();
 
                 // Move camera to current location
@@ -414,8 +483,8 @@ public class ExploreFragment extends Fragment implements GoogleMap.OnMarkerClick
         // Clear existing items
         clusterManager.clearItems();
 
-        // Add only posts within 5km
-        for (MoodPost moodPost : dataList) {
+        // Add only posts within 5km and matching current filter
+        for (MoodPost moodPost : filteredDataList) {
             if (Boolean.TRUE.equals(moodPost.getLocation())) {
                 LatLng moodPostLatLng = new LatLng(moodPost.getLatitude(), moodPost.getLongitude());
 
@@ -426,7 +495,6 @@ public class ExploreFragment extends Fragment implements GoogleMap.OnMarkerClick
                         "@" + moodPost.getProfile().getUserId(),
                         moodPost
                 );
-
                 clusterManager.addItem(moodMarker);
             }
         }
