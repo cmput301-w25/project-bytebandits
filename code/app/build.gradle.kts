@@ -38,6 +38,13 @@ android {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
     }
+    packagingOptions {
+        // Exclude these files to avoid duplicate LICENSE.md errors
+        exclude("META-INF/LICENSE.md")
+        exclude("META-INF/LICENSE-notice.md")
+        exclude("META-INF/AL2.0")
+        exclude("META-INF/LGPL2.1")
+    }
 }
 
 dependencies {
@@ -54,10 +61,13 @@ dependencies {
     implementation("com.google.maps.android:android-maps-utils:3.11.2")
     testImplementation(libs.junit)
     testImplementation(libs.robolectric)
-    testImplementation("org.mockito:mockito-core:5.7.0")
+    testImplementation(libs.mockito.core)
+    androidTestImplementation(libs.mockito.android)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
     androidTestImplementation(libs.rules)
+    androidTestImplementation("org.junit.jupiter:junit-jupiter-api:5.10.0")
+    androidTestRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.10.0")
 }
 
 secrets {

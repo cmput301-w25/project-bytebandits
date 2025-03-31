@@ -12,6 +12,8 @@ constraintlayout = "2.1.4"
 firebaseFirestore = "25.1.2"
 playServicesLocation = "21.1.0"
 playServicesMaps = "19.1.0"
+mockitoAndroid = "5.10.0"
+mockitoCore = "5.7.0"
 robolectric = "4.10"
 secretsGradlePlugin = "2.0.1"
 playServicesLocationVersion = "21.3.0"
@@ -30,6 +32,8 @@ constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayo
 firebase-firestore = { group = "com.google.firebase", name = "firebase-firestore", version.ref = "firebaseFirestore" }
 play-services-location = { module = "com.google.android.gms:play-services-location", version.ref = "playServicesLocation" }
 play-services-maps = { module = "com.google.android.gms:play-services-maps", version.ref = "playServicesMaps" }
+mockito-android = { module = "org.mockito:mockito-android", version.ref = "mockitoAndroid" }
+mockito-core = { module = "org.mockito:mockito-core", version.ref = "mockitoCore" }
 robolectric = { module = "org.robolectric:robolectric", version.ref = "robolectric" }
 secrets-gradle-plugin = { module = "com.google.android.libraries.mapsplatform.secrets-gradle-plugin:secrets-gradle-plugin", version.ref = "secretsGradlePlugin" }
 gms-play-services-location = { group = "com.google.android.gms", name = "play-services-location", version.ref = "playServicesLocationVersion" }

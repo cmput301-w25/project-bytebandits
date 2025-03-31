@@ -28,6 +28,10 @@ public class SessionManager {
         this.gson = new Gson();
     }
 
+    public static void setTestInstance(SessionManager testInstance) {
+        instance = testInstance;
+    }
+
     // Public method to get the singleton instance
     public static synchronized SessionManager getInstance(Context context) {
         if (instance == null) {

@@ -1,5 +1,6 @@
 package com.github.bytebandits.bithub;
 
+import static org.mockito.Mockito.*;
 import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.action.ViewActions.clearText;
 import static androidx.test.espresso.action.ViewActions.click;
@@ -41,6 +42,9 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.jupiter.api.MethodOrderer;
+import org.junit.jupiter.api.Order;
+import org.junit.jupiter.api.TestMethodOrder;
 import org.junit.runner.RunWith;
 
 import java.io.IOException;
@@ -59,56 +63,70 @@ public class MainActivityTest {
     private Context testContext;
     private Profile testProfile;
     private Profile testProfile2;
+    private static SessionManager mockSessionManager;
 
     @BeforeClass
     public static void setup() {
         DatabaseManager dbInstance = DatabaseManager.getInstance(true);
         CollectionReference usersCollectionRef = dbInstance.getUsersCollectionRef();
 
+        DocumentReference userDocRef1 = usersCollectionRef.document("testUser1");
+        DocumentReference userDocRef2 = usersCollectionRef.document("testUser2");
+
         // Add Users
         HashMap<String, Object> user1 = new HashMap<>();
         user1.put("userId", "testUser1");
         user1.put("profile", "{\"userID\":\"testUser1\",\"locationServices\":true,\"image\":null}");
         user1.put("password", "1");
-        user1.put("email", "testemail1@gmail.com");
 
         HashMap<String, Object> user2 = new HashMap<>();
         user2.put("userId", "testUser2");
         user2.put("profile", "{\"userID\":\"testUser2\",\"locationServices\":false,\"image\":null}");
         user2.put("password", "2");
-        user2.put("email", "testemail2@gmail.com");
 
-        DocumentReference user1DocRef = usersCollectionRef
-                .document((String) Objects.requireNonNull(user1.get("userId")));
-        DocumentReference user2DocRef = usersCollectionRef
-                .document((String) Objects.requireNonNull(user2.get("userId")));
+        userDocRef1.set(user1);
+        userDocRef2.set(user2);
 
-        user1DocRef.set(user1);
-        user2DocRef.set(user2);
-
+        dbInstance.acceptUserFollow("testUser2", "testUser1");
         // Idk why but for some reason adding a mood post in the set up makes things not
         // break ¯\_(ツ)_/¯
-        Profile randProfile = new Profile("ツ");
+        Profile randProfile = new Profile("test");
         dbInstance.addPost(new MoodPost(Emotion.SURPRISE, randProfile,
-                false, null, null, null, false),
-                randProfile.getUserId(), Optional.empty());
+                        false, null, null, null, false),
+                randProfile.getUserId(), null);
+
+        SessionManager.getInstance(ApplicationProvider.getApplicationContext()).createLoginSession("testUser2");
+        mockSessionManager = mock(SessionManager.class);
+
+        // Force SessionManager to return the mock instance
+        SessionManager.setTestInstance(mockSessionManager);
+        mockSessionManager.saveProfile(new Profile("testUser2"));
+        // Define behavior for mockSessionManager
+        when(mockSessionManager.getUserId()).thenReturn("testUser2");
+        when(mockSessionManager.getProfile()).thenReturn(new Profile("testUser2"));
+        when(mockSessionManager.isLoggedIn()).thenReturn(true);
+        try {
+            Thread.sleep(5000);
+        } catch (InterruptedException e) {
+            // Caught exception
+        }
     }
 
     @Before
-    public void seedDatabase() throws InterruptedException {
+    public void seedDatabase() {
         this.dbInstance = DatabaseManager.getInstance(true);
         testContext = ApplicationProvider.getApplicationContext();
         SessionManager sessionManager = SessionManager.getInstance(testContext);
         testProfile = new Profile("testUser1");
-        testProfile.enableLocationServices();
         testProfile2 = new Profile("testUser2");
-        sessionManager.saveProfile(testProfile);
+        testProfile2.enableLocationServices();
+
 
         // Add Posts
         MoodPost[] moodPosts = {
                 new MoodPost(Emotion.HAPPINESS, testProfile, true, SocialSituation.ALONE, "This is a description", null,
                         true),
-                new MoodPost(Emotion.SADNESS, testProfile2, false, SocialSituation.ALONE, "Test Desc",
+                new MoodPost(Emotion.SADNESS, testProfile, false, SocialSituation.ALONE, "Test Desc",
                         null, true),
                 new MoodPost(Emotion.ANGER, testProfile, false, null, null, null, false),
         };
@@ -117,18 +135,13 @@ public class MainActivityTest {
         moodPosts[0].addComment(new Comment(testProfile2, "test comment"));
 
         for (MoodPost post : moodPosts) {
-            if (Objects.equals(post.getProfile().getUserId(), testProfile.getUserId())) {
-                dbInstance.addPost(post, testProfile.getUserId(), Optional.empty());
-            }
-            else {
-                dbInstance.addPost(post, testProfile2.getUserId(), Optional.empty());
-            }
+            dbInstance.addPost(post, testProfile.getUserId(), null);
         }
 
         // Delay so that movies added in seedDatabase() have a chance to update on
         // firebase's side before we test for them
         try {
-            Thread.sleep(3000);
+            Thread.sleep(5000);
         } catch (InterruptedException e) {
             // Caught exception
         }
@@ -147,34 +160,34 @@ public class MainActivityTest {
      * public void moodHistory() {
      * // Click on the profile icon in the navigation bar
      * onView(withId(R.id.profile)).perform(click());
-     * 
+     *
      * // Check if mood post list history is displayed
      * onView(withId(R.id.mood_post_list_history)).check(matches(isDisplayed()));
      * }
-     * 
+     *
      * @Test
      * public void logout() {
      * // Click on the profile icon in the navigation bar
      * onView(withId(R.id.profile)).perform(click());
      * onView(withId(R.id.settings_button)).perform(click());
      * onView(withId(R.id.logout_button)).perform(click());
-     * 
+     *
      * // Check if startup activity is displayed
      * onView(withId(R.layout.activity_startup)).check(matches(isDisplayed()));
      * }
-     * 
+     *
      * @Test
      * public void navbar() {
      * // Click on the Home icon in the navigation bar
      * onView(withId(R.id.home)).perform(click());
      * // Check if a unique view within the home fragment is displayed
      * onView(withId(R.id.moodIcon)).check(matches(isDisplayed()));
-     * 
+     *
      * // Click on the Profile icon in the navigation bar
      * onView(withId(R.id.profile)).perform(click());
      * // Check if a unique view within the profile fragment is displayed
      * onView(withId(R.id.mood_post_list_history)).check(matches(isDisplayed()));
-     * 
+     *
      * // Click on the Create icon in the navigation bar
      * onView(withId(R.id.create)).perform(click());
      * // Check if a unique view within the post mood fragment is displayed
@@ -194,21 +207,21 @@ public class MainActivityTest {
         onView(withId(R.id.detailedViewName)).check(matches(withText("testUser1")));
         onView(withId(R.id.detailedViewSocialSituation)).check(matches(withText("ALONE")));
         onView(withId(R.id.detailedViewDescription)).check(matches(withText("This is a description")));
-        onView(withText("Back")).perform(click());
+        onView(withId(R.id.backButton)).perform(click());
         // Click on Sadness and check if movie details are displayed properly
         onView(withText("Sadness")).perform(click());
         onView(withId(R.id.detailedViewEmotion)).check(matches(withText("Sadness")));
         onView(withId(R.id.detailedViewName)).check(matches(withText("testUser2")));
         onView(withId(R.id.detailedViewSocialSituation)).check(matches(withText("ALONE")));
         onView(withId(R.id.detailedViewDescription)).check(matches(withText("Test Desc")));
-        onView(withText("Back")).perform(click());
+        onView(withId(R.id.backButton)).perform(click());
         // Click on Anger and check if movie details are displayed properly
         onView(withText("Anger")).perform(click());
         onView(withId(R.id.detailedViewEmotion)).check(matches(withText("Anger")));
         onView(withId(R.id.detailedViewName)).check(matches(withText("testUser1")));
         onView(withId(R.id.detailedViewSocialSituation)).check(matches(withText("")));
         onView(withId(R.id.detailedViewDescription)).check(matches(withText("")));
-        onView(withText("Back")).perform(click());
+        onView(withId(R.id.backButton)).perform(click());
     }
 
     @Test
@@ -299,7 +312,7 @@ public class MainActivityTest {
 
         // Check that we can't edit a mood post that isn't ours
         try {
-            onView(withText("Edit")).check(matches(isDisplayed()));
+            onView(withId(R.id.editButton)).check(matches(isDisplayed()));
             // View is in hierarchy
             throw new AssertionError("Can edit a mood post that isn't ours");
         } catch (AssertionFailedError e) {
@@ -311,7 +324,7 @@ public class MainActivityTest {
     public void editMoodPostRemoveDetails() {
         // Click on buttons to open edit mood post
         onView(withText("Happiness")).perform(click());
-        onView(withText("Edit")).perform(click());
+        onView(withId(R.id.editButton)).perform(click());
 
         // Check all details are properly shown
         onView(withId(R.id.postMoodEmotion)).check(matches(withSpinnerText("HAPPINESS")));
@@ -355,7 +368,7 @@ public class MainActivityTest {
     public void editMoodPostAddDetails() {
         // Click on buttons to open edit mood post
         onView(withText("Anger")).perform(click());
-        onView(withText("Edit")).perform(click());
+        onView(withId(R.id.editButton)).perform(click());
 
         // Check all details are properly shown
         onView(withId(R.id.postMoodEmotion)).check(matches(withSpinnerText("ANGER")));
@@ -396,7 +409,7 @@ public class MainActivityTest {
     public void editMoodPostCancel() {
         // Click on buttons to open edit mood post
         onView(withText("Anger")).perform(click());
-        onView(withText("Edit")).perform(click());
+        onView(withId(R.id.editButton)).perform(click());
 
         // Check all details are properly shown
         onView(withId(R.id.postMoodEmotion)).check(matches(withSpinnerText("ANGER")));
@@ -442,7 +455,7 @@ public class MainActivityTest {
     public void deleteMoodPost() {
         // Click on buttons to open and delete mood post
         onView(withText("Happiness")).perform(click());
-        onView(withText("Delete")).perform(click());
+        onView(withId(R.id.deleteButton)).perform(click());
 
         // Check that our mood post list DOESN'T have deleted mood post
         try {
@@ -461,7 +474,7 @@ public class MainActivityTest {
 
         // Check that we can't edit a mood post that isn't ours
         try {
-            onView(withText("Delete")).check(matches(isDisplayed()));
+            onView(withId(R.id.deleteButton)).check(matches(isDisplayed()));
             // View is in hierarchy
             throw new AssertionError("Can delete a mood post that isn't ours");
         } catch (AssertionFailedError e) {
@@ -473,7 +486,7 @@ public class MainActivityTest {
     public void viewOtherUsersComment() {
         // Click on buttons to open the comments
         onView(withText("Happiness")).perform(click());
-        onView(withText("Comments")).perform(click());
+        onView(withId(R.id.commentsButton)).perform(click());
 
         // Make sure comment is there with right info
         onView(withText("testUser2")).check(matches(isDisplayed()));
@@ -494,7 +507,7 @@ public class MainActivityTest {
     public void addComment() {
         // Click on buttons to open the comments
         onView(withText("Sadness")).perform(click());
-        onView(withText("Comments")).perform(click());
+        onView(withId(R.id.commentsButton)).perform(click());
 
         // Add a comment
         onView(withText("Add")).perform(click());
