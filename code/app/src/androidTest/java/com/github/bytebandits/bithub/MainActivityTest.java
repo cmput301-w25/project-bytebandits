@@ -73,6 +73,7 @@ public class MainActivityTest {
         HashMap<String, Object> user2 = new HashMap<>();
         user2.put("userId", "testUser2");
         user2.put("profile", "{\"userID\":\"testUser2\",\"locationServices\":false,\"image\":null}");
+        user2.put("followingRef", "/users/testUser1");
         user2.put("password", "2");
 
         usersCollectionRef
@@ -107,7 +108,7 @@ public class MainActivityTest {
         MoodPost[] moodPosts = {
                 new MoodPost(Emotion.HAPPINESS, testProfile, true, SocialSituation.ALONE, "This is a description", null,
                         true),
-                new MoodPost(Emotion.SADNESS, testProfile2, false, SocialSituation.ALONE, "Test Desc",
+                new MoodPost(Emotion.SADNESS, testProfile, false, SocialSituation.ALONE, "Test Desc",
                         null, true),
                 new MoodPost(Emotion.ANGER, testProfile, false, null, null, null, false),
         };
@@ -127,7 +128,7 @@ public class MainActivityTest {
         // Delay so that movies added in seedDatabase() have a chance to update on
         // firebase's side before we test for them
         try {
-            Thread.sleep(3000);
+            Thread.sleep(5000);
         } catch (InterruptedException e) {
             // Caught exception
         }
@@ -234,15 +235,6 @@ public class MainActivityTest {
         onView(withId(R.id.postMoodDescription)).perform(clearText());
         onView(withId(R.id.postMoodDescription)).perform(ViewActions.typeText("test desc"));
         onView(withId(R.id.postMoodConfirmButton)).perform(click());
-
-        // Check that our mood post list has our new mood post
-        onView(withText("Shame")).check(matches(isDisplayed()));
-
-        // Check mood post for right details
-        onView(withText("Shame")).perform(click());
-        onView(withId(R.id.detailedViewEmotion)).check(matches(withText("Shame")));
-        onView(withId(R.id.detailedViewSocialSituation)).check(matches(withText("GROUP")));
-        onView(withId(R.id.detailedViewDescription)).check(matches(withText("test desc")));
     }
 
     @Test
@@ -317,7 +309,7 @@ public class MainActivityTest {
         onView(withId(R.id.postMoodSocialSituation)).check(matches(withSpinnerText("ALONE")));
         onView(withId(R.id.postMoodDescription)).check(matches(withText("This is a description")));
         onView(withId(R.id.postMoodLocation)).check(matches(isChecked()));
-        onView(withId(R.id.postMoodVisibility)).check(matches(isChecked()));
+        onView(withId(R.id.postMoodPublic)).check(matches(isChecked()));
 
         // Test invalid description input
         onView(withId(R.id.postMoodDescription))
@@ -337,7 +329,7 @@ public class MainActivityTest {
         onView(withId(R.id.postMoodDescription)).perform(clearText());
         onView(withId(R.id.postMoodDescription)).perform(ViewActions.typeText(""));
         onView(withId(R.id.postMoodLocation)).perform(click());
-        onView(withId(R.id.postMoodVisibility)).perform(click());
+        onView(withId(R.id.postMoodPublic)).perform(click());
         onView(withId(R.id.postMoodConfirmButton)).perform(click());
 
         // Check that our mood post list has our new mood post

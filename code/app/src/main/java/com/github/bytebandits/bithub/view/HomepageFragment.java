@@ -23,10 +23,12 @@ import com.github.bytebandits.bithub.MainActivity;
 import com.github.bytebandits.bithub.controller.DatabaseManager;
 import com.github.bytebandits.bithub.controller.PostFilterManager;
 import com.github.bytebandits.bithub.controller.SessionManager;
+import com.github.bytebandits.bithub.model.DocumentReferences;
 import com.github.bytebandits.bithub.model.MoodPost;
 import com.github.bytebandits.bithub.R;
 import com.github.bytebandits.bithub.model.Profile;
 import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import org.json.JSONException;
@@ -124,28 +126,54 @@ public class HomepageFragment extends Fragment implements FilterDialog.FilterLis
 
         // Firestore listener to update lists when database changes
         CollectionReference moodPostRef = DatabaseManager.getInstance().getPostsCollectionRef();
-        moodPostRef.addSnapshotListener((value, error) -> {
-            if (error != null) {
-                Log.e("Firestore", error.toString());
+        DocumentReference userDocRef = DatabaseManager.getInstance().getUsersCollectionRef().document(SessionManager.getInstance(requireContext()).getUserId());
+        userDocRef.get().addOnSuccessListener(userDocSnapshot -> {
+            if (!userDocSnapshot.exists() || !userDocSnapshot.contains(DocumentReferences.FOLLOWINGS.getDocRefString())) {
+                return;
             }
-            if (value != null) {
-                Log.d("Firestore", "SnapshotListener triggered, updating dataList");
-                dataList.clear();
-                if (!value.isEmpty()) {
-                    for (QueryDocumentSnapshot snapshot : value) {
-                        dataList.add(snapshot.toObject(MoodPost.class));
-                    }
-                }
-                // Reset filteredDataList to reflect new data
-                filteredDataList.clear();
-                filteredDataList.addAll(dataList);
 
-                if (moodPostAdapter != null) {
-                    moodPostAdapter.notifyDataSetChanged();
+            List<DocumentReference> followingDocRefs = (List<DocumentReference>) userDocSnapshot.get(DocumentReferences.FOLLOWINGS.getDocRefString());
+            List<String> followingUserIds = new ArrayList<>();
+
+            if (followingDocRefs != null) {
+                for (DocumentReference ref : followingDocRefs) {
+                    followingUserIds.add(ref.getId());
                 }
             }
+
+            if (followingUserIds.isEmpty()) {
+                return;
+            }
+
+            // Attach a Firestore snapshot listener for real-time updates
+            DatabaseManager.getInstance().getPostsCollectionRef()
+                    .whereIn("profile.userId", followingUserIds)
+                    .whereEqualTo("private", false)
+                    .addSnapshotListener((querySnapshot, error) -> {
+                        if (error != null) {
+                            Log.e("DatabaseManager", "Error listening for post updates: " + error.getMessage(), error);
+                            return;
+                        }
+
+                        if (querySnapshot == null || querySnapshot.isEmpty()) {
+                            Log.d("DatabaseManager", "No public posts from followed users.");
+                            return;
+                        }
+
+                        dataList.clear();
+                        for (QueryDocumentSnapshot doc : querySnapshot) {
+                            MoodPost post = doc.toObject(MoodPost.class);
+                            dataList.add(post);
+                        }
+
+                        dataList.sort((p1, p2) -> p2.getPostedDateTime().compareTo(p1.getPostedDateTime()));
+                        filteredDataList.clear();
+                        filteredDataList.addAll(dataList);
+                        if (moodPostAdapter != null) {
+                            moodPostAdapter.notifyDataSetChanged();
+                        }
+                    });
         });
-
         profileSearchManager(view);
 
         return view;

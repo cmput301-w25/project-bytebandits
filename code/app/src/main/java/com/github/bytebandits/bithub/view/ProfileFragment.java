@@ -19,12 +19,14 @@ import androidx.fragment.app.Fragment;
 
 import com.github.bytebandits.bithub.controller.DatabaseManager;
 import com.github.bytebandits.bithub.controller.PostFilterManager;
+import com.github.bytebandits.bithub.model.DocumentReferences;
 import com.github.bytebandits.bithub.model.Profile;
 import com.github.bytebandits.bithub.model.MoodPost;
 import com.github.bytebandits.bithub.R;
 import com.github.bytebandits.bithub.controller.SessionManager;
 import com.github.bytebandits.bithub.model.Profile;
 import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.util.ArrayList;
@@ -197,26 +199,44 @@ public class ProfileFragment extends Fragment implements FilterDialog.FilterList
             });
         });
 
-        // Listener to update dataList and filteredDataList whenever the database
-        // changes
+        // Listener to update dataList and filteredDataList whenever the database changes
         CollectionReference moodPostRef = DatabaseManager.getInstance().getPostsCollectionRef();
-        moodPostRef.addSnapshotListener((value, error) -> {
+        DocumentReference userDocRef = DatabaseManager.getInstance().getUsersCollectionRef().document(SessionManager.getInstance(requireContext()).getUserId());
+        userDocRef.addSnapshotListener((value, error) -> {
             if (error != null) {
-                Log.e("Firestore", error.toString());
+                Log.e("Firestore", "Snapshot listener error: " + error.toString());
+                return;
             }
+
             if (value != null) {
+                ArrayList<DocumentReference> postRefs = (ArrayList<DocumentReference>) value.get(DocumentReferences.POSTS.getDocRefString());
+                if (postRefs == null) {
+                    Log.d("Firestore", "No posts found");
+                    return;
+                }
+
                 dataList.clear();
                 filteredDataList.clear();
-                if (!value.isEmpty()) {
-                    for (QueryDocumentSnapshot snapshot : value) {
-                        MoodPost post = snapshot.toObject(MoodPost.class);
-                        dataList.add(post);
-                    }
-                    filteredDataList.addAll(dataList); // Copy the entire list to filteredDataList
+                for (DocumentReference postRef : postRefs) {
+                    postRef.get()
+                            .addOnSuccessListener(doc -> {
+                                if (doc.exists()) {
+                                    dataList.add(doc.toObject(MoodPost.class));
+                                }
+
+                                if (dataList.size() ==  postRefs.size()) {
+                                    dataList.sort((p1, p2) -> p2.getPostedDateTime().compareTo(p1.getPostedDateTime()));
+                                    filteredDataList.addAll(dataList);
+
+                                    if (moodPostAdapter != null) {
+                                        moodPostAdapter.notifyDataSetChanged();
+                                    }
+                                }
+                            })
+                            .addOnFailureListener(e ->
+                                    Log.e("Firestore", "Failed to fetch post: " + e.getMessage()));
                 }
-                if (moodPostAdapter != null) {
-                    moodPostAdapter.notifyDataSetChanged();
-                }
+
             }
         });
         return view;

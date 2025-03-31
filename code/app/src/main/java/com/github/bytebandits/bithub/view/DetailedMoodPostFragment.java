@@ -104,7 +104,7 @@ public class DetailedMoodPostFragment extends DialogFragment {
                         .setPositiveButton("Yes", (confirmDialog, which) -> {
                             DatabaseManager.getInstance().deletePost(moodPost.getPostID(),
                                     moodPost.getProfile().getUserId(),
-                                    Optional.empty());
+                                    null);
                             dialog.dismiss();
                             confirmDialog.cancel();
                         })
