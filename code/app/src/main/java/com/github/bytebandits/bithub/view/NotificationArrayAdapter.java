@@ -87,7 +87,6 @@ public class NotificationArrayAdapter extends ArrayAdapter<Notification> {
         dateView.setText(notification.getFormattedPostedDate());
         timeView.setText(notification.getFormattedPostedTime());
 
-
         return view;
     }
 }

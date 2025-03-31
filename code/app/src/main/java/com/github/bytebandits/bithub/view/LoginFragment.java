@@ -9,7 +9,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -29,7 +28,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
  */
 public class LoginFragment extends Fragment {
 
-    TextInputEditText userEmailText;
+    TextInputEditText usernameText;
     TextInputEditText passwordText;
     Button login;
     FloatingActionButton back;
@@ -40,7 +39,7 @@ public class LoginFragment extends Fragment {
             @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.login, container, false);
         login = view.findViewById(R.id.loginBtn);
-        userEmailText = view.findViewById(R.id.UserEmailInputText);
+        usernameText = view.findViewById(R.id.UserLoginInputText);
         passwordText = view.findViewById(R.id.PswrdInputText);
         back = view.findViewById(R.id.backActionButton);
 
@@ -59,8 +58,8 @@ public class LoginFragment extends Fragment {
      * Checks to see if provided information is valid
      */
     private void authenticate() {
-        if (!(isEmptyText(userEmailText) || isEmptyText(passwordText))) {
-            String userId = userEmailText.getText().toString();
+        if (!(isEmptyText(usernameText) || isEmptyText(passwordText))) {
+            String userId = usernameText.getText().toString();
             String password = passwordText.getText().toString();
 
             Log.d("LoginFragment", "Attempting login for userId: " + userId);
@@ -91,13 +90,13 @@ public class LoginFragment extends Fragment {
                     ((StartupActivity) requireActivity()).mainActivitySwitch();
                 } else {
                     Log.d("LoginFragment", "Login failed, showing error dialog");
-                    AlertDialog dialog = createDialog("Invalid information!");
+                    AlertDialog dialog = createDialog(getString(R.string.startup_invalid));
                     dialog.show();
                 }
             });
         } else {
             Log.d("LoginFragment", "Empty username or password");
-            AlertDialog dialog = createDialog("No null/empty strings allowed!");
+            AlertDialog dialog = createDialog(getString(R.string.startup_null));
             dialog.show();
         }
     }
@@ -124,7 +123,7 @@ public class LoginFragment extends Fragment {
         builder.setPositiveButton("Close", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
-                userEmailText.setText("");
+                usernameText.setText("");
                 passwordText.setText("");
             }
         });

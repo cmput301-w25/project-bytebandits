@@ -20,11 +20,11 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/UserEmailInputLayout"
+        android:id="@+id/UserLoginInputLayout"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="64dp"
-        android:layout_marginTop="100dp"
+        android:layout_marginTop="150dp"
         android:layout_marginEnd="64dp"
         android:textColorHint="@color/Accent1"
         app:hintTextColor="@color/Accent1"
@@ -33,11 +33,11 @@
         app:layout_constraintTop_toBottomOf="@+id/loginText">
 
         <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/UserEmailInputText"
+            android:id="@+id/UserLoginInputText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:fontFamily="@font/stix_two_text_bold"
-            android:hint="@string/login_user_email"
+            android:hint="@string/login_user"
             android:scrollHorizontally="false"
             android:singleLine="true"
             android:textColor="#A59289"
@@ -57,7 +57,7 @@
         app:hintTextColor="@color/Accent1"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/UserEmailInputLayout">
+        app:layout_constraintTop_toBottomOf="@+id/UserLoginInputLayout">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/PswrdInputText"

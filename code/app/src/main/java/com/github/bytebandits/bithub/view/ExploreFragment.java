@@ -94,7 +94,6 @@ public class ExploreFragment extends Fragment implements GoogleMap.OnMarkerClick
                     dataList.addAll(posts);
 
                 });
-
             });
         });
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(getActivity());

@@ -15,23 +15,11 @@
         android:focusable="auto"
         android:focusableInTouchMode="true">
 
-        <ListView
-            android:id="@+id/mood_post_list_history"
-            android:layout_width="415dp"
-            android:layout_height="627dp"
-            android:layout_marginStart="1dp"
-            android:layout_marginEnd="1dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.538"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/divider4" />
-
         <TextView
             android:id="@+id/username_textview"
             android:layout_width="211dp"
             android:layout_height="57dp"
-            android:layout_marginTop="130dp"
+            android:layout_marginTop="100dp"
             android:layout_marginBottom="45dp"
             android:fontFamily="@font/stix_two_text_italic"
             android:gravity="center"
@@ -101,6 +89,22 @@
             android:src="@drawable/baseline_group_add_24"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
+
+        <ListView
+            android:id="@+id/mood_post_list_history"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:scrollbarSize="3dp"
+            android:scrollbarStyle="outsideOverlay"
+            android:scrollbars="vertical"
+            android:scrollingCache="true"
+            android:smoothScrollbar="true"
+            android:nestedScrollingEnabled="true"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/divider4" />
 
         <!--        <ImageView-->
 <!--            android:id="@+id/profile_picture"-->
