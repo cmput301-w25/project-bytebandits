@@ -11,6 +11,7 @@ material = "1.10.0"
 activity = "1.10.0"
 constraintlayout = "2.1.4"
 firebaseFirestore = "25.1.2"
+mockitoAndroid = "5.10.0"
 mockitoCore = "5.7.0"
 playServicesLocation = "21.1.0"
 playServicesMaps = "19.1.0"
@@ -31,6 +32,7 @@ material = { group = "com.google.android.material", name = "material", version.r
 activity = { group = "androidx.activity", name = "activity", version.ref = "activity" }
 constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayout", version.ref = "constraintlayout" }
 firebase-firestore = { group = "com.google.firebase", name = "firebase-firestore", version.ref = "firebaseFirestore" }
+mockito-android = { module = "org.mockito:mockito-android", version.ref = "mockitoAndroid" }
 mockito-core = { module = "org.mockito:mockito-core", version.ref = "mockitoCore" }
 play-services-location = { module = "com.google.android.gms:play-services-location", version.ref = "playServicesLocation" }
 play-services-maps = { module = "com.google.android.gms:play-services-maps", version.ref = "playServicesMaps" }

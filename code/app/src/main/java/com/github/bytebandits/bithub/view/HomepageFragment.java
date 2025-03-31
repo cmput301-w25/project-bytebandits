@@ -83,7 +83,7 @@ public class HomepageFragment extends Fragment implements FilterDialog.FilterLis
         }
 
         executor.execute(() -> {
-                DatabaseManager.getInstance().getAllFollowerPosts(SessionManager.getInstance(requireContext()).getUserId(), posts -> {
+                DatabaseManager.getInstance().getAllFollowerPosts(SessionManager.getInstance(getContext()).getUserId(), posts -> {
                     if (posts == null) {
                         Log.e("HomepageFragment", "Error: posts is null");
                     }
