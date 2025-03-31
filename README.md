@@ -28,7 +28,7 @@ The app features a dynamic mood map feed, giving users a real-time view of emoti
 ## Setup Instructions
 
 1. Download `google-services.json` and put it in the `code/app/` directory.
-2. Add API key to `secrets.properties` in the `code/app/`.
+2. Add API key to `secrets.properties` in the `code/` directory.
     - MAPS_API_KEY=AIzaSyC_KGgid8HfeN2ruATSSA63Do6K_lI7trc
 
 ## Documentation
