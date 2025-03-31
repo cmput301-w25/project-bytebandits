@@ -12,6 +12,7 @@ import com.google.firebase.firestore.*;
 import org.jetbrains.annotations.NotNull;
 import java.util.*;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.inject.Singleton;
 
@@ -193,52 +194,94 @@ public final class DatabaseManager {
     public void getNotifications(String userId, OnNotificationsFetchListener listener) {
         DocumentReference userDocRef = this.usersCollectionRef.document(userId);
         userDocRef.get().addOnSuccessListener(userDocSnapshot -> {
-            if (!userDocSnapshot.exists()) {
-                Log.d("DatabaseManager", "User document does not exist.");
-                return;
-            }
             ArrayList<MoodPost> postNotifications = new ArrayList<>();
             ArrayList<HashMap<String, Object>> requestNotifications = new ArrayList<>();
+            if (!userDocSnapshot.exists()) {
+                listener.onNotificationsFetchListener(postNotifications, new ArrayList<>());
+                return;
+            };
+
+            // Prepare lists of tasks
+            List<Task<DocumentSnapshot>> postTasks = new ArrayList<>();
+            List<Task<DocumentSnapshot>> requestTasks = new ArrayList<>();
 
             // Fetch post notifications
-            if (userDocSnapshot.contains(DocumentReferences.NOTIFICATION_POSTS.getDocRefString())) {
-                List<DocumentReference> postRefs =
-                        (List<DocumentReference>) userDocSnapshot.get(DocumentReferences.NOTIFICATION_POSTS.getDocRefString());
-
+            Object postRefsObj = userDocSnapshot.get(DocumentReferences.NOTIFICATION_POSTS.getDocRefString());
+            if (postRefsObj instanceof List) {
+                List<DocumentReference> postRefs = (List<DocumentReference>) postRefsObj;
                 for (DocumentReference postRef : postRefs) {
-                    postRef.get().addOnSuccessListener(postDoc -> {
-                        if (postDoc.exists()) {
-                            MoodPost post = postDoc.toObject(MoodPost.class);
-                            postNotifications.add(post);
-                            Log.d("DatabaseManager", "Post notification fetched: " + post.toString());
-                        }
-                    }).addOnFailureListener(e -> Log.e("DatabaseManager", "Error fetching post: " + e.getMessage(), e));
+                    postTasks.add(postRef.get());
                 }
-            } else {
-                Log.d("DatabaseManager", "No post notifications found.");
             }
 
             // Fetch request notifications
-            if (userDocSnapshot.contains(DocumentReferences.NOTIFICATION_REQS.getDocRefString())) {
-                List<DocumentReference> userRefs =
-                        (List<DocumentReference>) userDocSnapshot.get(DocumentReferences.NOTIFICATION_REQS.getDocRefString());
-                Log.d("DatabaseManager", "Request notifications: " + userRefs);
-
-                for (DocumentReference userRef : userRefs) {
-                    userRef.get().addOnSuccessListener(userDoc -> {
-                        if (userDoc.exists()) {
-                            HashMap<String, Object> user = (HashMap<String, Object>) userDoc.getData();
-                            requestNotifications.add(user);
-                        }
-                    });
+            Object requestRefsObj = userDocSnapshot.get(DocumentReferences.NOTIFICATION_REQS.getDocRefString());
+            if (requestRefsObj instanceof List) {
+                List<DocumentReference> requestRefs = (List<DocumentReference>) requestRefsObj;
+                for (DocumentReference requestRef : requestRefs) {
+                    requestTasks.add(requestRef.get());
                 }
-            } else {
-                Log.d("DatabaseManager", "No request notifications found.");
             }
 
-            listener.onNotificationsFetchListener(postNotifications, requestNotifications);
+            // If no tasks, immediately return
+            if (postTasks.isEmpty() && requestTasks.isEmpty()) {
+                listener.onNotificationsFetchListener(postNotifications, requestNotifications);
+                return;
+            }
+
+            // Create a list to track all tasks
+            List<Task<DocumentSnapshot>> allTasks = new ArrayList<>();
+            allTasks.addAll(postTasks);
+            allTasks.addAll(requestTasks);
+
+            // Wait for all tasks to complete
+            Tasks.whenAll(allTasks).addOnCompleteListener(task -> {
+                // Process post notifications
+                for (Task<DocumentSnapshot> postTask : postTasks) {
+                    if (postTask.isSuccessful()) {
+                        DocumentSnapshot postDoc = postTask.getResult();
+                        if (postDoc.exists()) {
+                            try {
+                                MoodPost post = postDoc.toObject(MoodPost.class);
+
+                                // Handle profile conversion if needed
+                                if (post != null) {
+                                    postNotifications.add(post);
+                                    Log.d("DatabaseManager", "Post notification fetched: " + post.toString());
+                                }
+                            } catch (Exception e) {
+                                Log.e("DatabaseManager", "Error processing post", e);
+                            }
+                        }
+                    } else {
+                        Log.e("DatabaseManager", "Post task failed: " + postTask.getException());
+                    }
+                }
+
+                // Process request notifications
+                for (Task<DocumentSnapshot> requestTask : requestTasks) {
+                    if (requestTask.isSuccessful()) {
+                        DocumentSnapshot userDoc = requestTask.getResult();
+                        if (userDoc.exists()) {
+                            try {
+                                HashMap<String, Object> user = new HashMap<>(userDoc.getData());
+                                requestNotifications.add(user);
+                                Log.d("DatabaseManager", "Request notification fetched: " + user.toString());
+                            } catch (Exception e) {
+                                Log.e("DatabaseManager", "Error processing request", e);
+                            }
+                        }
+                    } else {
+                        Log.e("DatabaseManager", "Request task failed: " + requestTask.getException());
+                    }
+                }
+
+                // Call listener with all fetched notifications
+                listener.onNotificationsFetchListener(postNotifications, requestNotifications);
+            });
         }).addOnFailureListener(e -> {
-            Log.e("DatabaseManager", "Error fetching notifications: " + e.getMessage(), e);
+            Log.e("DatabaseManager", "Error fetching user document: " + e.getMessage(), e);
+            listener.onNotificationsFetchListener(new ArrayList<>(), new ArrayList<>());
         });
     }
 
@@ -255,6 +298,23 @@ public final class DatabaseManager {
         userDocRef.update(DocumentReferences.NOTIFICATION_POSTS.getDocRefString(), FieldValue.arrayRemove(postDocRef));
     }
 
+    public void clearAllNotifications(String userId) {
+        DocumentReference userDocRef = this.usersCollectionRef.document(userId);
+
+        // Clear both post and request notifications
+        Map<String, Object> updates = new HashMap<>();
+        updates.put(DocumentReferences.NOTIFICATION_POSTS.getDocRefString(), new ArrayList<>());
+        updates.put(DocumentReferences.NOTIFICATION_REQS.getDocRefString(), new ArrayList<>());
+
+        userDocRef.update(updates)
+                .addOnSuccessListener(aVoid -> {
+                    Log.d("DatabaseManager", "All notifications cleared successfully");
+                })
+                .addOnFailureListener(e -> {
+                    Log.e("DatabaseManager", "Error clearing notifications", e);
+                });
+    }
+
 
     /**
      * Sends a follow request to a specific user.
@@ -266,9 +326,6 @@ public final class DatabaseManager {
     public void sendFollowRequest(String currentUserId, String requestedUserId) {
         DocumentReference currentDocRef = this.usersCollectionRef.document(currentUserId);
         this.sendNotification(requestedUserId, currentDocRef, DocumentReferences.NOTIFICATION_REQS);
-
-        // TODO: REMOVE LATER
-//         this.acceptUserFollow(requestedUserId, currentUserId);
     }
 
     /**
@@ -429,7 +486,8 @@ public final class DatabaseManager {
         DocumentReference userDocRef = usersCollectionRef.document(userId);
         userDocRef.update(DocumentReferences.POSTS.getDocRefString(), FieldValue.arrayUnion(postDocRef));
 
-        sendPostNotifications(userDocRef, postDocRef);
+        if (!post.isPrivate())
+            sendPostNotifications(userDocRef, postDocRef);
     }
 
     /**
@@ -549,6 +607,8 @@ public final class DatabaseManager {
                             if (allPosts.isEmpty()) {
                                 Log.d("DatabaseManager", "No public posts found from followed users.");
                             }
+
+                            allPosts.sort((p1, p2) -> p2.getPostedDateTime().compareTo(p1.getPostedDateTime()));
                             listener.onPostsFetched(allPosts);
                         }
                     }).addOnFailureListener(e -> {
@@ -674,61 +734,40 @@ public final class DatabaseManager {
      *                 });
      */
     public void getUserPosts(@NotNull String userId, OnPostsFetchListener listener) {
-        ArrayList<MoodPost> posts = new ArrayList<>();
-        usersCollectionRef.document(userId).get().addOnCompleteListener(task -> {
-            if (task.isSuccessful() && task.getResult() != null) {
-                DocumentSnapshot userSnapshot = task.getResult();
-                Object postRefsObject = userSnapshot.get("postRefs");
+        DocumentReference userDocRef = usersCollectionRef.document(userId);
+        userDocRef.get().addOnSuccessListener(userSnapshot  -> {
+            if (!userSnapshot.exists() || !userSnapshot.contains(DocumentReferences.POSTS.getDocRefString())) {
+                Log.d("DatabaseManager", "User document does not exist or has no postRefs");
+                listener.onPostsFetched(new ArrayList<>());
+                return;
+            }
 
-                List<DocumentReference> postRefs = new ArrayList<>();
+            ArrayList<DocumentReference> postRefs = (ArrayList<DocumentReference>) userSnapshot.get(DocumentReferences.POSTS.getDocRefString());
+            AtomicInteger remainingPosts = new AtomicInteger(postRefs.size());
+            List<MoodPost> posts = Collections.synchronizedList(new ArrayList<>());
 
-                if (postRefsObject instanceof List) {
-                    List<?> rawList = (List<?>) postRefsObject;
-                    for (Object item : rawList) {
-                        if (item instanceof DocumentReference) {
-                            postRefs.add((DocumentReference) item);
-                        } else if (item instanceof String) {
-                            // Convert string to DocumentReference
-                            postRefs.add(firestoreDb.document((String) item));
-                        } else {
-                            Log.e("getUserPosts", "Unexpected item in postRefs: " + item);
-                        }
-                    }
-                }
-
-                if (postRefs.isEmpty()) {
-                    Log.d("getUserPosts", "postRefs is empty");
-                    listener.onPostsFetched(posts);
-                    return;
-                } else {
-                    Log.d("getUserPosts", "postRefs size: " + postRefs.size());
-                    for (DocumentReference ref : postRefs) {
-                        Log.d("getUserPosts", "postRef: " + ref.getPath());
-                    }
-                }
-
-                int[] postRemaining = { postRefs.size() }; // Track individual post retrieval
-
-                for (DocumentReference postRef : postRefs) {
-                    postRef.get().addOnCompleteListener(postTask -> {
-                        if (postTask.isSuccessful() && postTask.getResult().exists()) {
-                            MoodPost moodPost = postTask.getResult().toObject(MoodPost.class);
+            for (DocumentReference postRef : postRefs) {
+                postRef.get().addOnSuccessListener(postSnapshot -> {
+                    if (postSnapshot.exists()) {
+                        MoodPost moodPost = postSnapshot.toObject(MoodPost.class);
+                        if (moodPost != null) {
                             posts.add(moodPost);
-                            Log.d("getUserPosts", "Fetched post: " + moodPost);
-                        } else {
-                            Log.d("getUserPosts", "Failed to fetch post: " + postRef.getPath());
+                            Log.d("DatabaseManager", "Fetched post: " + moodPost);
                         }
-                        postRemaining[0]--;
+                    } else {
+                        Log.d("DatabaseManager", "Post not found: " + postRef.getPath());
+                    }
 
-                        // When all postRefs are processed, update the map
-                        if (postRemaining[0] == 0) {
-                            Log.d("getUserPosts", "All posts fetched, returning list");
-                            listener.onPostsFetched(posts);
-                        }
-                    });
-                }
-            } else {
-                Log.e("getUserPosts", "Failed to fetch user document", task.getException());
+                    if (remainingPosts.decrementAndGet() == 0) {
+                        posts.sort((p1, p2) -> p2.getPostedDateTime().compareTo(p1.getPostedDateTime()));
+                        listener.onPostsFetched(new ArrayList<MoodPost>(posts));
+                    }
+                }).addOnFailureListener(e -> {
+                    Log.e("DatabaseManager", "Error fetching post: " + postRef.getPath(), e);
+                    if (remainingPosts.decrementAndGet() == 0) {
+                        listener.onPostsFetched(new ArrayList<MoodPost>(posts));
+                    }
+                });
             }
         });
     }

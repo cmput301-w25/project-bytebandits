@@ -110,6 +110,8 @@ public class ProfileFragment extends Fragment implements FilterDialog.FilterList
                                     followingButton.setImageResource(R.drawable.baseline_group_remove_24);
                                     followingButton.setOnClickListener(v -> {
                                         DatabaseManager.getInstance().unfollowUser(loggedInUser, userId);
+                                        Toast.makeText(requireContext(), "Unfollowed!", Toast.LENGTH_SHORT).show();
+
                                     });
                                 } else {
                                     followingButton.setVisibility(View.VISIBLE);

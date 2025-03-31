@@ -1,5 +1,7 @@
 package com.github.bytebandits.bithub.view;
 
+import android.app.AlertDialog;
+import android.content.Context;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -7,6 +9,7 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
+import android.location.Location;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -22,6 +25,8 @@ import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import com.github.bytebandits.bithub.controller.DatabaseManager;
 import com.github.bytebandits.bithub.R;
+import com.github.bytebandits.bithub.controller.SessionManager;
+import com.github.bytebandits.bithub.model.MoodMarker;
 import com.github.bytebandits.bithub.model.MoodPost;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
@@ -34,8 +39,17 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MapColorScheme;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.ListenerRegistration;
+import com.google.maps.android.clustering.Cluster;
+import com.google.maps.android.clustering.ClusterManager;
+import com.google.maps.android.clustering.view.ClusterRenderer;
+import com.google.maps.android.clustering.view.DefaultClusterRenderer;
 
 import android.Manifest;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -49,6 +63,11 @@ public class ExploreFragment extends Fragment implements GoogleMap.OnMarkerClick
     private final ExecutorService executor = Executors.newSingleThreadExecutor();
     private final Handler mainHandler = new Handler(Looper.getMainLooper());
     private static final int REQUEST_LOCATION_PERMISSION = 1001;
+
+    private ListenerRegistration postsListener;
+
+    private ClusterManager<MoodMarker> clusterManager;
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -61,18 +80,21 @@ public class ExploreFragment extends Fragment implements GoogleMap.OnMarkerClick
         } else {
             Log.d("ExploreFragment", "dataList already initialized with size: " + dataList.size());
         }
+        
+        setupPostsRealTimeListener();
+        
         // Listener so that dataList gets updated whenever the database does
         executor.execute(() -> {
-                    DatabaseManager.getInstance().getAllPublicPosts(posts -> {
-                        if (posts != null) {
-                            Log.e("ExploreFragment", "Error: posts is null");
-                        }
-                        mainHandler.post(() -> {
-                            dataList.clear();
-                            dataList.addAll(posts);
+            DatabaseManager.getInstance().getAllFollowerPosts(SessionManager.getInstance(requireContext()).getProfile().getUserId(),posts -> {
+                if (posts != null) {
+                    Log.e("ExploreFragment", "Error: posts is null");
+                }
+                mainHandler.post(() -> {
+                    dataList.clear();
+                    dataList.addAll(posts);
 
-                        });
-                    });
+                });
+            });
         });
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(getActivity());
 
@@ -84,6 +106,7 @@ public class ExploreFragment extends Fragment implements GoogleMap.OnMarkerClick
 
         return view;
     }
+
     /**
      * Finds the exact MoodPost matching the marker's location
      * @param marker The marker that was clicked
@@ -105,87 +128,33 @@ public class ExploreFragment extends Fragment implements GoogleMap.OnMarkerClick
 
         return null;
     }
-    @Override
-    public void onMapReady(GoogleMap map) {
-        googleMap = map;
-        googleMap.setMapColorScheme(MapColorScheme.DARK);
-        // Check for location permissions
-        if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION)
-                != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getActivity(),
-                Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
 
-            requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION,
-                    Manifest.permission.ACCESS_COARSE_LOCATION}, REQUEST_LOCATION_PERMISSION);
-            return;
+    private MoodPost findExactPost(MoodMarker moodMarker, List<MoodPost> posts) {
+        if (posts == null || posts.isEmpty()) {
+            return null;
         }
-        googleMap.setMyLocationEnabled(true);
-
-        // Get and update to the current location
-        fusedLocationClient.getLastLocation().addOnSuccessListener(getActivity(), location -> {
-            if (location != null && googleMap != null) {
-                // Convert current location to a LatLng
-                LatLng currentLatLng = new LatLng(location.getLatitude(), location.getLongitude());
-
-                for (MoodPost moodPost : dataList) {
-                    LatLng moodPostLatLng = new LatLng(moodPost.getLatitude(), moodPost.getLongitude());
-                    Drawable drawable = ContextCompat.getDrawable(requireContext(), moodPost.getEmotion().getLogoID());
-                    int desiredWidth = 240; // Adjust this value as needed
-                    int desiredHeight = 240; // Adjust this value as needed
-
-                    // Create a bitmap with the desired dimensions
-                    Bitmap bitmap = Bitmap.createBitmap(desiredWidth, desiredHeight, Bitmap.Config.ARGB_8888);
-                    Canvas canvas = new Canvas(bitmap);
-
-                    // Draw the off-white rounded rectangle with shadow
-                    Paint rectPaint = new Paint();
-                    rectPaint.setColor(Color.parseColor("#D3D3D3")); // Light gray color
-                    rectPaint.setAntiAlias(true);
-                    rectPaint.setShadowLayer(10f, 0f, 5f, Color.BLACK); // Shadow effect
-                    float cornerRadius = 40f; // Adjust corner radius as needed
-                    float padding = 20f; // Padding around the icon
-                    canvas.drawRoundRect(padding, padding, desiredWidth - padding, desiredHeight - padding, cornerRadius, cornerRadius, rectPaint);
-
-                    float drawablePadding = 30f; // Padding specifically for the drawable
-                    drawable.setBounds((int) (padding + drawablePadding), (int) (padding + drawablePadding), (int) (desiredWidth - padding - drawablePadding), (int) (desiredHeight - padding - drawablePadding - 40f)); // Leave space for text background
-                    drawable.draw(canvas); // Draw the drawable on top of the rectangle
-
-                    // Add a rounded black background for the text
-                    Paint textBackgroundPaint = new Paint();
-                    textBackgroundPaint.setColor(Color.WHITE); // White background for text
-                    textBackgroundPaint.setAntiAlias(true);
-                    float textBackgroundHeight = 50f; // Height of the text background
-                    float textBackgroundTop = desiredHeight - textBackgroundHeight - padding;
-                    canvas.drawRoundRect(padding + 10f, textBackgroundTop, desiredWidth - padding - 10f, textBackgroundTop + textBackgroundHeight, cornerRadius / 2, cornerRadius / 2, textBackgroundPaint);
-
-                    // Add text to the bitmap
-                    Paint textPaint = new Paint();
-                    textPaint.setColor(Color.BLACK); // Set text color to black
-                    textPaint.setTextSize(50f); // Set text size
-                    textPaint.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.BOLD_ITALIC)); // Bold and italic
-                    textPaint.setAntiAlias(true);
-                    textPaint.setTextAlign(Paint.Align.CENTER);
-
-                    // Calculate the position for the text with padding
-                    float xPos = canvas.getWidth() / 2f;
-                    float yPos = textBackgroundTop + textBackgroundHeight / 2f - ((textPaint.descent() + textPaint.ascent()) / 2f);
-
-                    // Draw the text on the canvas after the drawable
-                    String userId = "@" + moodPost.getProfile().getUserId();
-                    canvas.drawText(userId, xPos, yPos, textPaint);
-                    googleMap.addMarker(new MarkerOptions().position(moodPostLatLng).title(moodPost.getProfile().getUserId()).icon(BitmapDescriptorFactory.fromBitmap(bitmap)));
-                }
-                // Move and zoom the camera to the user's location
-                googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(currentLatLng, 15));
+        for (MoodPost post : posts) {
+            if (moodMarker.getPosition().latitude == post.getLatitude() &&
+                    moodMarker.getPosition().longitude == post.getLongitude()) {
+                return post;
             }
-        });
-        googleMap.setOnMarkerClickListener(this);
+        }
+        return null;
+    }
 
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        // Remove Firestore listener to prevent memory leaks
+        if (postsListener != null) {
+            postsListener.remove();
+        }
     }
 
     @Override
     public boolean onMarkerClick(@NonNull Marker marker) {
         executor.execute(() -> {
-            DatabaseManager.getInstance().getAllPublicPosts(posts -> {
+            DatabaseManager.getInstance().getAllFollowerPosts(SessionManager.getInstance(requireContext()).getUserId(),posts -> {
                 if (posts == null) {
                     Log.e("ExploreFragment", "Error: posts is null");
                 }
@@ -234,5 +203,227 @@ public class ExploreFragment extends Fragment implements GoogleMap.OnMarkerClick
         } else {
             super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         }
+    }
+    private List getDisplayStrings(List moodPosts) {
+        List displayStrings = new ArrayList<MoodPost>();
+        for (Object post : moodPosts) {
+// For example, display the userID and perhaps a snippet of content.
+            if (post instanceof MoodPost) {
+                displayStrings.add("@" + ((MoodPost) post).getProfile().getUserId());
+            }
+        }
+        return displayStrings;
+    }
+
+    private LatLng currentUserLocation;
+    private static final double MAX_DISTANCE_KM = 5.0; // 5 km radius
+
+    private void setupPostsRealTimeListener() {
+        DatabaseManager databaseManager = DatabaseManager.getInstance();
+        CollectionReference postsRef = databaseManager.getPostsCollectionRef();
+
+        postsListener = postsRef.addSnapshotListener((querySnapshot, e) -> {
+            if (e != null) {
+                Log.w("ExploreFragment", "Listen failed.", e);
+                return;
+            }
+
+            if (querySnapshot != null) {
+                // Fetch all public posts
+                databaseManager.getAllFollowerPosts(SessionManager.getInstance(requireContext()).getUserId(),posts -> {
+                    mainHandler.post(() -> {
+                        // Clear existing data and markers
+                        dataList.clear();
+                        if (clusterManager != null) {
+                            clusterManager.clearItems();
+                        }
+
+                        // Add new posts within 5km
+                        if (posts != null && !posts.isEmpty()) {
+                            filterPostsByDistance(posts);
+
+                            // Rerender markers if map is ready
+                            if (googleMap != null) {
+                                renderMapMarkers();
+                            }
+                        }
+                    });
+                });
+            }
+        });
+    }
+
+    private void filterPostsByDistance(List<MoodPost> posts) {
+        if (currentUserLocation == null) return;
+
+        dataList.clear();
+        for (MoodPost post : posts) {
+            if (Boolean.TRUE.equals(post.getLocation())) {
+                LatLng postLocation = new LatLng(post.getLatitude(), post.getLongitude());
+                double distance = calculateDistance(currentUserLocation, postLocation);
+
+                if (distance <= MAX_DISTANCE_KM) {
+                    dataList.add(post);
+                }
+            }
+        }
+    }
+
+    private double calculateDistance(LatLng point1, LatLng point2) {
+        float[] results = new float[1];
+        Location.distanceBetween(
+                point1.latitude, point1.longitude,
+                point2.latitude, point2.longitude,
+                results
+        );
+        // Convert meters to kilometers
+        return results[0] / 1000.0;
+    }
+
+    @Override
+    public void onMapReady(GoogleMap map) {
+        googleMap = map;
+        googleMap.setMapColorScheme(MapColorScheme.DARK);
+        if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getActivity(),
+                Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+
+            requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION,
+                    Manifest.permission.ACCESS_COARSE_LOCATION}, REQUEST_LOCATION_PERMISSION);
+            return;
+        }
+        googleMap.setMyLocationEnabled(true);
+
+        // ... existing permission checks ...
+
+        fusedLocationClient.getLastLocation().addOnSuccessListener(getActivity(), location -> {
+            if (location != null && googleMap != null) {
+                // Store current user location
+                currentUserLocation = new LatLng(location.getLatitude(), location.getLongitude());
+
+                clusterManager = new ClusterManager<>(requireContext(), googleMap);
+                myClusterRenderer myClusterRenderer = new myClusterRenderer(requireContext(), googleMap, clusterManager);
+                clusterManager.setRenderer(myClusterRenderer);
+
+                // Update cluster click listener to use filtered posts
+                clusterManager.setOnClusterClickListener(cluster -> {
+                    List<MoodPost> clusterPosts = new ArrayList<>();
+                    for (Object moodMarker : cluster.getItems()) {
+                        if (moodMarker instanceof MoodMarker) {
+                            clusterPosts.add(((MoodMarker) moodMarker).getMoodPost());
+                        }
+                    }
+                    showMoodPostsListDialog(clusterPosts);
+                    return true;
+                });
+
+                // Update cluster item click listener
+                clusterManager.setOnClusterItemClickListener(moodMarker -> {
+                    executor.execute(() -> {
+                        DatabaseManager.getInstance().getAllFollowerPosts(SessionManager.getInstance(requireContext()).getUserId(), posts -> {
+                            mainHandler.post(() -> {
+                                // Filter posts by distance
+                                List<MoodPost> filteredPosts = new ArrayList<>();
+                                for (MoodPost post : posts) {
+                                    if (post.getLocation()) {
+                                        LatLng postLocation = new LatLng(post.getLatitude(), post.getLongitude());
+                                        double distance = calculateDistance(currentUserLocation, postLocation);
+
+                                        if (distance <= MAX_DISTANCE_KM) {
+                                            filteredPosts.add(post);
+                                        }
+                                    }
+                                }
+
+                                MoodPost exactPost = findExactPost(moodMarker, filteredPosts);
+                                DetailedMoodPostFragment detailedMoodPostFragment =
+                                        DetailedMoodPostFragment.newInstance(exactPost);
+                                detailedMoodPostFragment.show(
+                                        getActivity().getSupportFragmentManager(),
+                                        "Detailed Mood Post View"
+                                );
+                            });
+                        });
+                    });
+                    return false;
+                });
+
+                // Render markers within 5km
+                filterPostsByDistance(dataList);
+                renderMapMarkers();
+
+                // Move camera to current location
+                googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(currentUserLocation, 15));
+            }
+        });
+    }
+
+    private void renderMapMarkers() {
+        if (clusterManager == null || googleMap == null) return;
+
+        // Clear existing items
+        clusterManager.clearItems();
+
+        // Add only posts within 5km
+        for (MoodPost moodPost : dataList) {
+            if (Boolean.TRUE.equals(moodPost.getLocation())) {
+                LatLng moodPostLatLng = new LatLng(moodPost.getLatitude(), moodPost.getLongitude());
+
+                MoodMarker moodMarker = new MoodMarker(
+                        moodPostLatLng.latitude,
+                        moodPostLatLng.longitude,
+                        moodPost.getEmotion().getState(),
+                        "@" + moodPost.getProfile().getUserId(),
+                        moodPost
+                );
+
+                clusterManager.addItem(moodMarker);
+            }
+        }
+
+        // Cluster and refresh
+        clusterManager.cluster();
+    }
+
+    private void showMoodPostsListDialog(final List<MoodPost> moodPosts) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
+        builder.setTitle("Nearby Mood Posts");
+
+        // Create a new list with display strings
+        List<String> displayStrings = new ArrayList<>();
+        for (MoodPost post : moodPosts) {
+            // Calculate and display distance
+            LatLng postLocation = new LatLng(post.getLatitude(), post.getLongitude());
+            double distance = calculateDistance(currentUserLocation, postLocation);
+
+            displayStrings.add(String.format("@%s - %s", post.getProfile().getUserId(), post.getEmotion().getState()));
+        }
+
+        ListView listView = new ListView(requireContext());
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(
+                requireContext(),
+                android.R.layout.simple_list_item_1,
+                displayStrings
+        );
+
+        listView.setAdapter(adapter);
+
+        // Handle item clicks in the list
+        listView.setOnItemClickListener((parent, view, position, id) -> {
+            // Get the corresponding MoodPost
+            MoodPost selectedPost = moodPosts.get(position);
+
+            // Open a detailed view dialog or Fragment
+            DetailedMoodPostFragment detailedMoodPostFragment =
+                    DetailedMoodPostFragment.newInstance(selectedPost);
+            detailedMoodPostFragment.show(
+                    getActivity().getSupportFragmentManager(),
+                    "DetailedMoodPost"
+            );
+        });
+
+        builder.setView(listView);
+        builder.setNegativeButton("Cancel", null);
+        builder.show();
     }
 }
